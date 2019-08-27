@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -42,7 +42,7 @@ namespace dnSpy.Debugger.CallStack.TextEditor {
 		[ImportingConstructor]
 		ActiveStatementTaggerProvider(ActiveStatementService activeStatementService) => this.activeStatementService = activeStatementService;
 
-		public ITagger<T> CreateTagger<T>(ITextView textView, ITextBuffer buffer) where T : ITag {
+		public ITagger<T>? CreateTagger<T>(ITextView textView, ITextBuffer buffer) where T : ITag {
 			if (textView.TextBuffer != buffer)
 				return null;
 			return textView.TextBuffer.Properties.GetOrCreateSingletonProperty(() => new ActiveStatementTagger(activeStatementService, textView)) as ITagger<T>;
@@ -51,7 +51,7 @@ namespace dnSpy.Debugger.CallStack.TextEditor {
 
 	sealed class ActiveStatementTagger : ITagger<ITextMarkerTag> {
 		public ITextView TextView { get; }
-		public event EventHandler<SnapshotSpanEventArgs> TagsChanged;
+		public event EventHandler<SnapshotSpanEventArgs>? TagsChanged;
 
 		readonly ActiveStatementService activeStatementService;
 
@@ -66,7 +66,7 @@ namespace dnSpy.Debugger.CallStack.TextEditor {
 		public IEnumerable<ITagSpan<ITextMarkerTag>> GetTags(NormalizedSnapshotSpanCollection spans) =>
 			activeStatementService.GetTags(this, spans);
 
-		void TextView_Closed(object sender, EventArgs e) {
+		void TextView_Closed(object? sender, EventArgs e) {
 			TextView.Closed -= TextView_Closed;
 			activeStatementService.OnDisposed(this);
 		}

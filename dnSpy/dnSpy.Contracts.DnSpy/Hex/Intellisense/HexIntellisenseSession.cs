@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -49,12 +49,12 @@ namespace dnSpy.Contracts.Hex.Intellisense {
 		/// <summary>
 		/// Gets the presenter
 		/// </summary>
-		public abstract HexIntellisensePresenter Presenter { get; }
+		public abstract HexIntellisensePresenter? Presenter { get; }
 
 		/// <summary>
 		/// Raised after <see cref="Presenter"/> is changed
 		/// </summary>
-		public abstract event EventHandler PresenterChanged;
+		public abstract event EventHandler? PresenterChanged;
 
 		/// <summary>
 		/// Starts the session
@@ -69,7 +69,7 @@ namespace dnSpy.Contracts.Hex.Intellisense {
 		/// <summary>
 		/// Raised after <see cref="Dismiss"/> is called
 		/// </summary>
-		public abstract event EventHandler Dismissed;
+		public abstract event EventHandler? Dismissed;
 
 		/// <summary>
 		/// true if the session has been dismissed
@@ -84,7 +84,7 @@ namespace dnSpy.Contracts.Hex.Intellisense {
 		/// <summary>
 		/// Raised after <see cref="Recalculate"/> is called
 		/// </summary>
-		public abstract event EventHandler Recalculated;
+		public abstract event EventHandler? Recalculated;
 
 		/// <summary>
 		/// Tries to get a match

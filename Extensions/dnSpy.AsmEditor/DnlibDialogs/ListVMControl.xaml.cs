@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -25,7 +25,7 @@ namespace dnSpy.AsmEditor.DnlibDialogs {
 	sealed partial class ListVMControl : UserControl {
 		public ListVMControl() => InitializeComponent();
 
-		void listBox_MouseDoubleClick(object sender, MouseButtonEventArgs e) {
+		void listBox_MouseDoubleClick(object? sender, MouseButtonEventArgs e) {
 			if (!UIUtilities.IsLeftDoubleClick<ListBoxItem>(listBox, e))
 				return;
 			if (DataContext is ListVM data)

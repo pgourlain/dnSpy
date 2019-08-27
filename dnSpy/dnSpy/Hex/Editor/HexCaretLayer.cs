@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -38,7 +38,7 @@ namespace dnSpy.Hex.Editor {
 		const double INACTIVE_CARET_HEIGHT = 2.0;
 
 		public HexColumnType ActiveColumn {
-			get { return activeColumn; }
+			get => activeColumn;
 			set {
 				if (value != HexColumnType.Values && value != HexColumnType.Ascii)
 					throw new ArgumentOutOfRangeException(nameof(value));
@@ -51,7 +51,7 @@ namespace dnSpy.Hex.Editor {
 		HexColumnType activeColumn;
 
 		public bool IsValuesCaretPresent {
-			get { return isValuesCaretPresent; }
+			get => isValuesCaretPresent;
 			set {
 				if (isValuesCaretPresent != value) {
 					isValuesCaretPresent = value;
@@ -62,7 +62,7 @@ namespace dnSpy.Hex.Editor {
 		bool isValuesCaretPresent;
 
 		public bool IsAsciiCaretPresent {
-			get { return isAsciiCaretPresent; }
+			get => isAsciiCaretPresent;
 			set {
 				if (isAsciiCaretPresent != value) {
 					isAsciiCaretPresent = value;
@@ -75,17 +75,17 @@ namespace dnSpy.Hex.Editor {
 		readonly CaretGeometry valuesCaretGeometry;
 		readonly CaretGeometry asciiCaretGeometry;
 
-		Brush activeCaretBrush;
-		Brush activeOverwriteCaretBrush;
-		Brush inactiveCaretBrush;
-		Brush inactiveOverwriteCaretBrush;
+		Brush? activeCaretBrush;
+		Brush? activeOverwriteCaretBrush;
+		Brush? inactiveCaretBrush;
+		Brush? inactiveOverwriteCaretBrush;
 
 		bool drawCaretShape;
 		bool overwriteMode;
-		DispatcherTimer dispatcherTimer;
+		DispatcherTimer? dispatcherTimer;
 
 		public bool OverwriteMode {
-			get { return overwriteMode; }
+			get => overwriteMode;
 			set {
 				if (overwriteMode != value) {
 					overwriteMode = value;
@@ -137,7 +137,7 @@ namespace dnSpy.Hex.Editor {
 		public double AsciiWidth => asciiCaretGeometry.Rect.Width;
 
 		public bool IsHidden {
-			get { return isHidden; }
+			get => isHidden;
 			set {
 				if (isHidden == value)
 					return;
@@ -159,7 +159,7 @@ namespace dnSpy.Hex.Editor {
 		readonly VSTC.IClassificationType inactiveCaretClassificationType;
 
 		public HexCaretLayer(HexCaretImpl hexCaret, HexAdornmentLayer layer, VSTC.IClassificationFormatMap classificationFormatMap, VSTC.IClassificationTypeRegistryService classificationTypeRegistryService) {
-			if (classificationTypeRegistryService == null)
+			if (classificationTypeRegistryService is null)
 				throw new ArgumentNullException(nameof(classificationTypeRegistryService));
 			overwriteMode = true;
 			this.hexCaret = hexCaret ?? throw new ArgumentNullException(nameof(hexCaret));
@@ -177,7 +177,7 @@ namespace dnSpy.Hex.Editor {
 			AddAdornment();
 		}
 
-		void ClassificationFormatMap_ClassificationFormatMappingChanged(object sender, EventArgs e) {
+		void ClassificationFormatMap_ClassificationFormatMappingChanged(object? sender, EventArgs e) {
 			activeCaretBrush = null;
 			activeOverwriteCaretBrush = null;
 			inactiveCaretBrush = null;
@@ -185,19 +185,19 @@ namespace dnSpy.Hex.Editor {
 			InvalidateVisual();
 		}
 
-		void VisualElement_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e) {
+		void VisualElement_IsVisibleChanged(object? sender, DependencyPropertyChangedEventArgs e) {
 			if (!layer.HexView.VisualElement.IsVisible)
 				StopTimer();
 			else
 				UpdateCaretProperties();
 		}
 
-		void VisualElement_GotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e) {
+		void VisualElement_GotKeyboardFocus(object? sender, KeyboardFocusChangedEventArgs e) {
 			if (!IsHidden)
 				UpdateCaretProperties();
 		}
 
-		void VisualElement_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e) {
+		void VisualElement_LostKeyboardFocus(object? sender, KeyboardFocusChangedEventArgs e) {
 			layer.Opacity = 0;
 			StopTimer();
 		}
@@ -205,15 +205,15 @@ namespace dnSpy.Hex.Editor {
 		void RemoveAdornment() => layer.RemoveAllAdornments();
 		void AddAdornment() => layer.AddAdornment(VSTE.AdornmentPositioningBehavior.OwnerControlled, (HexBufferSpan?)null, null, this, null);
 
-		struct SelectionState {
-			byte state;
+		readonly struct SelectionState {
+			readonly byte state;
 
 			public SelectionState(HexSelection selection) => state = (byte)(selection.IsEmpty ? 1 : 0);
 
 			public bool Equals(SelectionState other) => state == other.state;
 		}
 
-		void Selection_SelectionChanged(object sender, EventArgs e) {
+		void Selection_SelectionChanged(object? sender, EventArgs e) {
 			if (!new SelectionState(layer.HexView.Selection).Equals(oldSelectionState)) {
 				// Delay this because the caret's position hasn't been updated yet.
 				layer.HexView.VisualElement.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(UpdateCaretProperties));
@@ -295,8 +295,8 @@ namespace dnSpy.Hex.Editor {
 			return new Rect(left, top, right - left, bottom - top);
 		}
 
-		Rect GetCaretRect(HexViewLine line, bool drawOverwriteMode, HexColumnType column, HexCell cell, int cellPosition) {
-			if (cell == null)
+		Rect GetCaretRect(HexViewLine line, bool drawOverwriteMode, HexColumnType column, HexCell? cell, int cellPosition) {
+			if (cell is null)
 				return new Rect();
 
 			int linePosition = cell.CellSpan.Start + Math.Max(0, Math.Min(cell.CellSpan.Length - 1, cellPosition));
@@ -331,7 +331,7 @@ namespace dnSpy.Hex.Editor {
 		}
 
 		void StartTimer() {
-			if (dispatcherTimer != null)
+			if (!(dispatcherTimer is null))
 				throw new InvalidOperationException();
 			// Make sure the caret doesn't blink when it's moved
 			layer.Opacity = 1;
@@ -340,15 +340,15 @@ namespace dnSpy.Hex.Editor {
 				dispatcherTimer = new DispatcherTimer(TimeSpan.FromMilliseconds(blinkTimeMs), DispatcherPriority.Background, OnToggleBlink, layer.HexView.VisualElement.Dispatcher);
 		}
 
-		void OnToggleBlink(object sender, EventArgs e) =>
+		void OnToggleBlink(object? sender, EventArgs e) =>
 			layer.Opacity = layer.Opacity == 0 ? 1 : 0;
 
 		protected override void OnRender(DrawingContext drawingContext) {
 			base.OnRender(drawingContext);
-			Debug.Assert((activeCaretBrush == null) == (activeOverwriteCaretBrush == null));
-			Debug.Assert((inactiveCaretBrush == null) == (inactiveOverwriteCaretBrush == null));
-			Debug.Assert((activeCaretBrush == null) == (inactiveCaretBrush == null));
-			if (activeCaretBrush == null) {
+			Debug2.Assert((activeCaretBrush is null) == (activeOverwriteCaretBrush is null));
+			Debug2.Assert((inactiveCaretBrush is null) == (inactiveOverwriteCaretBrush is null));
+			Debug2.Assert((activeCaretBrush is null) == (inactiveCaretBrush is null));
+			if (activeCaretBrush is null) {
 				InitializeBrushes(out activeCaretBrush, out activeOverwriteCaretBrush, activeCaretClassificationType);
 				InitializeBrushes(out inactiveCaretBrush, out inactiveOverwriteCaretBrush, inactiveCaretClassificationType);
 			}
@@ -358,7 +358,7 @@ namespace dnSpy.Hex.Editor {
 
 		void DrawCaret(DrawingContext drawingContext, CaretGeometry caretGeometry, bool isActive) {
 			var geo = caretGeometry.Geometry;
-			if (geo == null)
+			if (geo is null)
 				return;
 			var caretBrush = isActive ? activeCaretBrush : inactiveCaretBrush;
 			var overwriteCaretBrush = isActive ? activeOverwriteCaretBrush : inactiveOverwriteCaretBrush;
@@ -388,13 +388,13 @@ namespace dnSpy.Hex.Editor {
 			public bool IsOverwriteMode { get; private set; }
 			public Rect Rect => rect;
 
-			public Geometry Geometry {
+			public Geometry? Geometry {
 				get {
 					if (!visible) {
-						Debug.Assert(geometry == null);
+						Debug2.Assert(geometry is null);
 						return null;
 					}
-					if (geometry == null) {
+					if (geometry is null) {
 						var geo = new RectangleGeometry(rect);
 						geo.Freeze();
 						geometry = geo;
@@ -402,7 +402,7 @@ namespace dnSpy.Hex.Editor {
 					return geometry;
 				}
 			}
-			Geometry geometry;
+			Geometry? geometry;
 			Rect rect;
 			bool visible;
 

@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -38,7 +38,7 @@ namespace dnSpy.Hex.Commands {
 			Loaded += OnLoaded;
 		}
 
-		void OnLoaded(object sender, RoutedEventArgs e) {
+		void OnLoaded(object? sender, RoutedEventArgs e) {
 			Loaded -= OnLoaded;
 			numberTextBox.SelectAll();
 		}

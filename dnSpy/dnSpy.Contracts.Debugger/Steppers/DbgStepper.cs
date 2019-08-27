@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -52,7 +52,7 @@ namespace dnSpy.Contracts.Debugger.Steppers {
 		/// <summary>
 		/// Raised when the step is complete
 		/// </summary>
-		public abstract event EventHandler<DbgStepCompleteEventArgs> StepComplete;
+		public abstract event EventHandler<DbgStepCompleteEventArgs>? StepComplete;
 
 		/// <summary>
 		/// Steps once. This method can be called again once <see cref="StepComplete"/> is raised.
@@ -76,7 +76,7 @@ namespace dnSpy.Contracts.Debugger.Steppers {
 	/// <summary>
 	/// Step complete event args
 	/// </summary>
-	public struct DbgStepCompleteEventArgs {
+	public readonly struct DbgStepCompleteEventArgs {
 		/// <summary>
 		/// Gets the thread
 		/// </summary>
@@ -85,19 +85,19 @@ namespace dnSpy.Contracts.Debugger.Steppers {
 		/// <summary>
 		/// Gets the error message or null if none
 		/// </summary>
-		public string Error { get; }
+		public string? Error { get; }
 
 		/// <summary>
 		/// true if there was an error
 		/// </summary>
-		public bool HasError => Error != null;
+		public bool HasError => !(Error is null);
 
 		/// <summary>
 		/// Constructor
 		/// </summary>
 		/// <param name="thread">Thread</param>
 		/// <param name="error">Error message or null if none</param>
-		public DbgStepCompleteEventArgs(DbgThread thread, string error) {
+		public DbgStepCompleteEventArgs(DbgThread thread, string? error) {
 			Thread = thread ?? throw new ArgumentNullException(nameof(thread));
 			Error = error;
 		}

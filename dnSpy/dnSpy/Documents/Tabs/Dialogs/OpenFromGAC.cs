@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -26,6 +26,7 @@ using dnSpy.Contracts.App;
 using dnSpy.Contracts.Documents.TreeView;
 using dnSpy.Contracts.Settings.AppearanceCategory;
 using dnSpy.Contracts.Text.Classification;
+using dnSpy.Documents.TreeView;
 using Microsoft.VisualStudio.Text.Classification;
 
 namespace dnSpy.Documents.Tabs.Dialogs {
@@ -33,18 +34,20 @@ namespace dnSpy.Documents.Tabs.Dialogs {
 	sealed class OpenFromGAC : IOpenFromGAC {
 		readonly IAppWindow appWindow;
 		readonly IDocumentTreeView documentTreeView;
+		readonly AssemblyExplorerMostRecentlyUsedList mruList;
 		readonly IClassificationFormatMap classificationFormatMap;
 		readonly ITextElementProvider textElementProvider;
 
 		[ImportingConstructor]
-		OpenFromGAC(IAppWindow appWindow, IDocumentTreeView documentTreeView, IClassificationFormatMapService classificationFormatMapService, ITextElementProvider textElementProvider) {
+		OpenFromGAC(IAppWindow appWindow, IDocumentTreeView documentTreeView, AssemblyExplorerMostRecentlyUsedList mruList, IClassificationFormatMapService classificationFormatMapService, ITextElementProvider textElementProvider) {
 			this.appWindow = appWindow;
 			this.documentTreeView = documentTreeView;
+			this.mruList = mruList;
 			classificationFormatMap = classificationFormatMapService.GetClassificationFormatMap(AppearanceCategoryConstants.UIMisc);
 			this.textElementProvider = textElementProvider;
 		}
 
-		public string[] GetPaths(Window ownerWindow) {
+		public string[] GetPaths(Window? ownerWindow) {
 			var win = new OpenFromGACDlg();
 			const bool syntaxHighlight = true;
 			var vm = new OpenFromGACVM(syntaxHighlight, classificationFormatMap, textElementProvider);
@@ -55,7 +58,7 @@ namespace dnSpy.Documents.Tabs.Dialogs {
 			return win.SelectedItems.Select(a => a.Path).ToArray();
 		}
 
-		public ModuleDef[] OpenAssemblies(bool selectAssembly, Window ownerWindow) =>
-			OpenDocumentsHelper.OpenDocuments(documentTreeView, appWindow.MainWindow, GetPaths(ownerWindow), selectAssembly).Select(a => a.ModuleDef).Where(a => a != null).ToArray();
+		public ModuleDef[] OpenAssemblies(bool selectAssembly, Window? ownerWindow) =>
+			OpenDocumentsHelper.OpenDocuments(documentTreeView, appWindow.MainWindow, mruList, GetPaths(ownerWindow), selectAssembly).Select(a => a.ModuleDef).OfType<ModuleDef>().ToArray();
 	}
 }

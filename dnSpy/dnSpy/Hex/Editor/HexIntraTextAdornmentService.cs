@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -42,12 +42,12 @@ namespace dnSpy.Hex.Editor {
 		[ImportingConstructor]
 		IntraTextAdornmentServiceSpaceNegotiatingAdornmentTaggerProvider(HexIntraTextAdornmentServiceProvider intraTextAdornmentServiceProvider) => this.intraTextAdornmentServiceProvider = intraTextAdornmentServiceProvider;
 
-		public override IHexTagger<T> CreateTagger<T>(HexView hexView, HexBuffer buffer) {
+		public override IHexTagger<T>? CreateTagger<T>(HexView hexView, HexBuffer buffer) {
 			if (hexView.Buffer != buffer)
 				return null;
 			var wpfHexView = hexView as WpfHexView;
-			Debug.Assert(wpfHexView != null);
-			if (wpfHexView == null)
+			Debug2.Assert(!(wpfHexView is null));
+			if (wpfHexView is null)
 				return null;
 			return wpfHexView.Properties.GetOrCreateSingletonProperty(
 				typeof(IntraTextAdornmentServiceSpaceNegotiatingAdornmentTagger),
@@ -60,7 +60,7 @@ namespace dnSpy.Hex.Editor {
 	}
 
 	sealed class IntraTextAdornmentServiceSpaceNegotiatingAdornmentTagger : HexTagger<HexSpaceNegotiatingAdornmentTag>, IIntraTextAdornmentServiceSpaceNegotiatingAdornmentTagger {
-		public override event EventHandler<HexBufferSpanEventArgs> TagsChanged;
+		public override event EventHandler<HexBufferSpanEventArgs>? TagsChanged;
 
 		readonly HexIntraTextAdornmentService intraTextAdornmentService;
 
@@ -90,7 +90,7 @@ namespace dnSpy.Hex.Editor {
 		HexIntraTextAdornmentServiceProviderImpl(HexViewTagAggregatorFactoryService viewTagAggregatorFactoryService) => this.viewTagAggregatorFactoryService = viewTagAggregatorFactoryService;
 
 		public override HexIntraTextAdornmentService Get(WpfHexView wpfHexView) {
-			if (wpfHexView == null)
+			if (wpfHexView is null)
 				throw new ArgumentNullException(nameof(wpfHexView));
 			return wpfHexView.Properties.GetOrCreateSingletonProperty(typeof(HexIntraTextAdornmentServiceImpl), () => new HexIntraTextAdornmentServiceImpl(wpfHexView, viewTagAggregatorFactoryService));
 		}
@@ -103,24 +103,24 @@ namespace dnSpy.Hex.Editor {
 	}
 
 	sealed class HexIntraTextAdornmentServiceImpl : HexIntraTextAdornmentService {
-#pragma warning disable 0169
+#pragma warning disable CS0169
 		[Export(typeof(HexAdornmentLayerDefinition))]
 		[VSUTIL.Name(PredefinedHexAdornmentLayers.IntraTextAdornment)]
 		[VSUTIL.Order(After = PredefinedHexAdornmentLayers.BottomLayer, Before = PredefinedHexAdornmentLayers.TopLayer)]
 		[VSUTIL.Order(After = PredefinedHexAdornmentLayers.Text)]
-		static HexAdornmentLayerDefinition adornmentLayer;
-#pragma warning restore 0169
+		static HexAdornmentLayerDefinition? adornmentLayer;
+#pragma warning restore CS0169
 
 		readonly WpfHexView wpfHexView;
 		readonly HexTagAggregator<HexIntraTextAdornmentTag> tagAggregator;
 		readonly List<AdornmentTagInfo> adornmentTagInfos;
 		readonly HashSet<object> currentLineIdentityTags;
-		HexAdornmentLayer layer;
-		IIntraTextAdornmentServiceSpaceNegotiatingAdornmentTagger tagger;
+		HexAdornmentLayer? layer;
+		IIntraTextAdornmentServiceSpaceNegotiatingAdornmentTagger? tagger;
 		static readonly object providerTag = new object();
 
 		public HexIntraTextAdornmentServiceImpl(WpfHexView wpfHexView, HexViewTagAggregatorFactoryService viewTagAggregatorFactoryService) {
-			if (viewTagAggregatorFactoryService == null)
+			if (viewTagAggregatorFactoryService is null)
 				throw new ArgumentNullException(nameof(viewTagAggregatorFactoryService));
 			adornmentTagInfos = new List<AdornmentTagInfo>();
 			currentLineIdentityTags = new HashSet<object>();
@@ -131,7 +131,7 @@ namespace dnSpy.Hex.Editor {
 			wpfHexView.LayoutChanged += WpfHexView_LayoutChanged;
 		}
 
-		void Selection_SelectionChanged(object sender, EventArgs e) => UpdateIsSelected();
+		void Selection_SelectionChanged(object? sender, EventArgs e) => UpdateIsSelected();
 
 		void UpdateIsSelected() {
 			if (adornmentTagInfos.Count == 0)
@@ -146,25 +146,26 @@ namespace dnSpy.Hex.Editor {
 			}
 		}
 
-		void UpdateIsSelected(AdornmentTagInfo adornmentInfo, HexViewLine line) {
-			if (line == null)
+		void UpdateIsSelected(AdornmentTagInfo adornmentInfo, HexViewLine? line) {
+			if (line is null)
 				line = wpfHexView.HexViewLines.GetHexViewLineContainingBufferPosition(adornmentInfo.BufferSpan.Start);
 			bool selected = IsSelected(adornmentInfo, line);
 			VSTE.IntraTextAdornment.SetIsSelected(adornmentInfo.UserUIElement, selected);
 		}
 
-		bool IsSelected(AdornmentTagInfo adornmentInfo, HexViewLine line) {
-			if (line == null)
+		bool IsSelected(AdornmentTagInfo adornmentInfo, HexViewLine? line) {
+			if (line is null)
 				return false;
 			if (wpfHexView.Selection.IsEmpty)
 				return false;
-			if (adornmentInfo.HexTagSpan != null) {
+			if (!(adornmentInfo.HexTagSpan is null)) {
 				foreach (var span in wpfHexView.Selection.SelectedSpans) {
 					if (span.Contains(adornmentInfo.BufferSpan))
 						return true;
 				}
 			}
 			else {
+				Debug2.Assert(!(adornmentInfo.HexTextTagSpan is null));
 				foreach (var span in wpfHexView.Selection.GetSelectionOnHexViewLine(line)) {
 					if (span.Contains(adornmentInfo.HexTextTagSpan.Span))
 						return true;
@@ -174,16 +175,16 @@ namespace dnSpy.Hex.Editor {
 		}
 
 		sealed class AdornmentTagInfo {
-			public HexSpaceNegotiatingAdornmentTag Tag;
+			public HexSpaceNegotiatingAdornmentTag? Tag;
 			public readonly UIElement UserUIElement;
-			public ZoomingUIElement TopUIElement;
-			public object LineIdentityTag;
+			public ZoomingUIElement? TopUIElement;
+			public object? LineIdentityTag;
 
-			// The full buffer line span if HexTextTagSpan != null, else it's an accurate span
+			// The full buffer line span if !(HexTextTagSpan is null), else it's an accurate span
 			public readonly HexBufferSpan BufferSpan;
 			// Mutually exclusive with HexTextTagSpan
-			public readonly IHexTagSpan<HexIntraTextAdornmentTag> HexTagSpan;
-			public readonly IHexTextTagSpan<HexIntraTextAdornmentTag> HexTextTagSpan;
+			public readonly IHexTagSpan<HexIntraTextAdornmentTag>? HexTagSpan;
+			public readonly IHexTextTagSpan<HexIntraTextAdornmentTag>? HexTextTagSpan;
 
 			public AdornmentTagInfo(HexBufferSpan span, UIElement element, IHexTagSpan<HexIntraTextAdornmentTag> tagSpan) {
 				BufferSpan = span;
@@ -198,15 +199,16 @@ namespace dnSpy.Hex.Editor {
 			}
 
 			public void Initialize() {
-				if (TopUIElement == null)
+				if (TopUIElement is null)
 					TopUIElement = new ZoomingUIElement(UserUIElement);
 				TopUIElement.Initialize();
 				TopUIElement.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
 			}
 		}
 
-		void WpfHexView_LayoutChanged(object sender, HexViewLayoutChangedEventArgs e) {
+		void WpfHexView_LayoutChanged(object? sender, HexViewLayoutChangedEventArgs e) {
 			if (adornmentTagInfos.Count > 0) {
+				Debug2.Assert(!(layer is null));
 				currentLineIdentityTags.Clear();
 				foreach (var line in wpfHexView.HexViewLines)
 					currentLineIdentityTags.Add(line.IdentityTag);
@@ -214,7 +216,7 @@ namespace dnSpy.Hex.Editor {
 					currentLineIdentityTags.Remove(line.IdentityTag);
 				for (int i = adornmentTagInfos.Count - 1; i >= 0; i--) {
 					var adornmentInfo = adornmentTagInfos[i];
-					if (!currentLineIdentityTags.Contains(adornmentInfo.LineIdentityTag))
+					if (!currentLineIdentityTags.Contains(adornmentInfo.LineIdentityTag!))
 						layer.RemoveAdornmentsByTag(adornmentInfo);
 				}
 				currentLineIdentityTags.Clear();
@@ -226,12 +228,12 @@ namespace dnSpy.Hex.Editor {
 
 					foreach (var identityTag in tags) {
 						var adornmentInfo = identityTag as AdornmentTagInfo;
-						Debug.Assert(adornmentInfo != null);
-						if (adornmentInfo == null)
+						Debug2.Assert(!(adornmentInfo is null));
+						if (adornmentInfo is null)
 							continue;
 						var bounds = line.GetAdornmentBounds(identityTag);
-						Debug.Assert(bounds != null);
-						if (bounds == null)
+						Debug2.Assert(!(bounds is null));
+						if (bounds is null)
 							continue;
 
 						adornmentInfo.Initialize();
@@ -247,14 +249,14 @@ namespace dnSpy.Hex.Editor {
 
 				foreach (var identityTag in tags) {
 					var adornmentInfo = identityTag as AdornmentTagInfo;
-					Debug.Assert(adornmentInfo != null);
-					if (adornmentInfo == null)
+					Debug2.Assert(!(adornmentInfo is null));
+					if (adornmentInfo is null)
 						continue;
 					var bounds = line.GetAdornmentBounds(identityTag);
-					if (bounds == null)
+					if (bounds is null)
 						continue;
 
-					if (layer == null) {
+					if (layer is null) {
 						layer = wpfHexView.GetAdornmentLayer(PredefinedHexAdornmentLayers.IntraTextAdornment);
 						// Can't do this in the ctor since Selection hasn't been initialized yet
 						wpfHexView.Selection.SelectionChanged += Selection_SelectionChanged;
@@ -272,16 +274,20 @@ namespace dnSpy.Hex.Editor {
 		}
 
 		void UpdateAdornmentUIState(HexViewLine line, AdornmentTagInfo adornmentInfo, VSTF.TextBounds bounds) {
+			Debug2.Assert(!(adornmentInfo.TopUIElement is null));
 			double verticalScale = line.LineTransform.VerticalScale;
 			adornmentInfo.TopUIElement.SetScale(verticalScale);
-			Canvas.SetTop(adornmentInfo.TopUIElement, bounds.TextTop + line.Baseline - verticalScale * adornmentInfo.Tag.Baseline);
+			Canvas.SetTop(adornmentInfo.TopUIElement, bounds.TextTop + line.Baseline - verticalScale * adornmentInfo.Tag!.Baseline);
 			Canvas.SetLeft(adornmentInfo.TopUIElement, bounds.Left);
 		}
 
 		bool AddAdornment(AdornmentTagInfo adornmentInfo, HexViewLine line) {
+			Debug2.Assert(!(adornmentInfo.TopUIElement is null));
+			Debug2.Assert(!(layer is null));
+
 			SizeChangedEventHandler sizeChanged = (a, e) => {
 				var bounds = line.GetAdornmentBounds(adornmentInfo);
-				if (bounds == null)
+				if (bounds is null)
 					return;
 				// Sometimes the size just gets changed very little, eg. from 400 to 399.95.....
 				const double d = 0.5;
@@ -295,10 +301,12 @@ namespace dnSpy.Hex.Editor {
 				adornmentTagInfos.Remove(adornmentInfo);
 				adornmentInfo.TopUIElement.SizeChanged -= sizeChanged;
 				adornmentInfo.TopUIElement.OnRemoved();
-				if (adornmentInfo.HexTagSpan != null)
+				if (!(adornmentInfo.HexTagSpan is null))
 					adornmentInfo.HexTagSpan.Tag.RemovalCallback?.Invoke(adornmentInfo.HexTagSpan, b);
-				else
+				else {
+					Debug2.Assert(!(adornmentInfo.HexTextTagSpan is null));
 					adornmentInfo.HexTextTagSpan.Tag.RemovalCallback?.Invoke(adornmentInfo.HexTextTagSpan, b);
+				}
 			};
 
 			Debug.Assert(!adornmentTagInfos.Contains(adornmentInfo));
@@ -322,7 +330,7 @@ namespace dnSpy.Hex.Editor {
 		}
 
 		public override void RegisterTagger(IIntraTextAdornmentServiceSpaceNegotiatingAdornmentTagger tagger) {
-			if (this.tagger != null)
+			if (!(this.tagger is null))
 				throw new InvalidOperationException();
 			this.tagger = tagger ?? throw new ArgumentNullException(nameof(tagger));
 		}
@@ -368,13 +376,13 @@ namespace dnSpy.Hex.Editor {
 
 		double Filter(double value) => value < 0 || value == double.PositiveInfinity || double.IsNaN(value) ? 0 : value;
 
-		void TagAggregator_TagsChanged(object sender, HexTagsChangedEventArgs e) {
+		void TagAggregator_TagsChanged(object? sender, HexTagsChangedEventArgs e) {
 			if (wpfHexView.IsClosed)
 				return;
 			tagger?.RefreshSpans(new HexBufferSpanEventArgs(e.Span));
 		}
 
-		void WpfHexView_Closed(object sender, EventArgs e) {
+		void WpfHexView_Closed(object? sender, EventArgs e) {
 			wpfHexView.Closed -= WpfHexView_Closed;
 			wpfHexView.LayoutChanged -= WpfHexView_LayoutChanged;
 			wpfHexView.Selection.SelectionChanged -= Selection_SelectionChanged;

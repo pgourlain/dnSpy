@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -25,31 +25,31 @@ using Microsoft.VisualStudio.Utilities;
 
 namespace dnSpy.Language.Intellisense {
 	static class SpaceReservationManagerDefinitions {
-#pragma warning disable 0169
+#pragma warning disable CS0169
 		[Export(typeof(SpaceReservationManagerDefinition))]
 		[Name(PredefinedSpaceReservationManagerNames.CurrentLine)]
 		[Order(Before = IntellisenseSpaceReservationManagerNames.SmartTagSpaceReservationManagerName)]
-		static readonly SpaceReservationManagerDefinition currentLineSpaceReservationManagerDefinition;
+		static readonly SpaceReservationManagerDefinition? currentLineSpaceReservationManagerDefinition;
 
 		[Export(typeof(SpaceReservationManagerDefinition))]
 		[Name(IntellisenseSpaceReservationManagerNames.SmartTagSpaceReservationManagerName)]
 		[Order(Before = IntellisenseSpaceReservationManagerNames.QuickInfoSpaceReservationManagerName, After = PredefinedSpaceReservationManagerNames.CurrentLine)]
-		static readonly SpaceReservationManagerDefinition smartTagSpaceReservationManagerDefinition;
+		static readonly SpaceReservationManagerDefinition? smartTagSpaceReservationManagerDefinition;
 
 		[Export(typeof(SpaceReservationManagerDefinition))]
 		[Name(IntellisenseSpaceReservationManagerNames.QuickInfoSpaceReservationManagerName)]
 		[Order(Before = IntellisenseSpaceReservationManagerNames.SignatureHelpSpaceReservationManagerName, After = IntellisenseSpaceReservationManagerNames.SmartTagSpaceReservationManagerName)]
-		static readonly SpaceReservationManagerDefinition quickInfoSpaceReservationManagerDefinition;
+		static readonly SpaceReservationManagerDefinition? quickInfoSpaceReservationManagerDefinition;
 
 		[Export(typeof(SpaceReservationManagerDefinition))]
 		[Name(IntellisenseSpaceReservationManagerNames.SignatureHelpSpaceReservationManagerName)]
 		[Order(Before = IntellisenseSpaceReservationManagerNames.CompletionSpaceReservationManagerName, After = IntellisenseSpaceReservationManagerNames.QuickInfoSpaceReservationManagerName)]
-		static readonly SpaceReservationManagerDefinition signatureHelpSpaceReservationManagerDefinition;
+		static readonly SpaceReservationManagerDefinition? signatureHelpSpaceReservationManagerDefinition;
 
 		[Export(typeof(SpaceReservationManagerDefinition))]
 		[Name(IntellisenseSpaceReservationManagerNames.CompletionSpaceReservationManagerName)]
 		[Order(After = IntellisenseSpaceReservationManagerNames.SignatureHelpSpaceReservationManagerName)]
-		static readonly SpaceReservationManagerDefinition completionSpaceReservationManagerDefinition;
-#pragma warning restore 0169
+		static readonly SpaceReservationManagerDefinition? completionSpaceReservationManagerDefinition;
+#pragma warning restore CS0169
 	}
 }

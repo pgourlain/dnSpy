@@ -1,4 +1,4 @@
-﻿/*
+/*
 	Copyright (c) 2015 Ki
 
 	Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -45,9 +45,9 @@ namespace dnSpy.BamlDecompiler {
 			this.documentWriterService = documentWriterService;
 		}
 
-		public ResourceNode Create(ModuleDef module, Resource resource, ITreeNodeGroup treeNodeGroup) => null;
+		public DocumentTreeNodeData Create(ModuleDef module, Resource resource, ITreeNodeGroup treeNodeGroup) => null;
 
-		public ResourceElementNode Create(ModuleDef module, ResourceElement resourceElement, ITreeNodeGroup treeNodeGroup) {
+		public DocumentTreeNodeData Create(ModuleDef module, ResourceElement resourceElement, ITreeNodeGroup treeNodeGroup) {
 			if (resourceElement.ResourceData.Code != ResourceTypeCode.ByteArray && resourceElement.ResourceData.Code != ResourceTypeCode.Stream)
 				return null;
 

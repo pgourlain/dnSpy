@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -53,6 +53,7 @@ namespace dnSpy.AsmEditor.Compiler {
 					}
 					InputBindings.Add(new KeyBinding(vm.AddGacReferenceCommand, Key.O, ModifierKeys.Control | ModifierKeys.Shift));
 					InputBindings.Add(new KeyBinding(vm.AddAssemblyReferenceCommand, Key.O, ModifierKeys.Control));
+					InputBindings.Add(new KeyBinding(vm.AddDocumentsCommand, Key.A, ModifierKeys.Control | ModifierKeys.Shift));
 					InputBindings.Add(new KeyBinding(vm.GoToNextDiagnosticCommand, Key.F4, ModifierKeys.None));
 					InputBindings.Add(new KeyBinding(vm.GoToNextDiagnosticCommand, Key.F8, ModifierKeys.None));
 					InputBindings.Add(new KeyBinding(vm.GoToPreviousDiagnosticCommand, Key.F4, ModifierKeys.Shift));
@@ -65,8 +66,8 @@ namespace dnSpy.AsmEditor.Compiler {
 			diagnosticsListView.SelectionChanged += DiagnosticsListView_SelectionChanged;
 		}
 
-		void EditCodeVM_CodeCompiled(object sender, EventArgs e) {
-			((EditCodeVM)sender).CodeCompiled -= EditCodeVM_CodeCompiled;
+		void EditCodeVM_CodeCompiled(object? sender, EventArgs e) {
+			((EditCodeVM)sender!).CodeCompiled -= EditCodeVM_CodeCompiled;
 			ClickOK();
 		}
 
@@ -84,28 +85,28 @@ namespace dnSpy.AsmEditor.Compiler {
 			decompilingControl.Visibility = Visibility.Collapsed;
 		}
 
-		void diagnosticsListView_MouseDoubleClick(object sender, MouseButtonEventArgs e) {
+		void diagnosticsListView_MouseDoubleClick(object? sender, MouseButtonEventArgs e) {
 			if (!UIUtilities.IsLeftDoubleClick<ListViewItem>(diagnosticsListView, e))
 				return;
 
 			var vm = DataContext as EditCodeVM;
 			var diag = diagnosticsListView.SelectedItem as CompilerDiagnosticVM;
-			Debug.Assert(vm != null && diag != null);
-			if (vm == null || diag == null)
+			Debug2.Assert(!(vm is null) && !(diag is null));
+			if (vm is null || diag is null)
 				return;
 
 			vm.MoveTo(diag);
 		}
 
-		void EditCodeVM_PropertyChanged(object sender, PropertyChangedEventArgs e) {
-			var vm = (EditCodeVM)sender;
+		void EditCodeVM_PropertyChanged(object? sender, PropertyChangedEventArgs e) {
+			var vm = (EditCodeVM)sender!;
 			if (e.PropertyName == nameof(vm.SelectedDocument))
 				UIUtilities.Focus(vm.SelectedDocument?.TextView.VisualElement);
 		}
 
-		void DiagnosticsListView_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+		void DiagnosticsListView_SelectionChanged(object? sender, SelectionChangedEventArgs e) {
 			var item = diagnosticsListView.SelectedItem;
-			if (item == null)
+			if (item is null)
 				return;
 			diagnosticsListView.ScrollIntoView(item);
 		}

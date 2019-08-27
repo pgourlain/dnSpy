@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -28,11 +28,11 @@ using Microsoft.VisualStudio.Text.Editor;
 namespace dnSpy.Text.Editor {
 	interface IWpfTextViewMarginProviderCollection {
 		WpfTextViewMarginInfo[] Margins { get; }
-		event EventHandler MarginsChanged;
+		event EventHandler? MarginsChanged;
 		void Dispose();
 	}
 
-	struct WpfTextViewMarginInfo {
+	readonly struct WpfTextViewMarginInfo {
 		public IWpfTextViewMarginProvider Provider { get; }
 		public IWpfTextViewMarginMetadata Metadata { get; }
 		public IWpfTextViewMargin Margin { get; }
@@ -51,14 +51,14 @@ namespace dnSpy.Text.Editor {
 		WpfTextViewMarginInfo[] currentMargins;
 
 		public WpfTextViewMarginInfo[] Margins => currentMargins;
-		public event EventHandler MarginsChanged;
+		public event EventHandler? MarginsChanged;
 
 		public WpfTextViewMarginProviderCollection(Lazy<IWpfTextViewMarginProvider, IWpfTextViewMarginMetadata>[] wpfTextViewMarginProviders, IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin marginContainer, string marginContainerName) {
-			if (wpfTextViewMarginProviders == null)
+			if (wpfTextViewMarginProviders is null)
 				throw new ArgumentNullException(nameof(wpfTextViewMarginProviders));
-			if (wpfTextViewHost == null)
+			if (wpfTextViewHost is null)
 				throw new ArgumentNullException(nameof(wpfTextViewHost));
-			if (marginContainerName == null)
+			if (marginContainerName is null)
 				throw new ArgumentNullException(nameof(marginContainerName));
 			this.wpfTextViewMarginProviders = wpfTextViewMarginProviders.Where(a =>
 				StringComparer.OrdinalIgnoreCase.Equals(marginContainerName, a.Metadata.MarginContainer) &&
@@ -90,7 +90,7 @@ namespace dnSpy.Text.Editor {
 				}
 				else {
 					var margin = lazy.Value.CreateMargin(wpfTextViewHost, marginContainer);
-					if (margin != null)
+					if (!(margin is null))
 						newInfos.Add(new WpfTextViewMarginInfo(lazy.Value, lazy.Metadata, margin));
 				}
 			}
@@ -119,8 +119,8 @@ namespace dnSpy.Text.Editor {
 		}
 
 		bool CanUse(IWpfTextViewMarginMetadata md) => wpfTextViewHost.TextView.TextDataModel.ContentType.IsOfAnyType(md.ContentTypes);
-		void TextDataModel_ContentTypeChanged(object sender, TextDataModelContentTypeChangedEventArgs e) => UpdateMargins();
-		void WpfTextViewHost_Closed(object sender, EventArgs e) => Dispose();
+		void TextDataModel_ContentTypeChanged(object? sender, TextDataModelContentTypeChangedEventArgs e) => UpdateMargins();
+		void WpfTextViewHost_Closed(object? sender, EventArgs e) => Dispose();
 
 		public void Dispose() {
 			wpfTextViewHost.Closed -= WpfTextViewHost_Closed;

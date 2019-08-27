@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -28,23 +28,21 @@ using VSUTIL = Microsoft.VisualStudio.Utilities;
 namespace dnSpy.Hex.Intellisense {
 	sealed class HexQuickInfoSessionImpl : HexQuickInfoSession {
 		public override VSLI.BulkObservableCollection<object> QuickInfoContent { get; }
-		public override event EventHandler ApplicableToSpanChanged;
+		public override event EventHandler? ApplicableToSpanChanged;
 		public override bool TrackMouse { get; }
 		public override HexView HexView { get; }
-		public override HexIntellisensePresenter Presenter => quickInfoPresenter;
+		public override HexIntellisensePresenter? Presenter => quickInfoPresenter;
 		public override HexCellPosition TriggerPoint { get; }
-		public override event EventHandler PresenterChanged;
-		public override event EventHandler Recalculated;
-		public override event EventHandler Dismissed;
+		public override event EventHandler? PresenterChanged;
+		public override event EventHandler? Recalculated;
+		public override event EventHandler? Dismissed;
 		public override bool IsDismissed => isDismissed;
 		bool isDismissed;
 		public override bool HasInteractiveContent => hasInteractiveContent;
 		bool hasInteractiveContent;
 		bool IsStarted { get; set; }
 
-		public override HexBufferSpanSelection ApplicableToSpan {
-			get { return applicableToSpan; }
-		}
+		public override HexBufferSpanSelection ApplicableToSpan => applicableToSpan;
 
 		void SetApplicableToSpan(HexBufferSpanSelection newValue) {
 			if (!applicableToSpan.Equals(newValue)) {
@@ -56,8 +54,8 @@ namespace dnSpy.Hex.Intellisense {
 
 		readonly Lazy<HexQuickInfoSourceProvider, VSUTIL.IOrderable>[] quickInfoSourceProviders;
 		readonly HexIntellisensePresenterFactoryService intellisensePresenterFactoryService;
-		HexQuickInfoSource[] quickInfoSources;
-		HexIntellisensePresenter quickInfoPresenter;
+		HexQuickInfoSource[]? quickInfoSources;
+		HexIntellisensePresenter? quickInfoPresenter;
 
 		public HexQuickInfoSessionImpl(HexView hexView, HexCellPosition triggerPoint, bool trackMouse, HexIntellisensePresenterFactoryService intellisensePresenterFactoryService, Lazy<HexQuickInfoSourceProvider, VSUTIL.IOrderable>[] quickInfoSourceProviders) {
 			if (triggerPoint.IsDefault)
@@ -71,17 +69,17 @@ namespace dnSpy.Hex.Intellisense {
 			HexView.Closed += HexView_Closed;
 		}
 
-		void HexView_Closed(object sender, EventArgs e) {
+		void HexView_Closed(object? sender, EventArgs e) {
 			if (!IsDismissed)
 				Dismiss();
 		}
 
 		HexQuickInfoSource[] CreateQuickInfoSources() {
-			List<HexQuickInfoSource> list = null;
+			List<HexQuickInfoSource>? list = null;
 			foreach (var provider in quickInfoSourceProviders) {
 				var source = provider.Value.TryCreateQuickInfoSource(HexView);
-				if (source != null) {
-					if (list == null)
+				if (!(source is null)) {
+					if (list is null)
 						list = new List<HexQuickInfoSource>();
 					list.Add(source);
 				}
@@ -90,7 +88,7 @@ namespace dnSpy.Hex.Intellisense {
 		}
 
 		void DisposeQuickInfoSources() {
-			if (quickInfoSources != null) {
+			if (!(quickInfoSources is null)) {
 				foreach (var source in quickInfoSources)
 					source.Dispose();
 				quickInfoSources = null;
@@ -133,9 +131,9 @@ namespace dnSpy.Hex.Intellisense {
 
 				hasInteractiveContent = CalculateHasInteractiveContent();
 				SetApplicableToSpan(applicableToSpan);
-				if (quickInfoPresenter == null) {
+				if (quickInfoPresenter is null) {
 					quickInfoPresenter = intellisensePresenterFactoryService.TryCreateIntellisensePresenter(this);
-					if (quickInfoPresenter == null) {
+					if (quickInfoPresenter is null) {
 						Dismiss();
 						return;
 					}

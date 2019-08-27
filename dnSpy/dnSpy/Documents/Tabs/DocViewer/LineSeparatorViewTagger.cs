@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -43,7 +43,7 @@ namespace dnSpy.Documents.Tabs.DocViewer {
 	[TextViewRole(PredefinedDsTextViewRoles.CanHaveLineSeparator)]
 	[TagType(typeof(ILineSeparatorTag))]
 	sealed class LineSeparatorViewTaggerProvider : IViewTaggerProvider {
-		public ITagger<T> CreateTagger<T>(ITextView textView, ITextBuffer buffer) where T : ITag {
+		public ITagger<T>? CreateTagger<T>(ITextView textView, ITextBuffer buffer) where T : ITag {
 			if (textView.TextBuffer != buffer)
 				return null;
 			return LineSeparatorViewTagger.GetInstance(textView) as ITagger<T>;
@@ -51,7 +51,7 @@ namespace dnSpy.Documents.Tabs.DocViewer {
 	}
 
 	sealed class LineSeparatorViewTagger : ITagger<ILineSeparatorTag> {
-		public event EventHandler<SnapshotSpanEventArgs> TagsChanged;
+		public event EventHandler<SnapshotSpanEventArgs>? TagsChanged;
 
 		readonly ITextView textView;
 		LineSeparatorCollection lineSeparatorCollection;
@@ -65,10 +65,10 @@ namespace dnSpy.Documents.Tabs.DocViewer {
 		public static LineSeparatorViewTagger GetInstance(ITextView textView) =>
 			textView.Properties.GetOrCreateSingletonProperty(typeof(LineSeparatorViewTagger), () => new LineSeparatorViewTagger(textView));
 
-		public void SetLineSeparatorCollection(LineSeparatorCollection coll) {
+		public void SetLineSeparatorCollection(LineSeparatorCollection? coll) {
 			if (textView.IsClosed)
 				return;
-			if (coll == null)
+			if (coll is null)
 				coll = LineSeparatorCollection.Empty;
 			if (lineSeparatorCollection == coll)
 				return;
@@ -97,7 +97,7 @@ namespace dnSpy.Documents.Tabs.DocViewer {
 		}
 		static readonly ILineSeparatorTag lineSeparatorTag = new LineSeparatorTag(true);
 
-		void TextView_Closed(object sender, EventArgs e) {
+		void TextView_Closed(object? sender, EventArgs e) {
 			lineSeparatorCollection = LineSeparatorCollection.Empty;
 			textView.Closed -= TextView_Closed;
 		}

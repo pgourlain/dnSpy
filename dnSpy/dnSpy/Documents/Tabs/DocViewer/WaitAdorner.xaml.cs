@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -25,13 +25,13 @@ namespace dnSpy.Documents.Tabs.DocViewer {
 	sealed partial class WaitAdorner : UserControl {
 		readonly Action onCancel;
 
-		public WaitAdorner(Action onCancel, string message) {
+		public WaitAdorner(Action onCancel, string? message) {
 			this.onCancel = onCancel;
 			InitializeComponent();
 			textBlock.Text = message;
 		}
 
-		void button_Click(object sender, RoutedEventArgs e) {
+		void button_Click(object? sender, RoutedEventArgs e) {
 			onCancel();
 			button.IsEnabled = false;
 		}

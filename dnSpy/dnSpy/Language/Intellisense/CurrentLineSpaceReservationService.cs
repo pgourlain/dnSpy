@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -37,13 +37,13 @@ namespace dnSpy.Language.Intellisense {
 	[Export(typeof(ICurrentLineSpaceReservationService))]
 	sealed class CurrentLineSpaceReservationService : ICurrentLineSpaceReservationService {
 		public void SessionCreated(IIntellisenseSession session) {
-			if (session == null)
+			if (session is null)
 				throw new ArgumentNullException(nameof(session));
 			if (!CurrentLineSpaceReservationAgent.IsSupportedSession(session))
 				return;
 			var wpfTextView = session.TextView as IWpfTextView;
-			Debug.Assert(wpfTextView != null);
-			if (wpfTextView == null)
+			Debug2.Assert(!(wpfTextView is null));
+			if (wpfTextView is null)
 				return;
 			var currentLineAgent = session.TextView.Properties.GetOrCreateSingletonProperty(typeof(CurrentLineSpaceReservationAgent), () => new CurrentLineSpaceReservationAgent(wpfTextView));
 			currentLineAgent.SessionCreated(session);
@@ -53,13 +53,13 @@ namespace dnSpy.Language.Intellisense {
 	sealed class CurrentLineSpaceReservationAgent : ISpaceReservationAgent {
 		bool ISpaceReservationAgent.HasFocus => false;
 		bool ISpaceReservationAgent.IsMouseOver => false;
-		event EventHandler ISpaceReservationAgent.GotFocus { add { } remove { } }
-		event EventHandler ISpaceReservationAgent.LostFocus { add { } remove { } }
+		event EventHandler? ISpaceReservationAgent.GotFocus { add { } remove { } }
+		event EventHandler? ISpaceReservationAgent.LostFocus { add { } remove { } }
 		readonly IWpfTextView wpfTextView;
-		ISpaceReservationManager spaceReservationManager;
+		ISpaceReservationManager? spaceReservationManager;
 
 		int ActiveSessions {
-			get { return activeSessions; }
+			get => activeSessions;
 			set {
 				if (wpfTextView.IsClosed)
 					return;
@@ -72,12 +72,12 @@ namespace dnSpy.Language.Intellisense {
 				if ((oldValue != 0) == (activeSessions != 0))
 					return;
 				if (activeSessions == 0) {
-					Debug.Assert(spaceReservationManager != null);
+					Debug2.Assert(!(spaceReservationManager is null));
 					wpfTextView.Caret.PositionChanged -= Caret_PositionChanged;
 					spaceReservationManager.RemoveAgent(this);
 				}
 				else {
-					if (spaceReservationManager == null)
+					if (spaceReservationManager is null)
 						spaceReservationManager = wpfTextView.GetSpaceReservationManager(PredefinedSpaceReservationManagerNames.CurrentLine);
 					wpfTextView.Caret.PositionChanged += Caret_PositionChanged;
 					spaceReservationManager.AddAgent(this);
@@ -92,7 +92,7 @@ namespace dnSpy.Language.Intellisense {
 		}
 
 		void ISpaceReservationAgent.Hide() => wpfTextView.Caret.PositionChanged -= Caret_PositionChanged;
-		void Caret_PositionChanged(object sender, CaretPositionChangedEventArgs e) => wpfTextView.QueueSpaceReservationStackRefresh();
+		void Caret_PositionChanged(object? sender, CaretPositionChangedEventArgs e) => wpfTextView.QueueSpaceReservationStackRefresh();
 
 		Rect WpfTextViewRectToScreenRect(Rect wpfTextViewRect) {
 			wpfTextViewRect.X -= wpfTextView.ViewportLeft;
@@ -103,7 +103,7 @@ namespace dnSpy.Language.Intellisense {
 		Rect ToScreenRect(Rect wpfRect) => new Rect(ToScreenPoint(wpfRect.TopLeft), ToScreenPoint(wpfRect.BottomRight));
 		Point ToScreenPoint(Point point) => wpfTextView.VisualElement.PointToScreen(point);
 
-		Geometry ISpaceReservationAgent.PositionAndDisplay(Geometry reservedSpace) {
+		Geometry? ISpaceReservationAgent.PositionAndDisplay(Geometry reservedSpace) {
 			if (wpfTextView.IsClosed)
 				return null;
 
@@ -119,7 +119,7 @@ namespace dnSpy.Language.Intellisense {
 		public static bool IsSupportedSession(IIntellisenseSession session) => session is ICompletionSession || session is ISignatureHelpSession;
 
 		public void SessionCreated(IIntellisenseSession session) {
-			if (session == null)
+			if (session is null)
 				throw new ArgumentNullException(nameof(session));
 			if (wpfTextView.IsClosed)
 				return;
@@ -132,13 +132,13 @@ namespace dnSpy.Language.Intellisense {
 			ActiveSessions++;
 		}
 
-		void Session_Dismissed(object sender, EventArgs e) {
-			var session = (IIntellisenseSession)sender;
+		void Session_Dismissed(object? sender, EventArgs e) {
+			var session = (IIntellisenseSession)sender!;
 			session.Dismissed -= Session_Dismissed;
 			ActiveSessions--;
 		}
 
-		void WpfTextView_Closed(object sender, EventArgs e) {
+		void WpfTextView_Closed(object? sender, EventArgs e) {
 			wpfTextView.Closed -= WpfTextView_Closed;
 			wpfTextView.Caret.PositionChanged -= Caret_PositionChanged;
 		}

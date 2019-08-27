@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -26,13 +26,13 @@ using Microsoft.VisualStudio.Utilities;
 namespace dnSpy.Output.Settings {
 	interface IOutputWindowOptionsService {
 		IOutputWindowOptions Default { get; }
-		event EventHandler<OptionChangedEventArgs> OptionChanged;
+		event EventHandler<OptionChangedEventArgs>? OptionChanged;
 	}
 
 	[Export(typeof(IOutputWindowOptionsService))]
 	sealed class OutputWindowOptionsService : IOutputWindowOptionsService {
 		public IOutputWindowOptions Default { get; }
-		public event EventHandler<OptionChangedEventArgs> OptionChanged;
+		public event EventHandler<OptionChangedEventArgs>? OptionChanged;
 
 		[ImportingConstructor]
 		OutputWindowOptionsService(ITextViewOptionsGroupService textViewOptionsGroupService, IContentTypeRegistryService contentTypeRegistryService) {
@@ -41,7 +41,7 @@ namespace dnSpy.Output.Settings {
 			Default = new OutputWindowOptions(group, contentTypeRegistryService.GetContentType(ContentTypes.Any));
 		}
 
-		void TextViewOptionsGroup_TextViewOptionChanged(object sender, TextViewOptionChangedEventArgs e) =>
+		void TextViewOptionsGroup_TextViewOptionChanged(object? sender, TextViewOptionChangedEventArgs e) =>
 			OptionChanged?.Invoke(this, new OptionChangedEventArgs(e.ContentType, e.OptionId));
 	}
 }

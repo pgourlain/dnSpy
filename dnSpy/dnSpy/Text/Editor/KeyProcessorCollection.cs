@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -50,14 +50,14 @@ namespace dnSpy.Text.Editor {
 			Reinitialize();
 		}
 
-		void VisualElement_KeyDown(object sender, KeyEventArgs e) {
+		void VisualElement_KeyDown(object? sender, KeyEventArgs e) {
 			foreach (var keyProcessor in keyProcessors) {
 				if (keyProcessor.IsInterestedInHandledEvents || !e.Handled)
 					keyProcessor.KeyDown(e);
 			}
 		}
 
-		void VisualElement_KeyUp(object sender, KeyEventArgs e) {
+		void VisualElement_KeyUp(object? sender, KeyEventArgs e) {
 			var array = keyProcessors;
 			foreach (var keyProcessor in array) {
 				if (keyProcessor.IsInterestedInHandledEvents || !e.Handled)
@@ -65,7 +65,7 @@ namespace dnSpy.Text.Editor {
 			}
 		}
 
-		void VisualElement_PreviewKeyDown(object sender, KeyEventArgs e) {
+		void VisualElement_PreviewKeyDown(object? sender, KeyEventArgs e) {
 			var array = keyProcessors;
 			foreach (var keyProcessor in array) {
 				if (keyProcessor.IsInterestedInHandledEvents || !e.Handled)
@@ -73,7 +73,7 @@ namespace dnSpy.Text.Editor {
 			}
 		}
 
-		void VisualElement_PreviewKeyUp(object sender, KeyEventArgs e) {
+		void VisualElement_PreviewKeyUp(object? sender, KeyEventArgs e) {
 			var array = keyProcessors;
 			foreach (var keyProcessor in array) {
 				if (keyProcessor.IsInterestedInHandledEvents || !e.Handled)
@@ -81,7 +81,7 @@ namespace dnSpy.Text.Editor {
 			}
 		}
 
-		void VisualElement_TextInput(object sender, TextCompositionEventArgs e) {
+		void VisualElement_TextInput(object? sender, TextCompositionEventArgs e) {
 			var array = keyProcessors;
 			foreach (var keyProcessor in array) {
 				if (keyProcessor.IsInterestedInHandledEvents || !e.Handled)
@@ -89,7 +89,7 @@ namespace dnSpy.Text.Editor {
 			}
 		}
 
-		void VisualElement_PreviewTextInput(object sender, TextCompositionEventArgs e) {
+		void VisualElement_PreviewTextInput(object? sender, TextCompositionEventArgs e) {
 			var array = keyProcessors;
 			foreach (var keyProcessor in array) {
 				if (keyProcessor.IsInterestedInHandledEvents || !e.Handled)
@@ -97,7 +97,7 @@ namespace dnSpy.Text.Editor {
 			}
 		}
 
-		void VisualElement_TextInputStart(object sender, TextCompositionEventArgs e) {
+		void VisualElement_TextInputStart(object? sender, TextCompositionEventArgs e) {
 			var array = keyProcessors;
 			foreach (var keyProcessor in array) {
 				if (keyProcessor.IsInterestedInHandledEvents || !e.Handled)
@@ -105,7 +105,7 @@ namespace dnSpy.Text.Editor {
 			}
 		}
 
-		void VisualElement_PreviewTextInputStart(object sender, TextCompositionEventArgs e) {
+		void VisualElement_PreviewTextInputStart(object? sender, TextCompositionEventArgs e) {
 			var array = keyProcessors;
 			foreach (var keyProcessor in array) {
 				if (keyProcessor.IsInterestedInHandledEvents || !e.Handled)
@@ -113,7 +113,7 @@ namespace dnSpy.Text.Editor {
 			}
 		}
 
-		void VisualElement_TextInputUpdate(object sender, TextCompositionEventArgs e) {
+		void VisualElement_TextInputUpdate(object? sender, TextCompositionEventArgs e) {
 			var array = keyProcessors;
 			foreach (var keyProcessor in array) {
 				if (keyProcessor.IsInterestedInHandledEvents || !e.Handled)
@@ -121,7 +121,7 @@ namespace dnSpy.Text.Editor {
 			}
 		}
 
-		void VisualElement_PreviewTextInputUpdate(object sender, TextCompositionEventArgs e) {
+		void VisualElement_PreviewTextInputUpdate(object? sender, TextCompositionEventArgs e) {
 			var array = keyProcessors;
 			foreach (var keyProcessor in array) {
 				if (keyProcessor.IsInterestedInHandledEvents || !e.Handled)
@@ -145,15 +145,15 @@ namespace dnSpy.Text.Editor {
 				if (!wpfTextView.TextDataModel.ContentType.IsOfAnyType(provider.Metadata.ContentTypes))
 					continue;
 				var keyProcessor = provider.Value.GetAssociatedProcessor(wpfTextView);
-				if (keyProcessor != null)
+				if (!(keyProcessor is null))
 					list.Add(keyProcessor);
 			}
 			keyProcessors = list.ToArray();
 		}
 
-		void TextDataModel_ContentTypeChanged(object sender, TextDataModelContentTypeChangedEventArgs e) => Reinitialize();
+		void TextDataModel_ContentTypeChanged(object? sender, TextDataModelContentTypeChangedEventArgs e) => Reinitialize();
 
-		void WpfTextView_Closed(object sender, EventArgs e) {
+		void WpfTextView_Closed(object? sender, EventArgs e) {
 			CleanUp();
 			wpfTextView.Closed -= WpfTextView_Closed;
 			wpfTextView.TextDataModel.ContentTypeChanged -= TextDataModel_ContentTypeChanged;

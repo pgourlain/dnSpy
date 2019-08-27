@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -49,7 +49,7 @@ namespace dnSpy.Contracts.Search {
 		/// A search result that was added to indicate that it's searching. Should be removed from
 		/// the list after the search has completed if it's not null.
 		/// </summary>
-		ISearchResult SearchingResult { get; }
+		ISearchResult? SearchingResult { get; }
 
 		/// <summary>
 		/// Starts the search
@@ -71,11 +71,11 @@ namespace dnSpy.Contracts.Search {
 		/// <summary>
 		/// Raised when the search has completed or was canceled
 		/// </summary>
-		event EventHandler OnSearchCompleted;
+		event EventHandler? OnSearchCompleted;
 
 		/// <summary>
 		/// Raised when there are more results available
 		/// </summary>
-		event EventHandler<SearchResultEventArgs> OnNewSearchResults;
+		event EventHandler<SearchResultEventArgs>? OnNewSearchResults;
 	}
 }

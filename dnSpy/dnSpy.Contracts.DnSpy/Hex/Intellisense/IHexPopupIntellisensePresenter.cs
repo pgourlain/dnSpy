@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -36,7 +36,7 @@ namespace dnSpy.Contracts.Hex.Intellisense {
 		/// <summary>
 		/// Raised after <see cref="SurfaceElement"/> is changed
 		/// </summary>
-		event EventHandler SurfaceElementChanged;
+		event EventHandler? SurfaceElementChanged;
 
 		/// <summary>
 		/// Gets the presentation span
@@ -46,7 +46,7 @@ namespace dnSpy.Contracts.Hex.Intellisense {
 		/// <summary>
 		/// Raised after <see cref="PresentationSpan"/> is changed
 		/// </summary>
-		event EventHandler PresentationSpanChanged;
+		event EventHandler? PresentationSpanChanged;
 
 		/// <summary>
 		/// Gets the popup style
@@ -56,7 +56,7 @@ namespace dnSpy.Contracts.Hex.Intellisense {
 		/// <summary>
 		/// Raised after <see cref="PopupStyles"/> is changed
 		/// </summary>
-		event EventHandler<VSLI.ValueChangedEventArgs<VSTA.PopupStyles>> PopupStylesChanged;
+		event EventHandler<VSLI.ValueChangedEventArgs<VSTA.PopupStyles>>? PopupStylesChanged;
 
 		/// <summary>
 		/// Gets the name of the <see cref="HexSpaceReservationManager"/>

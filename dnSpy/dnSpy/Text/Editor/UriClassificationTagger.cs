@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -41,12 +41,12 @@ namespace dnSpy.Text.Editor {
 			classificationTag = new ClassificationTag(themeClassificationTypeService.GetClassificationType(TextColor.Url));
 		}
 
-		public ITagger<T> CreateTagger<T>(ITextView textView, ITextBuffer buffer) where T : ITag =>
+		public ITagger<T>? CreateTagger<T>(ITextView textView, ITextBuffer buffer) where T : ITag =>
 			new UriClassificationTagger(classificationTag, buffer, viewTagAggregatorFactoryService.CreateTagAggregator<IUrlTag>(textView)) as ITagger<T>;
 	}
 
 	sealed class UriClassificationTagger : ITagger<IClassificationTag>, IDisposable {
-		public event EventHandler<SnapshotSpanEventArgs> TagsChanged;
+		public event EventHandler<SnapshotSpanEventArgs>? TagsChanged;
 
 		readonly IClassificationTag classificationTag;
 		readonly ITagAggregator<IUrlTag> tagAggregator;
@@ -59,7 +59,7 @@ namespace dnSpy.Text.Editor {
 			tagAggregator.TagsChanged += TagAggregator_TagsChanged;
 		}
 
-		void TagAggregator_TagsChanged(object sender, TagsChangedEventArgs e) {
+		void TagAggregator_TagsChanged(object? sender, TagsChangedEventArgs e) {
 			foreach (var span in e.Span.GetSpans(textBuffer))
 				TagsChanged?.Invoke(this, new SnapshotSpanEventArgs(span));
 		}

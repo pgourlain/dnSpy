@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -29,7 +29,7 @@ namespace dnSpy.Debugger.Impl {
 	sealed class SwitchToDebuggedProcess : IDbgManagerStartListener {
 		readonly DebuggerSettings debuggerSettings;
 		bool ignoreSetForeground;
-		DbgProcess currentProcess;
+		DbgProcess? currentProcess;
 
 		[ImportingConstructor]
 		SwitchToDebuggedProcess(DebuggerSettings debuggerSettings) => this.debuggerSettings = debuggerSettings;
@@ -42,42 +42,42 @@ namespace dnSpy.Debugger.Impl {
 			dbgManager.ProcessesChanged += DbgManager_ProcessesChanged;
 		}
 
-		void DbgManager_ProcessesChanged(object sender, DbgCollectionChangedEventArgs<DbgProcess> e) {
-			if (!e.Added && e.Objects.Contains(currentProcess))
+		void DbgManager_ProcessesChanged(object? sender, DbgCollectionChangedEventArgs<DbgProcess> e) {
+			if (!e.Added && e.Objects.Contains(currentProcess!))
 				currentProcess = null;
 		}
 
-		void DbgManager_CurrentProcessChanged(object sender, DbgCurrentObjectChangedEventArgs<DbgProcess> e) {
+		void DbgManager_CurrentProcessChanged(object? sender, DbgCurrentObjectChangedEventArgs<DbgProcess> e) {
 			if (!e.CurrentChanged)
 				return;
-			var newProcess = ((DbgManager)sender).CurrentProcess.Current;
-			if (newProcess != null)
+			var newProcess = ((DbgManager)sender!).CurrentProcess.Current;
+			if (!(newProcess is null))
 				currentProcess = newProcess;
 		}
 
-		void DbgManager_IsDebuggingChanged(object sender, EventArgs e) {
+		void DbgManager_IsDebuggingChanged(object? sender, EventArgs e) {
 			ignoreSetForeground = true;
 			currentProcess = null;
 		}
 
-		void DbgManager_IsRunningChanged(object sender, EventArgs e) {
-			var dbgManager = (DbgManager)sender;
+		void DbgManager_IsRunningChanged(object? sender, EventArgs e) {
+			var dbgManager = (DbgManager)sender!;
 			if (dbgManager.IsRunning != false)
 				return;
 			ignoreSetForeground = false;
 		}
 
-		void DbgManager_DelayedIsRunningChanged(object sender, EventArgs e) {
+		void DbgManager_DelayedIsRunningChanged(object? sender, EventArgs e) {
 			var process = currentProcess;
 			currentProcess = null;
 
 			// Ignore it the first time because the OS will give the debugged process focus
 			if (ignoreSetForeground)
 				return;
-			if (process == null)
-				process = ((DbgManager)sender).Processes.FirstOrDefault(a => a.State == DbgProcessState.Running);
+			if (process is null)
+				process = ((DbgManager)sender!).Processes.FirstOrDefault(a => a.State == DbgProcessState.Running);
 			// Fails if the process hasn't been created yet (eg. the engine hasn't connected to the process yet)
-			if (process == null)
+			if (process is null)
 				return;
 			if (!debuggerSettings.FocusActiveProcess)
 				return;

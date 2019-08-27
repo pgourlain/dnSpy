@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -30,9 +30,9 @@ namespace dnSpy.Text.Editor {
 	sealed class SpaceReservationManager : ISpaceReservationManager {
 		public ReadOnlyCollection<ISpaceReservationAgent> Agents { get; }
 		public bool HasAggregateFocus { get; private set; }
-		public event EventHandler<SpaceReservationAgentChangedEventArgs> AgentChanged;
-		public event EventHandler GotAggregateFocus;
-		public event EventHandler LostAggregateFocus;
+		public event EventHandler<SpaceReservationAgentChangedEventArgs>? AgentChanged;
+		public event EventHandler? GotAggregateFocus;
+		public event EventHandler? LostAggregateFocus;
 
 		public bool IsMouseOver {
 			get {
@@ -57,7 +57,7 @@ namespace dnSpy.Text.Editor {
 		public void AddAgent(ISpaceReservationAgent agent) {
 			if (wpfTextView.IsClosed)
 				throw new InvalidOperationException();
-			if (agent == null)
+			if (agent is null)
 				throw new ArgumentNullException(nameof(agent));
 			if (spaceReservationAgents.Contains(agent))
 				throw new InvalidOperationException();
@@ -70,7 +70,7 @@ namespace dnSpy.Text.Editor {
 		}
 
 		public bool RemoveAgent(ISpaceReservationAgent agent) {
-			if (agent == null)
+			if (agent is null)
 				throw new ArgumentNullException(nameof(agent));
 			if (!spaceReservationAgents.Remove(agent))
 				return false;
@@ -86,9 +86,9 @@ namespace dnSpy.Text.Editor {
 		public ISpaceReservationAgent CreatePopupAgent(ITrackingSpan visualSpan, PopupStyles style, UIElement content) {
 			if (wpfTextView.IsClosed)
 				throw new InvalidOperationException();
-			if (visualSpan == null)
+			if (visualSpan is null)
 				throw new ArgumentNullException(nameof(visualSpan));
-			if (content == null)
+			if (content is null)
 				throw new ArgumentNullException(nameof(content));
 			if ((style & (PopupStyles.DismissOnMouseLeaveText | PopupStyles.DismissOnMouseLeaveTextOrContent)) == (PopupStyles.DismissOnMouseLeaveText | PopupStyles.DismissOnMouseLeaveTextOrContent))
 				throw new ArgumentOutOfRangeException(nameof(style));
@@ -98,24 +98,24 @@ namespace dnSpy.Text.Editor {
 		public void UpdatePopupAgent(ISpaceReservationAgent agent, ITrackingSpan visualSpan, PopupStyles styles) {
 			if (wpfTextView.IsClosed)
 				throw new InvalidOperationException();
-			if (agent == null)
+			if (agent is null)
 				throw new ArgumentNullException(nameof(agent));
-			if (visualSpan == null)
+			if (visualSpan is null)
 				throw new ArgumentNullException(nameof(visualSpan));
 			if ((styles & (PopupStyles.DismissOnMouseLeaveText | PopupStyles.DismissOnMouseLeaveTextOrContent)) == (PopupStyles.DismissOnMouseLeaveText | PopupStyles.DismissOnMouseLeaveTextOrContent))
 				throw new ArgumentOutOfRangeException(nameof(styles));
 			if (!spaceReservationAgents.Contains(agent))
 				throw new ArgumentOutOfRangeException(nameof(agent));
 			var popupAgent = agent as PopupSpaceReservationAgent;
-			if (popupAgent == null)
+			if (popupAgent is null)
 				throw new ArgumentException();
 			popupAgent.Update(visualSpan, styles);
 			UpdateAggregateFocus();
 			wpfTextView.QueueSpaceReservationStackRefresh();
 		}
 
-		void SpaceReservationAgent_GotFocus(object sender, EventArgs e) => UpdateAggregateFocus();
-		void SpaceReservationAgent_LostFocus(object sender, EventArgs e) => UpdateAggregateFocus();
+		void SpaceReservationAgent_GotFocus(object? sender, EventArgs e) => UpdateAggregateFocus();
+		void SpaceReservationAgent_LostFocus(object? sender, EventArgs e) => UpdateAggregateFocus();
 
 		void UpdateAggregateFocus() {
 			bool newValue = CalculateAggregateFocus();
@@ -144,7 +144,7 @@ namespace dnSpy.Text.Editor {
 			for (int i = spaceReservationAgents.Count - 1; i >= 0; i--) {
 				var agent = spaceReservationAgents[i];
 				var geometry = isVisible ? agent.PositionAndDisplay(reservedSpace) : null;
-				if (geometry == null)
+				if (geometry is null)
 					RemoveAgent(agent);
 				else if (!geometry.IsEmpty())
 					reservedSpace.Children.Add(geometry);
@@ -153,7 +153,7 @@ namespace dnSpy.Text.Editor {
 			UpdateAggregateFocus();
 		}
 
-		void WpfTextView_Closed(object sender, EventArgs e) {
+		void WpfTextView_Closed(object? sender, EventArgs e) {
 			while (spaceReservationAgents.Count > 0)
 				RemoveAgent(spaceReservationAgents[spaceReservationAgents.Count - 1]);
 			wpfTextView.Closed -= WpfTextView_Closed;

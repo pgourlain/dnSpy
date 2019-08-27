@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -32,8 +32,8 @@ namespace dnSpy.Debugger.Breakpoints.Code {
 		public override int Id { get; }
 		public override DbgCodeBreakpointOptions Options { get; }
 		public override DbgCodeLocation Location { get; }
-		public override event EventHandler<DbgBreakpointHitCheckEventArgs> HitCheck;
-		public override event EventHandler<DbgBreakpointHitEventArgs> Hit;
+		public override event EventHandler<DbgBreakpointHitCheckEventArgs>? HitCheck;
+		public override event EventHandler<DbgBreakpointHitEventArgs>? Hit;
 
 		public override DbgCodeBreakpointSettings Settings {
 			get {
@@ -100,7 +100,7 @@ namespace dnSpy.Debugger.Breakpoints.Code {
 			}
 		}
 
-		public override event EventHandler<DbgCollectionChangedEventArgs<DbgBoundCodeBreakpoint>> BoundBreakpointsChanged;
+		public override event EventHandler<DbgCollectionChangedEventArgs<DbgBoundCodeBreakpoint>>? BoundBreakpointsChanged;
 		public override DbgBoundCodeBreakpoint[] BoundBreakpoints {
 			get {
 				lock (lockObj)
@@ -109,7 +109,7 @@ namespace dnSpy.Debugger.Breakpoints.Code {
 		}
 		readonly List<DbgBoundCodeBreakpoint> boundCodeBreakpoints;
 
-		public override event EventHandler BoundBreakpointsMessageChanged;
+		public override event EventHandler? BoundBreakpointsMessageChanged;
 		public override DbgBoundCodeBreakpointMessage BoundBreakpointsMessage {
 			get {
 				lock (lockObj)
@@ -139,7 +139,7 @@ namespace dnSpy.Debugger.Breakpoints.Code {
 			bool raiseBoundBreakpointsMessageChanged;
 			lock (lockObj) {
 				settings = newSettings;
-				if (settings.Labels == null)
+				if (settings.Labels is null)
 					settings.Labels = emptyLabels;
 				var oldMessage = boundBreakpointsMessage;
 				boundBreakpointsMessage = CalculateBoundBreakpointsMessage_NoLock();
@@ -206,7 +206,7 @@ namespace dnSpy.Debugger.Breakpoints.Code {
 			return raiseBoundBreakpointsMessageChanged;
 		}
 
-		void DbgBoundCodeBreakpoint_PropertyChanged(object sender, PropertyChangedEventArgs e) {
+		void DbgBoundCodeBreakpoint_PropertyChanged(object? sender, PropertyChangedEventArgs e) {
 			owner.DbgDispatcher.VerifyAccess();
 			if (e.PropertyName == nameof(DbgBoundCodeBreakpoint.Message)) {
 				bool raiseBoundBreakpointsMessageChanged;
@@ -225,26 +225,26 @@ namespace dnSpy.Debugger.Breakpoints.Code {
 			DbgBoundCodeBreakpointMessage? warningMsg = null;
 			foreach (var bp in boundCodeBreakpoints) {
 				var msg = bp.Message;
-				Debug.Assert(msg.Message != null);
-				if (msg.Message == null)
+				Debug2.Assert(!(msg.Message is null));
+				if (msg.Message is null)
 					continue;
 				switch (msg.Severity) {
 				case DbgBoundCodeBreakpointSeverity.None:
 					break;
 
 				case DbgBoundCodeBreakpointSeverity.Warning:
-					if (warningMsg == null)
+					if (warningMsg is null)
 						warningMsg = msg;
 					break;
 
 				case DbgBoundCodeBreakpointSeverity.Error:
-					if (errorMsg == null)
+					if (errorMsg is null)
 						errorMsg = msg;
 					break;
 
 				default:
 					Debug.Fail($"Unknown message severity: {msg.Severity}");
-					if (errorMsg == null)
+					if (errorMsg is null)
 						errorMsg = new DbgBoundCodeBreakpointMessage(DbgBoundCodeBreakpointSeverity.Error, "???");
 					break;
 				}
@@ -275,10 +275,10 @@ namespace dnSpy.Debugger.Breakpoints.Code {
 
 		protected override void CloseCore(DbgDispatcher dispatcher) {
 			Location.Close(dispatcher);
-			HitCheck = null;
-			Hit = null;
-			BoundBreakpointsChanged = null;
-			BoundBreakpointsMessageChanged = null;
+			HitCheck = null!;
+			Hit = null!;
+			BoundBreakpointsChanged = null!;
+			BoundBreakpointsMessageChanged = null!;
 		}
 	}
 }

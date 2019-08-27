@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -25,7 +25,7 @@ using dnSpy.Contracts.BackgroundImage;
 
 namespace dnSpy.BackgroundImage {
 	interface IBackgroundImageSettings {
-		event EventHandler SettingsChanged;
+		event EventHandler? SettingsChanged;
 		string[] Images { get; }
 		Stretch Stretch { get; }
 		StretchDirection StretchDirection { get; }
@@ -48,7 +48,7 @@ namespace dnSpy.BackgroundImage {
 	sealed class BackgroundImageSettings : IBackgroundImageSettings {
 		readonly RawSettings rawSettings;
 
-		public event EventHandler SettingsChanged;
+		public event EventHandler? SettingsChanged;
 
 		public string[] Images => rawSettings.Images.ToArray();
 		public Stretch Stretch => rawSettings.Stretch;

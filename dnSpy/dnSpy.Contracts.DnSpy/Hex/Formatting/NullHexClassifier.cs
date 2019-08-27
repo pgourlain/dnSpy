@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -32,7 +32,7 @@ namespace dnSpy.Contracts.Hex.Formatting {
 		public static readonly HexClassifier Instance = new RealNullHexClassifier();
 
 		sealed class RealNullHexClassifier : HexClassifier {
-			public override event EventHandler<HexClassificationChangedEventArgs> ClassificationChanged {
+			public override event EventHandler<HexClassificationChangedEventArgs>? ClassificationChanged {
 				add { }
 				remove { }
 			}

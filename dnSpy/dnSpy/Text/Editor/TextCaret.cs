@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -42,16 +42,16 @@ namespace dnSpy.Text.Editor {
 		public double Height => textCaretLayer.Height;
 		public bool InVirtualSpace => currentPosition.VirtualSpaces > 0;
 		public bool OverwriteMode => textCaretLayer.OverwriteMode;
-		public ITextViewLine ContainingTextViewLine => GetLine(currentPosition.Position, Affinity);
+		public ITextViewLine ContainingTextViewLine => GetLine(currentPosition.Position, Affinity)!;
 		internal VirtualSnapshotPoint CurrentPosition => currentPosition;
 		PositionAffinity Affinity { get; set; }
 
 		public bool IsHidden {
-			get { return textCaretLayer.IsHidden; }
-			set { textCaretLayer.IsHidden = value; }
+			get => textCaretLayer.IsHidden;
+			set => textCaretLayer.IsHidden = value;
 		}
 
-		public event EventHandler<CaretPositionChangedEventArgs> PositionChanged;
+		public event EventHandler<CaretPositionChangedEventArgs>? PositionChanged;
 		public CaretPosition Position => new CaretPosition(currentPosition, textView.BufferGraph.CreateMappingPoint(currentPosition.Position, PointTrackingMode.Positive), Affinity);
 		VirtualSnapshotPoint currentPosition;
 
@@ -62,9 +62,9 @@ namespace dnSpy.Text.Editor {
 		double preferredXCoordinate;
 
 		public TextCaret(IWpfTextView textView, IAdornmentLayer caretLayer, ISmartIndentationService smartIndentationService, IClassificationFormatMap classificationFormatMap) {
-			if (caretLayer == null)
+			if (caretLayer is null)
 				throw new ArgumentNullException(nameof(caretLayer));
-			if (classificationFormatMap == null)
+			if (classificationFormatMap is null)
 				throw new ArgumentNullException(nameof(classificationFormatMap));
 			this.textView = textView ?? throw new ArgumentNullException(nameof(textView));
 			imeState = new ImeState();
@@ -83,15 +83,15 @@ namespace dnSpy.Text.Editor {
 			InputMethod.SetIsInputMethodSuspended(textView.VisualElement, true);
 		}
 
-		void TextView_LayoutChanged(object sender, TextViewLayoutChangedEventArgs e) {
+		void TextView_LayoutChanged(object? sender, TextViewLayoutChangedEventArgs e) {
 			if (e.OldSnapshot != e.NewSnapshot)
 				OnImplicitCaretPositionChanged();
 			if (imeState.CompositionStarted)
 				MoveImeCompositionWindow();
 		}
 
-		void VisualElement_GotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e) => InitializeIME();
-		void VisualElement_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e) => StopIME(true);
+		void VisualElement_GotKeyboardFocus(object? sender, KeyboardFocusChangedEventArgs e) => InitializeIME();
+		void VisualElement_LostKeyboardFocus(object? sender, KeyboardFocusChangedEventArgs e) => StopIME(true);
 
 		void CancelCompositionString() {
 			if (imeState.Context == IntPtr.Zero)
@@ -102,10 +102,10 @@ namespace dnSpy.Text.Editor {
 		}
 
 		void InitializeIME() {
-			if (imeState.HwndSource != null)
+			if (!(imeState.HwndSource is null))
 				return;
 			imeState.HwndSource = PresentationSource.FromVisual(textView.VisualElement) as HwndSource;
-			if (imeState.HwndSource == null)
+			if (imeState.HwndSource is null)
 				return;
 
 			Debug.Assert(imeState.Context == IntPtr.Zero);
@@ -125,7 +125,7 @@ namespace dnSpy.Text.Editor {
 		}
 
 		void StopIME(bool cancelCompositionString) {
-			if (imeState.HwndSource == null)
+			if (imeState.HwndSource is null)
 				return;
 			if (cancelCompositionString)
 				CancelCompositionString();
@@ -138,7 +138,7 @@ namespace dnSpy.Text.Editor {
 
 		static class TfThreadMgrHelper {
 			static bool initd;
-			static ITfThreadMgr tfThreadMgr;
+			static ITfThreadMgr? tfThreadMgr;
 
 			[DllImport("msctf")]
 			static extern int TF_CreateThreadMgr(out ITfThreadMgr pptim);
@@ -206,7 +206,7 @@ namespace dnSpy.Text.Editor {
 				}
 			}
 
-			public HwndSource HwndSource;
+			public HwndSource? HwndSource;
 			public IntPtr Context;
 			public IntPtr HWND;
 			public IntPtr OldContext;
@@ -262,13 +262,13 @@ namespace dnSpy.Text.Editor {
 			var compForm = new ImeState.COMPOSITIONFORM();
 			compForm.dwStyle = CFS_DEFAULT;
 
-			var rootVisual = imeState.HwndSource.RootVisual;
-			GeneralTransform generalTransform = null;
-			if (rootVisual != null && rootVisual.IsAncestorOf(textView.VisualElement))
+			var rootVisual = imeState.HwndSource!.RootVisual;
+			GeneralTransform? generalTransform = null;
+			if (!(rootVisual is null) && rootVisual.IsAncestorOf(textView.VisualElement))
 				generalTransform = textView.VisualElement.TransformToAncestor(rootVisual);
 
 			var compTarget = imeState.HwndSource.CompositionTarget;
-			if (generalTransform != null && compTarget != null) {
+			if (!(generalTransform is null) && !(compTarget is null)) {
 				var transform = compTarget.TransformToDevice;
 				compForm.dwStyle = CFS_FORCE_POSITION;
 
@@ -285,7 +285,7 @@ namespace dnSpy.Text.Editor {
 			ImeState.ImmSetCompositionWindow(imeState.Context, ref compForm);
 		}
 
-		void Options_OptionChanged(object sender, EditorOptionChangedEventArgs e) {
+		void Options_OptionChanged(object? sender, EditorOptionChangedEventArgs e) {
 			if (e.OptionId == DefaultTextViewOptions.UseVirtualSpaceName) {
 				if (currentPosition.VirtualSpaces > 0 && textView.Selection.Mode != TextSelectionMode.Box && !textView.Options.IsVirtualSpaceEnabled())
 					MoveTo(currentPosition.Position);
@@ -298,11 +298,11 @@ namespace dnSpy.Text.Editor {
 			}
 		}
 
-		void TextBuffer_ContentTypeChanged(object sender, ContentTypeChangedEventArgs e) =>
+		void TextBuffer_ContentTypeChanged(object? sender, ContentTypeChangedEventArgs e) =>
 			// The value is cached, make sure it uses the latest snapshot
 			OnImplicitCaretPositionChanged();
 
-		void TextBuffer_ChangedHighPriority(object sender, TextContentChangedEventArgs e) {
+		void TextBuffer_ChangedHighPriority(object? sender, TextContentChangedEventArgs e) {
 			// The value is cached, make sure it uses the latest snapshot
 			OnImplicitCaretPositionChanged();
 			if (textView.Options.IsAutoScrollEnabled()) {
@@ -348,7 +348,7 @@ namespace dnSpy.Text.Editor {
 			if (line.VisibilityState != VisibilityState.FullyVisible) {
 				ViewRelativePosition relativeTo;
 				var firstVisibleLine = textView.TextViewLines?.FirstVisibleLine;
-				if (firstVisibleLine == null || !firstVisibleLine.IsVisible())
+				if (firstVisibleLine is null || !firstVisibleLine.IsVisible())
 					relativeTo = ViewRelativePosition.Top;
 				else if (line.Start.Position <= firstVisibleLine.Start.Position)
 					relativeTo = ViewRelativePosition.Top;
@@ -404,7 +404,7 @@ namespace dnSpy.Text.Editor {
 		public CaretPosition MoveTo(ITextViewLine textLine, double xCoordinate, bool captureHorizontalPosition) =>
 			MoveTo(textLine, xCoordinate, captureHorizontalPosition, true, true);
 		CaretPosition MoveTo(ITextViewLine textLine, double xCoordinate, bool captureHorizontalPosition, bool captureVerticalPosition, bool canAutoIndent) {
-			if (textLine == null)
+			if (textLine is null)
 				throw new ArgumentNullException(nameof(textLine));
 
 			bool filterPos = true;
@@ -505,8 +505,8 @@ namespace dnSpy.Text.Editor {
 		double PreferredYCoordinate => Math.Min(__preferredYCoordinate, textView.ViewportHeight) + textView.ViewportTop;
 		double __preferredYCoordinate;
 
-		ITextViewLine GetVisibleCaretLine() {
-			if (textView.TextViewLines == null)
+		ITextViewLine? GetVisibleCaretLine() {
+			if (textView.TextViewLines is null)
 				return null;
 			var line = ContainingTextViewLine;
 			if (line.IsVisible())
@@ -520,7 +520,7 @@ namespace dnSpy.Text.Editor {
 
 		void SavePreferredYCoordinate() {
 			var line = GetVisibleCaretLine();
-			if (line != null)
+			if (!(line is null))
 				__preferredYCoordinate = (line.Top + line.Bottom) / 2 - textView.ViewportTop;
 			else
 				__preferredYCoordinate = 0;
@@ -528,15 +528,15 @@ namespace dnSpy.Text.Editor {
 
 		public CaretPosition MoveToPreferredCoordinates() {
 			var textLine = textView.TextViewLines.GetTextViewLineContainingYCoordinate(PreferredYCoordinate);
-			if (textLine == null || !textLine.IsVisible())
+			if (textLine is null || !textLine.IsVisible())
 				textLine = PreferredYCoordinate <= textView.ViewportTop ? textView.TextViewLines.FirstVisibleLine : textView.TextViewLines.LastVisibleLine;
 			return MoveTo(textLine, preferredXCoordinate, false, false, true);
 		}
 
-		ITextViewLine GetLine(SnapshotPoint bufferPosition, PositionAffinity affinity) {
+		ITextViewLine? GetLine(SnapshotPoint bufferPosition, PositionAffinity affinity) {
 			bufferPosition = bufferPosition.TranslateTo(textView.TextSnapshot, GetPointTrackingMode(affinity));
 			var line = textView.GetTextViewLineContainingBufferPosition(bufferPosition);
-			if (line == null)
+			if (line is null)
 				return null;
 			if (affinity == PositionAffinity.Successor)
 				return line;

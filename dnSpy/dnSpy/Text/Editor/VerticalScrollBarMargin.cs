@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -39,7 +39,7 @@ namespace dnSpy.Text.Editor {
 		[ImportingConstructor]
 		VerticalScrollBarMarginProvider(IScrollMapFactoryService scrollMapFactoryService) => this.scrollMapFactoryService = scrollMapFactoryService;
 
-		public IWpfTextViewMargin CreateMargin(IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin marginContainer) =>
+		public IWpfTextViewMargin? CreateMargin(IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin marginContainer) =>
 			new VerticalScrollBarMargin(scrollMapFactoryService, wpfTextViewHost);
 	}
 
@@ -55,7 +55,7 @@ namespace dnSpy.Text.Editor {
 		readonly IScrollMap scrollMap;
 
 		public VerticalScrollBarMargin(IScrollMapFactoryService scrollMapFactoryService, IWpfTextViewHost wpfTextViewHost) {
-			if (scrollMapFactoryService == null)
+			if (scrollMapFactoryService is null)
 				throw new ArgumentNullException(nameof(scrollMapFactoryService));
 			this.wpfTextViewHost = wpfTextViewHost ?? throw new ArgumentNullException(nameof(wpfTextViewHost));
 			scrollMap = scrollMapFactoryService.Create(wpfTextViewHost.TextView, true);
@@ -70,10 +70,10 @@ namespace dnSpy.Text.Editor {
 
 		void UpdateVisibility() => Visibility = Enabled ? Visibility.Visible : Visibility.Collapsed;
 
-		public ITextViewMargin GetTextViewMargin(string marginName) =>
+		public ITextViewMargin? GetTextViewMargin(string marginName) =>
 			StringComparer.OrdinalIgnoreCase.Equals(PredefinedMarginNames.VerticalScrollBar, marginName) ? this : null;
 
-		void ScrollMap_MappingChanged(object sender, EventArgs e) => UpdateMinMax();
+		void ScrollMap_MappingChanged(object? sender, EventArgs e) => UpdateMinMax();
 
 		void UpdateMinMax() {
 			Minimum = scrollMap.Start;
@@ -111,12 +111,12 @@ namespace dnSpy.Text.Editor {
 			}
 		}
 
-		void Options_OptionChanged(object sender, EditorOptionChangedEventArgs e) {
+		void Options_OptionChanged(object? sender, EditorOptionChangedEventArgs e) {
 			if (e.OptionId == DefaultTextViewHostOptions.VerticalScrollBarName)
 				UpdateVisibility();
 		}
 
-		void VerticalScrollBarMargin_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e) {
+		void VerticalScrollBarMargin_IsVisibleChanged(object? sender, DependencyPropertyChangedEventArgs e) {
 			if (Visibility == Visibility.Visible) {
 				RegisterEvents();
 				UpdateMinMax();
@@ -128,7 +128,7 @@ namespace dnSpy.Text.Editor {
 				UnregisterEvents();
 		}
 
-		void TextView_LayoutChanged(object sender, TextViewLayoutChangedEventArgs e) {
+		void TextView_LayoutChanged(object? sender, TextViewLayoutChangedEventArgs e) {
 			LargeChange = scrollMap.ThumbSize;
 			ViewportSize = scrollMap.ThumbSize;
 			Value = scrollMap.GetCoordinateAtBufferPosition(FirstVisibleLinePoint);

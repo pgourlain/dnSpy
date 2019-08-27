@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -33,7 +33,7 @@ namespace dnSpy.Hex.Classification {
 		readonly HexTagAggregator<HexClassificationTag> hexTagAggregator;
 		readonly HexBuffer buffer;
 
-		public override event EventHandler<HexClassificationChangedEventArgs> ClassificationChanged;
+		public override event EventHandler<HexClassificationChangedEventArgs>? ClassificationChanged;
 
 		protected HexClassifierAggregator(HexTagAggregator<HexClassificationTag> hexTagAggregator, VSTC.IClassificationTypeRegistryService classificationTypeRegistryService, HexBuffer buffer) {
 			this.classificationTypeRegistryService = classificationTypeRegistryService ?? throw new ArgumentNullException(nameof(classificationTypeRegistryService));
@@ -42,7 +42,7 @@ namespace dnSpy.Hex.Classification {
 			hexTagAggregator.TagsChanged += HexTagAggregator_TagsChanged;
 		}
 
-		void HexTagAggregator_TagsChanged(object sender, HexTagsChangedEventArgs e) =>
+		void HexTagAggregator_TagsChanged(object? sender, HexTagsChangedEventArgs e) =>
 			ClassificationChanged?.Invoke(this, new HexClassificationChangedEventArgs(e.Span));
 
 		sealed class HexClassificationSpanComparer : IComparer<HexClassificationSpan> {
@@ -63,10 +63,10 @@ namespace dnSpy.Hex.Classification {
 			var list = new List<HexClassificationSpan>();
 
 			var taggerContext = new HexTaggerContext(context.Line, context.LineSpan);
-			var tags = cancellationToken != null ? hexTagAggregator.GetAllTags(taggerContext, cancellationToken.Value) : hexTagAggregator.GetAllTags(taggerContext);
+			var tags = !(cancellationToken is null) ? hexTagAggregator.GetAllTags(taggerContext, cancellationToken.Value) : hexTagAggregator.GetAllTags(taggerContext);
 			foreach (var tagSpan in tags) {
 				var overlap = textSpan.Overlap(tagSpan.Span);
-				if (overlap != null)
+				if (!(overlap is null))
 					list.Add(new HexClassificationSpan(overlap.Value, tagSpan.Tag.ClassificationType));
 			}
 

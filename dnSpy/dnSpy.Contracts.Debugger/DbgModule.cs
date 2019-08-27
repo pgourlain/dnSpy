@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -29,7 +29,7 @@ namespace dnSpy.Contracts.Debugger {
 		/// <summary>
 		/// Raised when a property is changed
 		/// </summary>
-		public abstract event PropertyChangedEventHandler PropertyChanged;
+		public abstract event PropertyChangedEventHandler? PropertyChanged;
 
 		/// <summary>
 		/// Gets the runtime
@@ -44,7 +44,7 @@ namespace dnSpy.Contracts.Debugger {
 		/// <summary>
 		/// Gets the app domain or null if it's a process module
 		/// </summary>
-		public abstract DbgAppDomain AppDomain { get; }
+		public abstract DbgAppDomain? AppDomain { get; }
 
 		/// <summary>
 		/// Gets the module object created by the debug engine
@@ -119,7 +119,7 @@ namespace dnSpy.Contracts.Debugger {
 		/// <summary>
 		/// Raised when the module's memory has been updated (eg. decrypted)
 		/// </summary>
-		public abstract event EventHandler Refreshed;
+		public abstract event EventHandler? Refreshed;
 
 		/// <summary>
 		/// Gets incremented when the module gets refreshed (<see cref="Refreshed"/>)

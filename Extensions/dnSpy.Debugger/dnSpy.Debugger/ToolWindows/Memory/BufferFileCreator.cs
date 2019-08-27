@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -44,7 +44,7 @@ namespace dnSpy.Debugger.ToolWindows.Memory {
 			processHexBufferProvider.HexBufferInfoCreated += ProcessHexBufferProvider_HexBufferInfoCreated;
 
 		// UI thread
-		void ProcessHexBufferProvider_HexBufferInfoCreated(object sender, HexBufferInfoCreatedEventArgs e) {
+		void ProcessHexBufferProvider_HexBufferInfoCreated(object? sender, HexBufferInfoCreatedEventArgs e) {
 			uiDispatcher.VerifyAccess();
 			new ModuleListener(hexBufferFileServiceFactory.Value, e.HexBufferInfo, uiDispatcher);
 		}
@@ -56,7 +56,7 @@ namespace dnSpy.Debugger.ToolWindows.Memory {
 			readonly List<DbgRuntime> runtimes;
 			readonly Dictionary<HexPosition, int> moduleReferences;
 			readonly HashSet<DbgModule> addedModules;
-			DbgProcess process;
+			DbgProcess? process;
 
 			// UI thread
 			public ModuleListener(HexBufferFileServiceFactory hexBufferFileServiceFactory, IHexBufferInfo hexBufferInfo, UIDispatcher uiDispatcher) {
@@ -82,16 +82,16 @@ namespace dnSpy.Debugger.ToolWindows.Memory {
 			}
 
 			// UI thread
-			void OnProcessChanged_UI(DbgProcess newProcess) {
+			void OnProcessChanged_UI(DbgProcess? newProcess) {
 				uiDispatcher.VerifyAccess();
 				if (disposed) {
-					Debug.Assert(process == null);
+					Debug2.Assert(process is null);
 					Debug.Assert(runtimes.Count == 0);
 					Debug.Assert(moduleReferences.Count == 0);
 					Debug.Assert(!hexBufferFileService.Files.Any());
 					return;
 				}
-				if (process != null)
+				if (!(process is null))
 					process.RuntimesChanged -= Process_RuntimesChanged;
 				foreach (var r in runtimes)
 					r.ModulesChanged -= DbgRuntime_ModulesChanged;
@@ -101,7 +101,7 @@ namespace dnSpy.Debugger.ToolWindows.Memory {
 				addedModules.Clear();
 
 				process = newProcess;
-				if (newProcess != null)
+				if (!(newProcess is null))
 					newProcess.DbgManager.Dispatcher.BeginInvoke(() => OnNewProcess_DbgThread(newProcess));
 			}
 
@@ -121,7 +121,7 @@ namespace dnSpy.Debugger.ToolWindows.Memory {
 			}
 
 			// DbgThread
-			void Process_RuntimesChanged(object sender, DbgCollectionChangedEventArgs<DbgRuntime> e) =>
+			void Process_RuntimesChanged(object? sender, DbgCollectionChangedEventArgs<DbgRuntime> e) =>
 				UI(() => Process_RuntimesChanged_UI(e.Objects, e.Added));
 
 			// UI thread
@@ -145,8 +145,8 @@ namespace dnSpy.Debugger.ToolWindows.Memory {
 			}
 
 			// DbgThread
-			void DbgRuntime_ModulesChanged(object sender, DbgCollectionChangedEventArgs<DbgModule> e) =>
-				UI(() => DbgRuntime_ModulesChanged_UI((DbgRuntime)sender, e.Objects, e.Added));
+			void DbgRuntime_ModulesChanged(object? sender, DbgCollectionChangedEventArgs<DbgModule> e) =>
+				UI(() => DbgRuntime_ModulesChanged_UI((DbgRuntime)sender!, e.Objects, e.Added));
 
 			// UI thread
 			void DbgRuntime_ModulesChanged_UI(DbgRuntime runtime, IList<DbgModule> modules, bool added) {
@@ -201,13 +201,13 @@ namespace dnSpy.Debugger.ToolWindows.Memory {
 			}
 
 			// UI thread
-			void HexBufferInfo_UnderlyingProcessChanged(object sender, EventArgs e) {
+			void HexBufferInfo_UnderlyingProcessChanged(object? sender, EventArgs e) {
 				uiDispatcher.VerifyAccess();
 				OnProcessChanged_UI();
 			}
 
 			// UI thread
-			void Buffer_Disposed(object sender, EventArgs e) {
+			void Buffer_Disposed(object? sender, EventArgs e) {
 				uiDispatcher.VerifyAccess();
 				OnProcessChanged_UI(null);
 				disposed = true;

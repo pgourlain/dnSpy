@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -34,19 +34,16 @@ using dnSpy.Properties;
 namespace dnSpy.Documents.TreeView.Resources {
 	[ExportResourceNodeProvider(Order = DocumentTreeViewConstants.ORDER_RSRCPROVIDER_RSRCELEMSET)]
 	sealed class ResourceElementSetNodeProvider : IResourceNodeProvider {
-		public ResourceNode Create(ModuleDef module, Resource resource, ITreeNodeGroup treeNodeGroup) {
+		public DocumentTreeNodeData? Create(ModuleDef module, Resource resource, ITreeNodeGroup treeNodeGroup) {
 			var er = resource as EmbeddedResource;
-			if (er == null)
+			if (er is null)
 				return null;
-			er.Data.Position = 0;
-			if (!ResourceReader.CouldBeResourcesFile(er.Data))
+			if (!ResourceReader.CouldBeResourcesFile(er.CreateReader()))
 				return null;
-
-			er.Data.Position = 0;
 			return new ResourceElementSetNodeImpl(treeNodeGroup, module, er);
 		}
 
-		public ResourceElementNode Create(ModuleDef module, ResourceElement resourceElement, ITreeNodeGroup treeNodeGroup) => null;
+		public DocumentTreeNodeData? Create(ModuleDef module, ResourceElement resourceElement, ITreeNodeGroup treeNodeGroup) => null;
 	}
 
 	sealed class ResourceElementSetNodeImpl : ResourceElementSetNode {
@@ -59,7 +56,7 @@ namespace dnSpy.Documents.TreeView.Resources {
 		public ResourceElementSetNodeImpl(ITreeNodeGroup treeNodeGroup, ModuleDef module, EmbeddedResource resource)
 			: base(treeNodeGroup, resource) {
 			this.module = module;
-			resourceElementSet = ResourceReader.Read(module, resource.Data);
+			resourceElementSet = ResourceReader.Read(module, resource.CreateReader());
 		}
 
 		public override void Initialize() => TreeNode.LazyLoading = true;
@@ -72,8 +69,12 @@ namespace dnSpy.Documents.TreeView.Resources {
 
 		protected override IEnumerable<ResourceData> GetDeserializedData() {
 			TreeNode.EnsureChildrenLoaded();
-			foreach (IResourceDataProvider node in TreeNode.DataChildren) {
-				foreach (var data in node.GetResourceData(ResourceDataType.Deserialized))
+			foreach (DocumentTreeNodeData node in TreeNode.DataChildren) {
+				var provider = ResourceDataProviderUtils.GetResourceDataProvider(node);
+				Debug2.Assert(!(provider is null));
+				if (provider is null)
+					continue;
+				foreach (var data in provider.GetResourceData(ResourceDataType.Deserialized))
 					yield return data;
 			}
 		}
@@ -89,8 +90,8 @@ namespace dnSpy.Documents.TreeView.Resources {
 
 		public override void RegenerateEmbeddedResource() {
 			var module = this.GetModule();
-			Debug.Assert(module != null);
-			if (module == null)
+			Debug2.Assert(!(module is null));
+			if (module is null)
 				throw new InvalidOperationException();
 			RegenerateEmbeddedResource(module);
 		}
@@ -99,8 +100,13 @@ namespace dnSpy.Documents.TreeView.Resources {
 			TreeNode.EnsureChildrenLoaded();
 			var outStream = new MemoryStream();
 			var resources = new ResourceElementSet();
-			foreach (ResourceElementNode child in TreeNode.DataChildren)
-				resources.Add(child.ResourceElement);
+			foreach (DocumentTreeNodeData child in TreeNode.DataChildren) {
+				var resourceElement = ResourceElementNode.GetResourceElement(child);
+				if (resourceElement is null)
+					throw new InvalidOperationException();
+				resources.Add(resourceElement);
+			}
+
 			ResourceWriter.Write(module, outStream, resources);
 			Resource = new EmbeddedResource(Resource.Name, outStream.ToArray(), Resource.Attributes);
 		}

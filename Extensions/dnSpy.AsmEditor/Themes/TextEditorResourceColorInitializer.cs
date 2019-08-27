@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -36,7 +36,7 @@ namespace dnSpy.AsmEditor.Themes {
 			InitializeResources();
 		}
 
-		void ThemeService_ThemeChanged(object sender, ThemeChangedEventArgs e) => InitializeResources();
+		void ThemeService_ThemeChanged(object? sender, ThemeChangedEventArgs e) => InitializeResources();
 
 		void InitializeResources() {
 			var theme = themeService.Theme;
@@ -44,7 +44,7 @@ namespace dnSpy.AsmEditor.Themes {
 			foreach (var f in typeof(TextColor).GetFields()) {
 				if (!f.IsLiteral)
 					continue;
-				var val = (TextColor)f.GetValue(null);
+				var val = (TextColor)f.GetValue(null)!;
 				if (val != TextColor.Last)
 					UpdateTextEditorResource(val, f.Name);
 			}
@@ -66,14 +66,14 @@ namespace dnSpy.AsmEditor.Themes {
 			Application.Current.Resources[GetInheritedFontWeightResourceKey(name)] = color.FontWeight ?? FontWeights.Normal;
 		}
 
-		static Brush GetBrush(Brush b) => b ?? Brushes.Transparent;
-		static string GetTextInheritedForegroundResourceKey(string name) => string.Format("TETextInherited{0}Foreground", name);
-		static string GetTextInheritedBackgroundResourceKey(string name) => string.Format("TETextInherited{0}Background", name);
-		static string GetTextInheritedFontStyleResourceKey(string name) => string.Format("TETextInherited{0}FontStyle", name);
-		static string GetTextInheritedFontWeightResourceKey(string name) => string.Format("TETextInherited{0}FontWeight", name);
-		static string GetInheritedForegroundResourceKey(string name) => string.Format("TEInherited{0}Foreground", name);
-		static string GetInheritedBackgroundResourceKey(string name) => string.Format("TEInherited{0}Background", name);
-		static string GetInheritedFontStyleResourceKey(string name) => string.Format("TEInherited{0}FontStyle", name);
-		static string GetInheritedFontWeightResourceKey(string name) => string.Format("TEInherited{0}FontWeight", name);
+		static Brush GetBrush(Brush? b) => b ?? Brushes.Transparent;
+		static string GetTextInheritedForegroundResourceKey(string name) => $"TETextInherited{name}Foreground";
+		static string GetTextInheritedBackgroundResourceKey(string name) => $"TETextInherited{name}Background";
+		static string GetTextInheritedFontStyleResourceKey(string name) => $"TETextInherited{name}FontStyle";
+		static string GetTextInheritedFontWeightResourceKey(string name) => $"TETextInherited{name}FontWeight";
+		static string GetInheritedForegroundResourceKey(string name) => $"TEInherited{name}Foreground";
+		static string GetInheritedBackgroundResourceKey(string name) => $"TEInherited{name}Background";
+		static string GetInheritedFontStyleResourceKey(string name) => $"TEInherited{name}FontStyle";
+		static string GetInheritedFontWeightResourceKey(string name) => $"TEInherited{name}FontWeight";
 	}
 }

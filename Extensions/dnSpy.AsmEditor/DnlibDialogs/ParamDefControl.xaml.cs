@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -27,6 +27,6 @@ namespace dnSpy.AsmEditor.DnlibDialogs {
 			Loaded += ParamDefControl_Loaded;
 		}
 
-		void ParamDefControl_Loaded(object sender, RoutedEventArgs e) => nameTextBox.Focus();
+		void ParamDefControl_Loaded(object? sender, RoutedEventArgs e) => nameTextBox.Focus();
 	}
 }

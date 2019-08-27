@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -23,16 +23,16 @@ using VSUTIL = Microsoft.VisualStudio.Utilities;
 
 namespace dnSpy.Hex.Classification.DnSpy {
 	static class ContentTypeDefinitions {
-#pragma warning disable 0169
+#pragma warning disable CS0169
 		[Export]
 		[VSUTIL.Name(CT.ContentTypes.HexToolTip)]
 		[VSUTIL.BaseDefinition(CT.ContentTypes.Text)]
-		static readonly VSUTIL.ContentTypeDefinition HexToolTipContentTypeDefinition;
+		static readonly VSUTIL.ContentTypeDefinition? HexToolTipContentTypeDefinition;
 
 		[Export]
 		[VSUTIL.Name(CT.ContentTypes.DefaultHexToolTip)]
 		[VSUTIL.BaseDefinition(CT.ContentTypes.HexToolTip)]
-		static readonly VSUTIL.ContentTypeDefinition DefaultHexToolTipContentTypeDefinition;
-#pragma warning restore 0169
+		static readonly VSUTIL.ContentTypeDefinition? DefaultHexToolTipContentTypeDefinition;
+#pragma warning restore CS0169
 	}
 }

@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -29,9 +29,9 @@ namespace dnSpy.Contracts.Documents.TreeView.Resources {
 	sealed class DeserializedDataInfo {
 		public Type ObjectType { get; }
 		public string Name { get; }
-		public object Value { get; }
+		public object? Value { get; }
 
-		public DeserializedDataInfo(Type objectType, string name, object value) {
+		public DeserializedDataInfo(Type objectType, string name, object? value) {
 			ObjectType = objectType;
 			Name = name;
 			Value = value;
@@ -90,8 +90,8 @@ namespace dnSpy.Contracts.Documents.TreeView.Resources {
 			var fmt = new BinaryFormatter();
 			fmt.Binder = new MyBinder(asmName, typeName);
 			var obj = fmt.Deserialize(new MemoryStream(data)) as DeserializedType;
-			Debug.Assert(obj != null);
-			if (obj == null)
+			Debug2.Assert(!(obj is null));
+			if (obj is null)
 				return new Dictionary<string, DeserializedDataInfo>();
 			return obj.DeserializedDataInfos;
 		}

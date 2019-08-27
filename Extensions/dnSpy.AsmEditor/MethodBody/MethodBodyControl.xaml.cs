@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -22,9 +22,9 @@ using System.Windows.Controls;
 
 namespace dnSpy.AsmEditor.MethodBody {
 	sealed partial class MethodBodyControl : UserControl {
-		LocalsListHelper localsListHelper;
-		InstructionsListHelper instructionsListHelper;
-		ExceptionHandlersListHelper exceptionHandlersListHelper;
+		LocalsListHelper? localsListHelper;
+		InstructionsListHelper? instructionsListHelper;
+		ExceptionHandlersListHelper? exceptionHandlersListHelper;
 
 		public MethodBodyControl() {
 			InitializeComponent();
@@ -32,14 +32,14 @@ namespace dnSpy.AsmEditor.MethodBody {
 			Loaded += MethodBodyControl_Loaded;
 		}
 
-		void MethodBodyControl_Loaded(object sender, RoutedEventArgs e) {
+		void MethodBodyControl_Loaded(object? sender, RoutedEventArgs e) {
 			Loaded -= MethodBodyControl_Loaded;
 			SetFocusToControl();
 		}
 
 		void SetFocusToControl() {
 			var data = DataContext as MethodBodyVM;
-			if (data == null)
+			if (data is null)
 				return;
 
 			if (data.IsCilBody)
@@ -48,9 +48,9 @@ namespace dnSpy.AsmEditor.MethodBody {
 				rvaTextBox.Focus();
 		}
 
-		void MethodBodyControl_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e) {
+		void MethodBodyControl_DataContextChanged(object? sender, DependencyPropertyChangedEventArgs e) {
 			var data = DataContext as MethodBodyVM;
-			if (data == null)
+			if (data is null)
 				return;
 
 			var ownerWindow = Window.GetWindow(this);

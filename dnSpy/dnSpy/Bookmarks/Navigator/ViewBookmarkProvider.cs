@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -31,7 +31,7 @@ namespace dnSpy.Bookmarks.Navigator {
 		/// <summary>
 		/// Raised when <see cref="BookmarksViewOrder"/> is changed
 		/// </summary>
-		public abstract event EventHandler BookmarksViewOrderChanged;
+		public abstract event EventHandler? BookmarksViewOrderChanged;
 
 		/// <summary>
 		/// Gets the default bookmark that gets selected when the active bookmark gets removed

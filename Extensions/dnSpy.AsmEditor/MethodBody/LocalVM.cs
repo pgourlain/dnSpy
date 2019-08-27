@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -20,6 +20,7 @@
 using System;
 using System.Windows.Input;
 using dnlib.DotNet;
+using dnlib.DotNet.Pdb;
 using dnSpy.AsmEditor.Commands;
 using dnSpy.AsmEditor.DnlibDialogs;
 using dnSpy.AsmEditor.Properties;
@@ -33,15 +34,15 @@ namespace dnSpy.AsmEditor.MethodBody {
 		LocalOptions origOptions;
 
 		public ITypeSigCreator TypeSigCreator {
-			set { typeSigCreator = value; }
+			set => typeSigCreator = value;
 		}
-		ITypeSigCreator typeSigCreator;
+		ITypeSigCreator? typeSigCreator;
 
 		public ICommand ReinitializeCommand => new RelayCommand(a => Reinitialize());
 		public ICommand EditTypeCommand => new RelayCommand(a => EditType());
 
 		public int Index {
-			get { return index; }
+			get => index;
 			set {
 				if (index != value) {
 					index = value;
@@ -52,10 +53,10 @@ namespace dnSpy.AsmEditor.MethodBody {
 		int index;
 
 		public bool IsPinned {
-			get { return Type is PinnedSig; }
+			get => Type is PinnedSig;
 			set {
 				var t = Type;
-				if (t == null)
+				if (t is null)
 					return;
 				if (value) {
 					if (!(t is PinnedSig))
@@ -68,8 +69,8 @@ namespace dnSpy.AsmEditor.MethodBody {
 			}
 		}
 
-		public TypeSig Type {
-			get { return type; }
+		public TypeSig? Type {
+			get => type;
 			set {
 				if (type != value) {
 					type = value;
@@ -78,10 +79,10 @@ namespace dnSpy.AsmEditor.MethodBody {
 				}
 			}
 		}
-		TypeSig type;
+		TypeSig? type;
 
-		public string Name {
-			get { return name; }
+		public string? Name {
+			get => name;
 			set {
 				if (name != value) {
 					name = value;
@@ -89,28 +90,35 @@ namespace dnSpy.AsmEditor.MethodBody {
 				}
 			}
 		}
-		string name;
+		string? name;
 
-		public bool IsCompilerGenerated {
-			get { return PdbAttributes == 1; }
-			set { PdbAttributes = value ? 1 : 0; }
+		public bool DebuggerHidden {
+			get => (Attributes & PdbLocalAttributes.DebuggerHidden) != 0;
+			set {
+				if (value)
+					Attributes |= PdbLocalAttributes.DebuggerHidden;
+				else
+					Attributes &= ~PdbLocalAttributes.DebuggerHidden;
+			}
 		}
 
-		public int PdbAttributes {
-			get { return pdbAttributes; }
+		public PdbLocalAttributes Attributes {
+			get => attributes;
 			set {
-				if (pdbAttributes != value) {
-					pdbAttributes = value;
-					OnPropertyChanged(nameof(PdbAttributes));
-					OnPropertyChanged(nameof(IsCompilerGenerated));
+				if (attributes != value) {
+					attributes = value;
+					OnPropertyChanged(nameof(Attributes));
+					OnPropertyChanged(nameof(DebuggerHidden));
 				}
 			}
 		}
-		int pdbAttributes;
+		PdbLocalAttributes attributes;
 
 		readonly TypeSigCreatorOptions typeSigCreatorOptions;
 
 		LocalVM() {
+			typeSigCreatorOptions = null!;
+			origOptions = null!;
 		}
 
 		public LocalVM(TypeSigCreatorOptions typeSigCreatorOptions, LocalOptions options) {
@@ -123,7 +131,7 @@ namespace dnSpy.AsmEditor.MethodBody {
 		}
 
 		void EditType() {
-			if (typeSigCreator == null)
+			if (typeSigCreator is null)
 				throw new InvalidOperationException();
 
 			var newType = typeSigCreator.Create(typeSigCreatorOptions, Type, out bool canceled);
@@ -139,13 +147,13 @@ namespace dnSpy.AsmEditor.MethodBody {
 		public void InitializeFrom(LocalOptions options) {
 			Type = options.Type;
 			Name = options.Name;
-			PdbAttributes = options.PdbAttributes;
+			Attributes = options.Attributes;
 		}
 
 		public LocalOptions CopyTo(LocalOptions options) {
 			options.Type = Type;
 			options.Name = Name;
-			options.PdbAttributes = PdbAttributes;
+			options.Attributes = Attributes;
 			return options;
 		}
 

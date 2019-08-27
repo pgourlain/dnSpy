@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -20,38 +20,38 @@
 using System;
 using System.Diagnostics;
 using dnlib.DotNet;
+using dnSpy.AsmEditor.Resources;
 using dnSpy.Contracts.Documents.TreeView;
-using dnSpy.Contracts.Documents.TreeView.Resources;
 
 namespace dnSpy.AsmEditor.Compiler {
 	sealed class ResourceNodeCreator {
 		readonly ModuleDef module;
 		readonly ResourcesFolderNode rsrcListNode;
-		readonly ResourceNode[] nodes;
+		readonly NodeAndResource[] nodes;
 
-		public ResourceNodeCreator(ResourcesFolderNode rsrcListNode, ResourceNode[] nodes) {
-			module = rsrcListNode.GetModule();
-			Debug.Assert(module != null);
+		public ResourceNodeCreator(ResourcesFolderNode rsrcListNode, NodeAndResource[] nodes) {
+			module = rsrcListNode.GetModule()!;
+			Debug2.Assert(!(module is null));
 			this.rsrcListNode = rsrcListNode;
 			this.nodes = nodes;
 		}
 
 		public void Add() {
 			for (int i = 0; i < nodes.Length; i++) {
-				var node = nodes[i];
-				module.Resources.Add(node.Resource);
-				rsrcListNode.TreeNode.AddChild(node.TreeNode);
+				var info = nodes[i];
+				module.Resources.Add(info.Resource);
+				rsrcListNode.TreeNode.AddChild(info.Node.TreeNode);
 			}
 		}
 
 		public void Remove() {
 			for (int i = nodes.Length - 1; i >= 0; i--) {
-				var node = nodes[i];
-				bool b = rsrcListNode.TreeNode.Children.Remove(node.TreeNode);
+				var info = nodes[i];
+				bool b = rsrcListNode.TreeNode.Children.Remove(info.Node.TreeNode);
 				Debug.Assert(b);
 				if (!b)
 					throw new InvalidOperationException();
-				b = module.Resources.Remove(node.Resource);
+				b = module.Resources.Remove(info.Resource);
 				Debug.Assert(b);
 				if (!b)
 					throw new InvalidOperationException();

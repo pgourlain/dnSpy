@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -28,7 +28,7 @@ namespace dnSpy.Contracts.Documents.Tabs.DocViewer {
 		/// <summary>
 		/// Gets the reference or null
 		/// </summary>
-		public object Reference { get; }
+		public object? Reference { get; }
 
 		/// <summary>
 		/// Gets the flags
@@ -56,6 +56,11 @@ namespace dnSpy.Contracts.Documents.Tabs.DocViewer {
 		public bool IsHidden => (Flags & DecompilerReferenceFlags.Hidden) != 0;
 
 		/// <summary>
+		/// true if reference can't be followed
+		/// </summary>
+		public bool NoFollow => (Flags & DecompilerReferenceFlags.NoFollow) != 0;
+
+		/// <summary>
 		/// Gets the span or null if it's unknown
 		/// </summary>
 		public Span? Span { get; }
@@ -64,7 +69,7 @@ namespace dnSpy.Contracts.Documents.Tabs.DocViewer {
 		/// Constructor
 		/// </summary>
 		/// <param name="reference">Reference or null</param>
-		public TextReference(object reference)
+		public TextReference(object? reference)
 			: this(reference, DecompilerReferenceFlags.None) {
 		}
 
@@ -73,7 +78,7 @@ namespace dnSpy.Contracts.Documents.Tabs.DocViewer {
 		/// </summary>
 		/// <param name="reference">Reference or null</param>
 		/// <param name="span">Span</param>
-		public TextReference(object reference, Span span)
+		public TextReference(object? reference, Span span)
 			: this(reference, DecompilerReferenceFlags.None, span) {
 		}
 
@@ -82,7 +87,7 @@ namespace dnSpy.Contracts.Documents.Tabs.DocViewer {
 		/// </summary>
 		/// <param name="reference">Reference or null</param>
 		/// <param name="flags">Flags</param>
-		public TextReference(object reference, DecompilerReferenceFlags flags) {
+		public TextReference(object? reference, DecompilerReferenceFlags flags) {
 			Reference = reference;
 			Flags = flags;
 			Span = null;
@@ -94,7 +99,7 @@ namespace dnSpy.Contracts.Documents.Tabs.DocViewer {
 		/// <param name="reference">Reference or null</param>
 		/// <param name="flags">Flags</param>
 		/// <param name="span">Span</param>
-		public TextReference(object reference, DecompilerReferenceFlags flags, Span span) {
+		public TextReference(object? reference, DecompilerReferenceFlags flags, Span span) {
 			Reference = reference;
 			Flags = flags;
 			Span = span;

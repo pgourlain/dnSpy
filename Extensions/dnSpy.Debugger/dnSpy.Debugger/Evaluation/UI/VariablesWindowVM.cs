@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -61,7 +61,7 @@ namespace dnSpy.Debugger.Evaluation.UI {
 	interface IVariablesWindowVM {
 		bool IsOpen { get; set; }
 		bool IsVisible { get; set; }
-		event EventHandler TreeViewChanged;
+		event EventHandler? TreeViewChanged;
 		ITreeView TreeView { get; }
 		IValueNodesVM VM { get; }
 	}
@@ -77,10 +77,10 @@ namespace dnSpy.Debugger.Evaluation.UI {
 			set => lazyToolWindowVMHelper.IsVisible = value;
 		}
 
-		public event EventHandler TreeViewChanged;
-		public ITreeView TreeView => valueNodesVM.TreeView;
+		public event EventHandler? TreeViewChanged;
+		public ITreeView TreeView => valueNodesVM!.TreeView;
 
-		IValueNodesVM IVariablesWindowVM.VM => valueNodesVM;
+		IValueNodesVM IVariablesWindowVM.VM => valueNodesVM!;
 
 		readonly VariablesWindowVMOptions variablesWindowVMOptions;
 		readonly Lazy<DbgManager> dbgManager;
@@ -89,7 +89,7 @@ namespace dnSpy.Debugger.Evaluation.UI {
 		readonly ValueNodesProviderImpl valueNodesProvider;
 		readonly Lazy<ValueNodesVMFactory> valueNodesVMFactory;
 		readonly Lazy<IMessageBoxService> messageBoxService;
-		IValueNodesVM valueNodesVM;
+		IValueNodesVM? valueNodesVM;
 
 		public VariablesWindowVM(VariablesWindowVMOptions variablesWindowVMOptions, Lazy<DbgManager> dbgManager, UIDispatcher uiDispatcher, Lazy<ValueNodesVMFactory> valueNodesVMFactory, Lazy<DbgLanguageService> dbgLanguageService, Lazy<DbgCallStackService> dbgCallStackService, Lazy<IMessageBoxService> messageBoxService) {
 			uiDispatcher.VerifyAccess();
@@ -123,7 +123,7 @@ namespace dnSpy.Debugger.Evaluation.UI {
 			uiDispatcher.VerifyAccess();
 			if (enable) {
 				valueNodesProvider.Initialize_UI(enable);
-				if (valueNodesVM == null) {
+				if (valueNodesVM is null) {
 					var options = new ValueNodesVMOptions() {
 						NodesProvider = valueNodesProvider,
 						ShowMessageBox = ShowMessageBox,
@@ -157,7 +157,7 @@ namespace dnSpy.Debugger.Evaluation.UI {
 		}
 
 		// DbgManager thread
-		void DbgManager_DelayedIsRunningChanged(object sender, EventArgs e) {
+		void DbgManager_DelayedIsRunningChanged(object? sender, EventArgs e) {
 			// If all processes are running and the window is hidden, hide it now
 			if (!IsVisible)
 				UI(() => lazyToolWindowVMHelper.TryHideWindow());

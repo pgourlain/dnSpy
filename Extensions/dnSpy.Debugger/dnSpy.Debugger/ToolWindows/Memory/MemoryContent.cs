@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -30,9 +30,9 @@ namespace dnSpy.Debugger.ToolWindows.Memory {
 	}
 
 	sealed class MemoryContent : IMemoryContent {
-		public IInputElement FocusedElement => memoryVM.CanEditMemory ? hexViewHost.HexView.VisualElement : memoryControl.DisabledFocusedElement;
-		public FrameworkElement ZoomElement => null;
-		public object UIObject => memoryControl;
+		public IInputElement? FocusedElement => memoryVM.CanEditMemory ? hexViewHost.HexView.VisualElement : memoryControl.DisabledFocusedElement;
+		public FrameworkElement? ZoomElement => null;
+		public object? UIObject => memoryControl;
 		public WpfHexView HexView => hexViewHost.HexView;
 		double IZoomable.ZoomValue => hexViewHost.HexView.ZoomLevel / 100;
 
@@ -54,7 +54,7 @@ namespace dnSpy.Debugger.ToolWindows.Memory {
 			wpfCommandService.Add(ControlConstants.GUID_DEBUGGER_MEMORY_WPFHEXVIEWHOST, hexViewHost.HostControl);
 		}
 
-		void HexBufferInfo_UnderlyingStreamChanged(object sender, EventArgs e) {
+		void HexBufferInfo_UnderlyingStreamChanged(object? sender, EventArgs e) {
 			if (HexView.IsClosed)
 				return;
 			HexView.Options.SetOptionValue(DefaultHexViewOptions.StartPositionId, hexBufferInfo.Buffer.Span.Start);

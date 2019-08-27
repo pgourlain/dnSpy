@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -43,14 +43,14 @@ namespace dnSpy.Contracts.Hex.Editor {
 		/// <summary>
 		/// Raised when it is closed
 		/// </summary>
-		public abstract event EventHandler Closed;
+		public abstract event EventHandler? Closed;
 
 		/// <summary>
 		/// Gets a margin or null if it doesn't exist
 		/// </summary>
 		/// <param name="marginName">Name of margin</param>
 		/// <returns></returns>
-		public abstract WpfHexViewMargin GetHexViewMargin(string marginName);
+		public abstract WpfHexViewMargin? GetHexViewMargin(string marginName);
 
 		/// <summary>
 		/// Gets the hex view

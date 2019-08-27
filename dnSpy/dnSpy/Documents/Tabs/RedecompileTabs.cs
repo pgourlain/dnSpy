@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -37,14 +37,13 @@ namespace dnSpy.Documents.Tabs {
 			decompilerService.DecompilerChanged += DecompilerService_DecompilerChanged;
 		}
 
-		void DecompilerService_DecompilerChanged(object sender, EventArgs e) {
+		void DecompilerService_DecompilerChanged(object? sender, EventArgs e) {
 			if (!appWindow.AppLoaded)
 				return;
 			var tab = documentTabService.ActiveTab;
-			var decompilerContent = tab?.Content as IDecompilerTabContent;
-			if (decompilerContent == null)
+			if (!(tab?.Content is IDecompilerTabContent decompilerContent))
 				return;
-			var decompilerService = (IDecompilerService)sender;
+			var decompilerService = (IDecompilerService)sender!;
 			if (decompilerContent.Decompiler == decompilerService.Decompiler)
 				return;
 			decompilerContent.Decompiler = decompilerService.Decompiler;

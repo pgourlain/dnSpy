@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -33,22 +33,22 @@ namespace dnSpy.Documents.Tabs.Dialogs {
 			InputBindings.Add(new KeyBinding(new RelayCommand(a => ClickCancel()), Key.Escape, ModifierKeys.None));
 		}
 
-		void ListView_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+		void ListView_SelectionChanged(object? sender, SelectionChangedEventArgs e) {
 			if (DataContext is TabsVM vm)
 				vm.SelectedItems = listView.SelectedItems.OfType<TabVM>().ToArray();
 		}
 
-		void ListView_MouseDoubleClick(object sender, MouseButtonEventArgs e) {
+		void ListView_MouseDoubleClick(object? sender, MouseButtonEventArgs e) {
 			if (!UIUtilities.IsLeftDoubleClick<ListViewItem>(listView, e))
 				return;
 			ExitDialog();
 		}
 
-		void activateButton_Click(object sender, System.Windows.RoutedEventArgs e) => ExitDialog();
+		void activateButton_Click(object? sender, System.Windows.RoutedEventArgs e) => ExitDialog();
 
 		void ExitDialog() {
 			var vm = DataContext as TabsVM;
-			if (vm == null)
+			if (vm is null)
 				return;
 			vm.Activate(listView.SelectedItem as TabVM);
 			ClickOK();

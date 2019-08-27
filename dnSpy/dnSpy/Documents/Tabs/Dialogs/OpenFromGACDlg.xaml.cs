@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -39,8 +39,8 @@ namespace dnSpy.Documents.Tabs.Dialogs {
 
 		public IEnumerable<GACFileVM> SelectedItems {
 			get {
-				foreach (GACFileVM vm in listView.SelectedItems)
-					yield return vm;
+				foreach (GACFileVM? vm in listView.SelectedItems)
+					yield return vm!;
 			}
 		}
 
@@ -51,7 +51,7 @@ namespace dnSpy.Documents.Tabs.Dialogs {
 				id.Dispose();
 		}
 
-		void ListView_MouseDoubleClick(object sender, MouseButtonEventArgs e) {
+		void ListView_MouseDoubleClick(object? sender, MouseButtonEventArgs e) {
 			if (!UIUtilities.IsLeftDoubleClick<ListViewItem>(listView, e))
 				return;
 			ClickOK();

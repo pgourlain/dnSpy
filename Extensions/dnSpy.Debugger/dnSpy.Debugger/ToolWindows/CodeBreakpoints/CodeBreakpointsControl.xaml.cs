@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -33,7 +33,7 @@ namespace dnSpy.Debugger.ToolWindows.CodeBreakpoints {
 			SearchTextBox.GotKeyboardFocus += SearchTextBox_GotKeyboardFocus;
 		}
 
-		void SearchTextBox_GotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e) =>
+		void SearchTextBox_GotKeyboardFocus(object? sender, KeyboardFocusChangedEventArgs e) =>
 			Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() => SearchTextBox.SelectAll()));
 
 		public void FocusSearchTextBox() {
@@ -41,12 +41,12 @@ namespace dnSpy.Debugger.ToolWindows.CodeBreakpoints {
 			SearchTextBox.SelectAll();
 		}
 
-		void ListView_MouseDoubleClick(object sender, MouseButtonEventArgs e) {
+		void ListView_MouseDoubleClick(object? sender, MouseButtonEventArgs e) {
 			if (!UIUtilities.IsLeftDoubleClick<ListViewItem>(listView, e))
 				return;
 			CodeBreakpointsListViewDoubleClick?.Invoke(this, EventArgs.Empty);
 		}
 
-		public event EventHandler CodeBreakpointsListViewDoubleClick;
+		public event EventHandler? CodeBreakpointsListViewDoubleClick;
 	}
 }

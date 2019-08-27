@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -17,6 +17,7 @@
     along with dnSpy.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using dnSpy.Contracts.Decompiler;
 
@@ -30,8 +31,9 @@ namespace dnSpy.Contracts.Text {
 		/// </summary>
 		/// <param name="n">name</param>
 		/// <returns></returns>
-		public static string CleanName(string n) {
-			if (n == null)
+		[return: NotNullIfNotNull("n")]
+		public static string? CleanName(string? n) {
+			if (n is null)
 				return n;
 			const int MAX_LEN = 0x100;
 			if (n.Length > MAX_LEN)
@@ -51,8 +53,9 @@ namespace dnSpy.Contracts.Text {
 		/// </summary>
 		/// <param name="id">Identifier</param>
 		/// <returns></returns>
-		public static string CleanIdentifier(string id) {
-			if (id == null)
+		[return: NotNullIfNotNull("id")]
+		public static string? CleanIdentifier(string? id) {
+			if (id is null)
 				return id;
 			id = IdentifierEscaper.Escape(id);
 			return CleanName(id);

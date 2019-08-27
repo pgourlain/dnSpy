@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -19,13 +19,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace dnSpy.Contracts.MVVM {
 	/// <summary>
 	/// Enum value
 	/// </summary>
-	public sealed class EnumVM {
+	public sealed class EnumVM : ViewModelBase {
 		readonly object value;
 		readonly string name;
 
@@ -45,7 +46,7 @@ namespace dnSpy.Contracts.MVVM {
 		/// <param name="value">Initial value</param>
 		public EnumVM(object value) {
 			this.value = value;
-			name = Enum.GetName(value.GetType(), value);
+			name = Enum.GetName(value.GetType(), value) ?? throw new ArgumentOutOfRangeException(nameof(value));
 		}
 
 		/// <summary>
@@ -76,6 +77,7 @@ namespace dnSpy.Contracts.MVVM {
 		public static EnumVM[] Create(bool sort, Type enumType, params object[] values) {
 			var list = new List<EnumVM>();
 			foreach (var value in enumType.GetEnumValues()) {
+				Debug2.Assert(!(value is null));
 				if (values.Any(a => a.Equals(value)))
 					continue;
 				list.Add(new EnumVM(value));
@@ -101,14 +103,14 @@ namespace dnSpy.Contracts.MVVM {
 		/// <summary>
 		/// Gets the selected item
 		/// </summary>
-		public new object SelectedItem {
+		public new object? SelectedItem {
 			get {
 				if (Index < 0 || Index >= list.Count)
 					return null;
 				return list[Index].Value;
 			}
 			set {
-				if (!object.Equals(SelectedItem, value))
+				if (!(value is null) && !object.Equals(SelectedItem, value))
 					SelectedIndex = GetIndex(value);
 			}
 		}
@@ -126,7 +128,7 @@ namespace dnSpy.Contracts.MVVM {
 		/// </summary>
 		/// <param name="list">Initial value</param>
 		/// <param name="onChanged">Called when the selected item gets changed</param>
-		public EnumListVM(IEnumerable<EnumVM> list, Action<int, int> onChanged)
+		public EnumListVM(IEnumerable<EnumVM> list, Action<int, int>? onChanged)
 			: base(list, onChanged) {
 		}
 

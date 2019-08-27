@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -35,11 +35,6 @@ namespace dnSpy.Contracts.Text.Classification {
 		/// Filter out newlines from the string by replacing them with spaces
 		/// </summary>
 		FilterOutNewLines				= 0x00000001,
-
-		/// <summary>
-		/// Use the new text formatter, it's faster but doesn't support word wrap or all unicode characters
-		/// </summary>
-		NewFormatter					= 0x00000002,
 
 		/// <summary>
 		/// Mask to get word wrap enum

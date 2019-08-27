@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -43,12 +43,12 @@ namespace dnSpy.Contracts.Hex.Editor {
 		/// <summary>
 		/// Raised after its adornment got keyboard focus
 		/// </summary>
-		public abstract event EventHandler GotFocus;
+		public abstract event EventHandler? GotFocus;
 
 		/// <summary>
 		/// Raised after its adornment lost keyboard focus
 		/// </summary>
-		public abstract event EventHandler LostFocus;
+		public abstract event EventHandler? LostFocus;
 
 		/// <summary>
 		/// Called to hide the adornment
@@ -60,6 +60,6 @@ namespace dnSpy.Contracts.Hex.Editor {
 		/// </summary>
 		/// <param name="reservedSpace">Reserved space</param>
 		/// <returns></returns>
-		public abstract Geometry PositionAndDisplay(Geometry reservedSpace);
+		public abstract Geometry? PositionAndDisplay(Geometry reservedSpace);
 	}
 }

@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -24,17 +24,18 @@ using System.Windows;
 using System.Windows.Threading;
 using dnSpy.Contracts.Documents;
 using dnSpy.Contracts.Documents.TreeView;
+using dnSpy.Documents.TreeView;
 
 namespace dnSpy.Documents.Tabs.Dialogs {
 	static class OpenDocumentsHelper {
-		internal static IDsDocument[] OpenDocuments(IDocumentTreeView documentTreeView, Window ownerWindow, IEnumerable<string> filenames, bool selectDocument = true) {
-			var documentLoader = new DsDocumentLoader(documentTreeView.DocumentService, ownerWindow);
+		internal static IDsDocument[] OpenDocuments(IDocumentTreeView documentTreeView, Window ownerWindow, AssemblyExplorerMostRecentlyUsedList mruList, IEnumerable<string> filenames, bool selectDocument = true) {
+			var documentLoader = new DsDocumentLoader(documentTreeView.DocumentService, ownerWindow, mruList);
 			var loadedDocuments = documentLoader.Load(filenames.Select(a => new DocumentToLoad(DsDocumentInfo.CreateDocument(a))));
 			var document = loadedDocuments.Length == 0 ? null : loadedDocuments[loadedDocuments.Length - 1];
-			if (selectDocument && document != null) {
+			if (selectDocument && !(document is null)) {
 				Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() => {
 					var node = documentTreeView.FindNode(document);
-					if (node != null)
+					if (!(node is null))
 						documentTreeView.TreeView.SelectItems(new[] { node });
 				}));
 			}

@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -27,12 +27,12 @@ namespace dnSpy.Contracts.Bookmarks.Navigator {
 		/// <summary>
 		/// Current active bookmark. It's null if there are no bookmarks or no bookmarks are visible in the UI
 		/// </summary>
-		public abstract Bookmark ActiveBookmark { get; set; }
+		public abstract Bookmark? ActiveBookmark { get; set; }
 
 		/// <summary>
 		/// Raised when <see cref="ActiveBookmark"/> is changed
 		/// </summary>
-		public abstract event EventHandler ActiveBookmarkChanged;
+		public abstract event EventHandler? ActiveBookmarkChanged;
 
 		/// <summary>
 		/// true if <see cref="SelectPreviousBookmark"/> can be called

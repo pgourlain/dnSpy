@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -43,7 +43,7 @@ namespace dnSpy.Text.Editor.Operations {
 			TextView.Closed += TextView_Closed;
 		}
 
-		void TextView_Closed(object sender, EventArgs e) => textViewUndoManagerProvider.RemoveTextViewUndoManager(TextView);
+		void TextView_Closed(object? sender, EventArgs e) => textViewUndoManagerProvider.RemoveTextViewUndoManager(TextView);
 
 		public void ClearUndoHistory() {
 			textBufferUndoManager.UnregisterUndoHistory();

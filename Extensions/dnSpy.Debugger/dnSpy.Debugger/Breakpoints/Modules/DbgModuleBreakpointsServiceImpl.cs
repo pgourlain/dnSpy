@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -54,7 +54,7 @@ namespace dnSpy.Debugger.Breakpoints.Modules {
 		void Dbg(Action callback) => dbgDispatcherProvider.Dbg(callback);
 
 		public override void Modify(DbgModuleBreakpointAndSettings[] settings) {
-			if (settings == null)
+			if (settings is null)
 				throw new ArgumentNullException(nameof(settings));
 			Dbg(() => ModifyCore(settings));
 		}
@@ -65,8 +65,8 @@ namespace dnSpy.Debugger.Breakpoints.Modules {
 			lock (lockObj) {
 				foreach (var info in settings) {
 					var bpImpl = info.Breakpoint as DbgModuleBreakpointImpl;
-					Debug.Assert(bpImpl != null);
-					if (bpImpl == null)
+					Debug2.Assert(!(bpImpl is null));
+					if (bpImpl is null)
 						continue;
 					Debug.Assert(breakpoints.Contains(bpImpl));
 					if (!breakpoints.Contains(bpImpl))
@@ -82,9 +82,9 @@ namespace dnSpy.Debugger.Breakpoints.Modules {
 				BreakpointsModified?.Invoke(this, new DbgBreakpointsModifiedEventArgs(new ReadOnlyCollection<DbgModuleBreakpointAndOldSettings>(bps)));
 		}
 
-		public override event EventHandler<DbgBreakpointsModifiedEventArgs> BreakpointsModified;
+		public override event EventHandler<DbgBreakpointsModifiedEventArgs>? BreakpointsModified;
 
-		public override event EventHandler<DbgCollectionChangedEventArgs<DbgModuleBreakpoint>> BreakpointsChanged;
+		public override event EventHandler<DbgCollectionChangedEventArgs<DbgModuleBreakpoint>>? BreakpointsChanged;
 		public override DbgModuleBreakpoint[] Breakpoints {
 			get {
 				lock (lockObj)
@@ -93,7 +93,7 @@ namespace dnSpy.Debugger.Breakpoints.Modules {
 		}
 
 		public override DbgModuleBreakpoint[] Add(DbgModuleBreakpointSettings[] settings) {
-			if (settings == null)
+			if (settings is null)
 				throw new ArgumentNullException(nameof(settings));
 			// Return a copy since the caller could modify the array
 			var bps = new DbgModuleBreakpoint[settings.Length];
@@ -124,7 +124,7 @@ namespace dnSpy.Debugger.Breakpoints.Modules {
 		}
 
 		public override void Remove(DbgModuleBreakpoint[] breakpoints) {
-			if (breakpoints == null)
+			if (breakpoints is null)
 				throw new ArgumentNullException(nameof(breakpoints));
 			Dbg(() => RemoveCore(breakpoints));
 		}
@@ -135,8 +135,8 @@ namespace dnSpy.Debugger.Breakpoints.Modules {
 			lock (lockObj) {
 				foreach (var bp in breakpoints) {
 					var bpImpl = bp as DbgModuleBreakpointImpl;
-					Debug.Assert(bpImpl != null);
-					if (bpImpl == null)
+					Debug2.Assert(!(bpImpl is null));
+					if (bpImpl is null)
 						continue;
 					Debug.Assert(this.breakpoints.Contains(bpImpl));
 					if (!this.breakpoints.Contains(bpImpl))
@@ -167,21 +167,21 @@ namespace dnSpy.Debugger.Breakpoints.Modules {
 			}
 		}
 
-		public override DbgModuleBreakpoint[] Find(DbgModuleBreakpointInfo module) {
-			List<DbgModuleBreakpoint> foundBps = null;
+		public override DbgModuleBreakpoint[] Find(in DbgModuleBreakpointInfo module) {
+			List<DbgModuleBreakpoint>? foundBps = null;
 			lock (lockObj) {
 				foreach (var bp in breakpoints) {
 					if (bp.IsMatch(module)) {
-						if (foundBps == null)
+						if (foundBps is null)
 							foundBps = new List<DbgModuleBreakpoint>();
 						foundBps.Add(bp);
 					}
 				}
 			}
-			return foundBps == null ? Array.Empty<DbgModuleBreakpoint>() : foundBps.ToArray();
+			return foundBps is null ? Array.Empty<DbgModuleBreakpoint>() : foundBps.ToArray();
 		}
 
-		public override bool IsMatch(DbgModuleBreakpointInfo module) {
+		public override bool IsMatch(in DbgModuleBreakpointInfo module) {
 			lock (lockObj) {
 				foreach (var bp in breakpoints) {
 					if (bp.IsMatch(module))

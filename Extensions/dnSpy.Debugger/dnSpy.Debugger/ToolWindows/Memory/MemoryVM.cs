@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -67,7 +67,7 @@ namespace dnSpy.Debugger.ToolWindows.Memory {
 		void UI(Action callback) => uiDispatcher.UI(callback);
 
 		// DbgManager thread
-		void DbgManager_IsDebuggingChanged(object sender, EventArgs e) => UI(() => {
+		void DbgManager_IsDebuggingChanged(object? sender, EventArgs e) => UI(() => {
 			//TODO: Only invalidate the processes that get paused, not every process
 			processHexBufferProvider.InvalidateMemory();
 			InitializeCanEditMemory_UI();

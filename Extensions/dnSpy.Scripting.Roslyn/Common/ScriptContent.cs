@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -35,9 +35,9 @@ namespace dnSpy.Scripting.Roslyn.Common {
 	}
 
 	abstract class ScriptContent : IScriptContent {
-		public object UIObject => scriptControl;
-		public IInputElement FocusedElement => replEditor.FocusedElement;
-		public FrameworkElement ZoomElement => replEditor.ZoomElement;
+		public object? UIObject => scriptControl;
+		public IInputElement? FocusedElement => replEditor.FocusedElement;
+		public FrameworkElement? ZoomElement => replEditor.ZoomElement;
 		public ScriptControlVM ScriptControlVM => scriptControlVM;
 		public double ZoomLevel => replEditor.TextView.ZoomLevel;
 
@@ -58,11 +58,11 @@ namespace dnSpy.Scripting.Roslyn.Common {
 			scriptControl.DataContext = scriptControlVM;
 		}
 
-		void ScriptControlVM_OnCommandExecuted(object sender, EventArgs e) =>
+		void ScriptControlVM_OnCommandExecuted(object? sender, EventArgs e) =>
 			// Make sure the up/down arrow icons are updated
 			CommandManager.InvalidateRequerySuggested();
 
-		public static ScriptContent GetScriptContent(IReplEditor replEditor) => (ScriptContent)replEditor.Tag;
+		public static ScriptContent GetScriptContent(IReplEditor replEditor) => (ScriptContent)replEditor.Tag!;
 		protected abstract ScriptControlVM CreateScriptControlVM(IReplEditor replEditor, IServiceLocator serviceLocator, ReplSettings replSettings);
 		public void OnClose() { }
 		public void OnHidden() { }

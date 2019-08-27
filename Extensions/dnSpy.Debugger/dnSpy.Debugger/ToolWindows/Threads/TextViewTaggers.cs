@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -41,12 +41,12 @@ namespace dnSpy.Debugger.ToolWindows.Threads {
 			this.debuggerSettings = debuggerSettings;
 		}
 
-		public ITagger<T> CreateTagger<T>(ITextBuffer buffer) where T : ITag =>
+		public ITagger<T>? CreateTagger<T>(ITextBuffer buffer) where T : ITag =>
 			new ThreadTagger(nameClassificationTag, debuggerSettings) as ITagger<T>;
 	}
 
 	sealed class ThreadTagger : ITagger<IClassificationTag> {
-		public event EventHandler<SnapshotSpanEventArgs> TagsChanged { add { } remove { } }
+		public event EventHandler<SnapshotSpanEventArgs>? TagsChanged { add { } remove { } }
 		readonly IClassificationTag nameClassificationTag;
 		readonly DebuggerSettings debuggerSettings;
 

@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -23,26 +23,26 @@ using Microsoft.VisualStudio.Utilities;
 
 namespace dnSpy.Language.Intellisense {
 	static class ContentTypeDefinitions {
-#pragma warning disable 0169
+#pragma warning disable CS0169
 		[Export]
 		[Name(ContentTypes.CompletionItemText)]
 		[BaseDefinition(ContentTypes.Text)]
-		static readonly ContentTypeDefinition CompletionItemText;
+		static readonly ContentTypeDefinition? CompletionItemText;
 
 		[Export]
 		[Name(ContentTypes.CompletionDisplayText)]
 		[BaseDefinition(ContentTypes.CompletionItemText)]
-		static readonly ContentTypeDefinition CompletionDisplayText;
+		static readonly ContentTypeDefinition? CompletionDisplayText;
 
 		[Export]
 		[Name(ContentTypes.CompletionSuffix)]
 		[BaseDefinition(ContentTypes.CompletionItemText)]
-		static readonly ContentTypeDefinition CompletionSuffix;
+		static readonly ContentTypeDefinition? CompletionSuffix;
 
 		[Export]
 		[Name(ContentTypes.CompletionToolTip)]
 		[BaseDefinition(ContentTypes.Text)]
-		static readonly ContentTypeDefinition CompletionToolTip;
-#pragma warning restore 0169
+		static readonly ContentTypeDefinition? CompletionToolTip;
+#pragma warning restore CS0169
 	}
 }

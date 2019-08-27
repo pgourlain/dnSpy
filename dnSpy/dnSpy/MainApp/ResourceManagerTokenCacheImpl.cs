@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -28,7 +28,7 @@ namespace dnSpy.MainApp {
 		readonly object lockObj;
 		readonly Dictionary<Assembly, int> tokensDict;
 
-		public event EventHandler TokensUpdated;
+		public event EventHandler? TokensUpdated;
 
 		public ResourceManagerTokenCacheImpl() {
 			lockObj = new object();
@@ -47,8 +47,8 @@ namespace dnSpy.MainApp {
 		}
 
 		public void SetTokens(Assembly[] assemblies, int[] tokens) {
-			Debug.Assert(assemblies != null);
-			Debug.Assert(tokens != null);
+			Debug2.Assert(!(assemblies is null));
+			Debug2.Assert(!(tokens is null));
 			Debug.Assert(assemblies.Length == tokens.Length);
 			lock (lockObj) {
 				for (int i = 0; i < assemblies.Length; i++) {

@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -44,7 +44,7 @@ namespace dnSpy.AsmEditor.DnlibDialogs {
 		public bool NativeType_IsEnabled => IsEnabled;
 
 		public bool IsEnabled {
-			get { return isEnabled; }
+			get => isEnabled;
 			set {
 				if (isEnabled != value) {
 					isEnabled = value;
@@ -78,18 +78,18 @@ namespace dnSpy.AsmEditor.DnlibDialogs {
 			}
 		}
 
-		public bool IsRawMarshalType => (dnlib.DotNet.NativeType)NativeType.SelectedItem == dnlib.DotNet.NativeType.RawBlob;
-		public bool IsFixedSysStringMarshalType => (dnlib.DotNet.NativeType)NativeType.SelectedItem == dnlib.DotNet.NativeType.FixedSysString;
-		public bool IsSafeArrayMarshalType => (dnlib.DotNet.NativeType)NativeType.SelectedItem == dnlib.DotNet.NativeType.SafeArray;
-		public bool IsFixedArrayMarshalType => (dnlib.DotNet.NativeType)NativeType.SelectedItem == dnlib.DotNet.NativeType.FixedArray;
-		public bool IsArrayMarshalType => (dnlib.DotNet.NativeType)NativeType.SelectedItem == dnlib.DotNet.NativeType.Array;
-		public bool IsCustomMarshalType => (dnlib.DotNet.NativeType)NativeType.SelectedItem == dnlib.DotNet.NativeType.CustomMarshaler;
+		public bool IsRawMarshalType => (dnlib.DotNet.NativeType)NativeType.SelectedItem! == dnlib.DotNet.NativeType.RawBlob;
+		public bool IsFixedSysStringMarshalType => (dnlib.DotNet.NativeType)NativeType.SelectedItem! == dnlib.DotNet.NativeType.FixedSysString;
+		public bool IsSafeArrayMarshalType => (dnlib.DotNet.NativeType)NativeType.SelectedItem! == dnlib.DotNet.NativeType.SafeArray;
+		public bool IsFixedArrayMarshalType => (dnlib.DotNet.NativeType)NativeType.SelectedItem! == dnlib.DotNet.NativeType.FixedArray;
+		public bool IsArrayMarshalType => (dnlib.DotNet.NativeType)NativeType.SelectedItem! == dnlib.DotNet.NativeType.Array;
+		public bool IsCustomMarshalType => (dnlib.DotNet.NativeType)NativeType.SelectedItem! == dnlib.DotNet.NativeType.CustomMarshaler;
 
 		public bool IsInterfaceMarshalType {
 			get {
-				return (dnlib.DotNet.NativeType)NativeType.SelectedItem == dnlib.DotNet.NativeType.IUnknown ||
-					(dnlib.DotNet.NativeType)NativeType.SelectedItem == dnlib.DotNet.NativeType.IDispatch ||
-					(dnlib.DotNet.NativeType)NativeType.SelectedItem == dnlib.DotNet.NativeType.IntF;
+				return (dnlib.DotNet.NativeType)NativeType.SelectedItem! == dnlib.DotNet.NativeType.IUnknown ||
+					(dnlib.DotNet.NativeType)NativeType.SelectedItem! == dnlib.DotNet.NativeType.IDispatch ||
+					(dnlib.DotNet.NativeType)NativeType.SelectedItem! == dnlib.DotNet.NativeType.IntF;
 			}
 		}
 
@@ -100,59 +100,57 @@ namespace dnSpy.AsmEditor.DnlibDialogs {
 
 		static readonly EnumVM[] variantTypeList = new EnumVM[] {
 			new EnumVM(VariantType.NotInitialized, dnSpy_AsmEditor_Resources.MarshalType_EnumNotInitialized),
-			new EnumVM(VariantType.None, "None"),
-			new EnumVM(VariantType.Null, "Null"),
-			new EnumVM(VariantType.I2, "I2"),
-			new EnumVM(VariantType.I4, "I4"),
-			new EnumVM(VariantType.R4, "R4"),
-			new EnumVM(VariantType.R8, "R8"),
-			new EnumVM(VariantType.CY, "CY"),
-			new EnumVM(VariantType.Date, "Date"),
-			new EnumVM(VariantType.BStr, "BStr"),
-			new EnumVM(VariantType.Dispatch, "Dispatch"),
-			new EnumVM(VariantType.Error, "Error"),
-			new EnumVM(VariantType.Bool, "Bool"),
-			new EnumVM(VariantType.Variant, "Variant"),
-			new EnumVM(VariantType.Unknown, dnSpy_AsmEditor_Resources.Unknown),
-			new EnumVM(VariantType.Decimal, "Decimal"),
-			new EnumVM(VariantType.I1, "I1"),
-			new EnumVM(VariantType.UI1, "UI1"),
-			new EnumVM(VariantType.UI2, "UI2"),
-			new EnumVM(VariantType.UI4, "UI4"),
-			new EnumVM(VariantType.I8, "I8"),
-			new EnumVM(VariantType.UI8, "UI8"),
-			new EnumVM(VariantType.Int, "Int"),
-			new EnumVM(VariantType.UInt, "UInt"),
-			new EnumVM(VariantType.Void, "Void"),
-			new EnumVM(VariantType.HResult, "HResult"),
-			new EnumVM(VariantType.Ptr, "Ptr"),
-			new EnumVM(VariantType.SafeArray, "SafeArray"),
-			new EnumVM(VariantType.CArray, "CArray"),
-			new EnumVM(VariantType.UserDefined, "UserDefined"),
-			new EnumVM(VariantType.LPStr, "LPStr"),
-			new EnumVM(VariantType.LPWStr, "LPWStr"),
-			new EnumVM(VariantType.Record, "Record"),
-			new EnumVM(VariantType.IntPtr, "IntPtr"),
-			new EnumVM(VariantType.UIntPtr, "UIntPtr"),
-			new EnumVM(VariantType.FileTime, "FileTime"),
-			new EnumVM(VariantType.Blob, "Blob"),
-			new EnumVM(VariantType.Stream, "Stream"),
-			new EnumVM(VariantType.Storage, "Storage"),
-			new EnumVM(VariantType.StreamedObject, "StreamedObject"),
-			new EnumVM(VariantType.StoredObject, "StoredObject"),
-			new EnumVM(VariantType.BlobObject, "BlobObject"),
-			new EnumVM(VariantType.CF, "CF"),
-			new EnumVM(VariantType.CLSID, "CLSID"),
-			new EnumVM(VariantType.VersionedStream, "VersionedStream"),
-			new EnumVM(VariantType.BStrBlob, "BStrBlob"),
+			new EnumVM(VariantType.None),
+			new EnumVM(VariantType.Null),
+			new EnumVM(VariantType.I2),
+			new EnumVM(VariantType.I4),
+			new EnumVM(VariantType.R4),
+			new EnumVM(VariantType.R8),
+			new EnumVM(VariantType.CY),
+			new EnumVM(VariantType.Date),
+			new EnumVM(VariantType.BStr),
+			new EnumVM(VariantType.Dispatch),
+			new EnumVM(VariantType.Error),
+			new EnumVM(VariantType.Bool),
+			new EnumVM(VariantType.Variant),
+			new EnumVM(VariantType.Unknown),
+			new EnumVM(VariantType.Decimal),
+			new EnumVM(VariantType.I1),
+			new EnumVM(VariantType.UI1),
+			new EnumVM(VariantType.UI2),
+			new EnumVM(VariantType.UI4),
+			new EnumVM(VariantType.I8),
+			new EnumVM(VariantType.UI8),
+			new EnumVM(VariantType.Int),
+			new EnumVM(VariantType.UInt),
+			new EnumVM(VariantType.Void),
+			new EnumVM(VariantType.HResult),
+			new EnumVM(VariantType.Ptr),
+			new EnumVM(VariantType.SafeArray),
+			new EnumVM(VariantType.CArray),
+			new EnumVM(VariantType.UserDefined),
+			new EnumVM(VariantType.LPStr),
+			new EnumVM(VariantType.LPWStr),
+			new EnumVM(VariantType.Record),
+			new EnumVM(VariantType.IntPtr),
+			new EnumVM(VariantType.UIntPtr),
+			new EnumVM(VariantType.FileTime),
+			new EnumVM(VariantType.Blob),
+			new EnumVM(VariantType.Stream),
+			new EnumVM(VariantType.Storage),
+			new EnumVM(VariantType.StreamedObject),
+			new EnumVM(VariantType.StoredObject),
+			new EnumVM(VariantType.BlobObject),
+			new EnumVM(VariantType.CF),
+			new EnumVM(VariantType.CLSID),
+			new EnumVM(VariantType.VersionedStream),
+			new EnumVM(VariantType.BStrBlob),
 		};
 		public EnumListVM SafeArrayMarshalType_VariantType { get; }
 
 		public VariantType SafeArrayMarshalType_VT {
-			get {
-				return (safeArrayMarshalType_vt & ~VariantType.TypeMask) |
-					((VariantType)SafeArrayMarshalType_VariantType.SelectedItem & VariantType.TypeMask);
-			}
+			get => (safeArrayMarshalType_vt & ~VariantType.TypeMask) |
+					((VariantType)SafeArrayMarshalType_VariantType.SelectedItem! & VariantType.TypeMask);
 			set {
 				if (safeArrayMarshalType_vt != value) {
 					safeArrayMarshalType_vt = value;
@@ -172,28 +170,28 @@ namespace dnSpy.AsmEditor.DnlibDialogs {
 		public bool SafeArrayMarshalType_VT_Flags_IsEnabled {
 			get {
 				return SafeArrayMarshalType_VT_IsEnabled &&
-					(VariantType)SafeArrayMarshalType_VariantType.SelectedItem != VariantType.NotInitialized;
+					(VariantType)SafeArrayMarshalType_VariantType.SelectedItem! != VariantType.NotInitialized;
 			}
 		}
 
 		public bool SafeArrayMarshalType_VT_Vector {
-			get { return GetFlagValue(VariantType.Vector); }
-			set { SetFlagValue(VariantType.Vector, value); }
+			get => GetFlagValue(VariantType.Vector);
+			set => SetFlagValue(VariantType.Vector, value);
 		}
 
 		public bool SafeArrayMarshalType_VT_Array {
-			get { return GetFlagValue(VariantType.Array); }
-			set { SetFlagValue(VariantType.Array, value); }
+			get => GetFlagValue(VariantType.Array);
+			set => SetFlagValue(VariantType.Array, value);
 		}
 
 		public bool SafeArrayMarshalType_VT_ByRef {
-			get { return GetFlagValue(VariantType.ByRef); }
-			set { SetFlagValue(VariantType.ByRef, value); }
+			get => GetFlagValue(VariantType.ByRef);
+			set => SetFlagValue(VariantType.ByRef, value);
 		}
 
 		public bool SafeArrayMarshalType_VT_Reserved {
-			get { return GetFlagValue(VariantType.Reserved); }
-			set { SetFlagValue(VariantType.Reserved, value); }
+			get => GetFlagValue(VariantType.Reserved);
+			set => SetFlagValue(VariantType.Reserved, value);
 		}
 
 		bool GetFlagValue(VariantType flag) => (SafeArrayMarshalType_VT & flag) != 0;
@@ -216,14 +214,14 @@ namespace dnSpy.AsmEditor.DnlibDialogs {
 		public NullableCompressedUInt32 ArrayMarshalType_ParamNum { get; }
 		public bool ArrayMarshalType_ParamNum_IsEnabled =>
 			ArrayMarshalType_NativeType_IsEnabled &&
-			(NativeType)ArrayMarshalType_NativeType.SelectedItem != dnlib.DotNet.NativeType.NotInitialized;
+			(NativeType)ArrayMarshalType_NativeType.SelectedItem! != dnlib.DotNet.NativeType.NotInitialized;
 		public NullableCompressedUInt32 ArrayMarshalType_NumElems { get; }
 		public bool ArrayMarshalType_NumElems_IsEnabled => ArrayMarshalType_ParamNum_IsEnabled && !ArrayMarshalType_ParamNum.IsNull;
 		public NullableCompressedUInt32 ArrayMarshalType_Flags { get; }
 		public bool ArrayMarshalType_Flags_IsEnabled => ArrayMarshalType_NumElems_IsEnabled && !ArrayMarshalType_NumElems.IsNull;
 
-		public string CustomMarshalType_GUID {
-			get { return customMarshalType_guid; }
+		public string? CustomMarshalType_GUID {
+			get => customMarshalType_guid;
 			set {
 				if (customMarshalType_guid != value) {
 					customMarshalType_guid = value;
@@ -232,12 +230,12 @@ namespace dnSpy.AsmEditor.DnlibDialogs {
 				}
 			}
 		}
-		string customMarshalType_guid;
+		string? customMarshalType_guid;
 
 		public bool CustomMarshalType_GUID_IsEnabled => IsEnabled;
 
-		public string CustomMarshalType_NativeTypeName {
-			get { return customMarshalType_nativeTypeName; }
+		public string? CustomMarshalType_NativeTypeName {
+			get => customMarshalType_nativeTypeName;
 			set {
 				if (customMarshalType_nativeTypeName != value) {
 					customMarshalType_nativeTypeName = value;
@@ -246,14 +244,14 @@ namespace dnSpy.AsmEditor.DnlibDialogs {
 				}
 			}
 		}
-		string customMarshalType_nativeTypeName;
+		string? customMarshalType_nativeTypeName;
 
 		public bool CustomMarshalType_NativeTypeName_IsEnabled => IsEnabled;
 		public TypeSigCreatorVM CustomMarshalType_CustMarshaler_TypeSigCreator { get; }
 		public bool CustomMarshalType_CustMarshaler_TypeSigCreator_IsEnabled => IsEnabled;
 
-		public string CustomMarshalType_Cookie {
-			get { return customMarshalType_cookie; }
+		public string? CustomMarshalType_Cookie {
+			get => customMarshalType_cookie;
 			set {
 				if (customMarshalType_cookie != value) {
 					customMarshalType_cookie = value;
@@ -262,15 +260,15 @@ namespace dnSpy.AsmEditor.DnlibDialogs {
 				}
 			}
 		}
-		string customMarshalType_cookie;
+		string? customMarshalType_cookie;
 
 		public bool CustomMarshalType_Cookie_IsEnabled => IsEnabled;
 		public NullableCompressedUInt32 InterfaceMarshalType_IidParamIndex { get; }
 		public bool InterfaceMarshalType_IidParamIndex_IsEnabled => IsEnabled;
-		public string TypeString => NativeType.SelectedItem.ToString();
+		public string TypeString => NativeType.SelectedItem!.ToString()!;
 		void TypeStringUpdated() => OnPropertyChanged(nameof(TypeString));
 
-		public MarshalTypeVM(ModuleDef ownerModule, IDecompilerService decompilerService, TypeDef ownerType, MethodDef ownerMethod) {
+		public MarshalTypeVM(ModuleDef ownerModule, IDecompilerService decompilerService, TypeDef? ownerType, MethodDef? ownerMethod) {
 			NativeType = new EnumListVM(nativeTypeList, (a, b) => { OnNativeTypeChanged(); TypeStringUpdated(); });
 			FixNativeTypeEnum(NativeType, false);
 			RawMarshalType_Data = new HexStringVM(a => { HasErrorUpdated(); TypeStringUpdated(); });
@@ -325,7 +323,7 @@ namespace dnSpy.AsmEditor.DnlibDialogs {
 		public string CustomMarshalType_CustMarshaler_TypeHeader =>
 			string.Format(dnSpy_AsmEditor_Resources.Type, CustomMarshalType_CustMarshaler_TypeSigCreator.TypeSigDnlibFullName);
 
-		void safeArrayMarshalType_userDefinedSubType_typeSigCreator_PropertyChanged(object sender, PropertyChangedEventArgs e) {
+		void safeArrayMarshalType_userDefinedSubType_typeSigCreator_PropertyChanged(object? sender, PropertyChangedEventArgs e) {
 			if (e.PropertyName == nameof(SafeArrayMarshalType_UserDefinedSubType_TypeSigCreator.TypeSigDnlibFullName))
 				OnPropertyChanged(nameof(SafeArrayMarshalType_UserDefinedSubType_TypeHeader));
 			OnSafeArrayMarshalTypeIsEnabledChanged();
@@ -333,14 +331,14 @@ namespace dnSpy.AsmEditor.DnlibDialogs {
 			HasErrorUpdated();
 		}
 
-		void customMarshalType_custMarshaler_typeSigCreator_PropertyChanged(object sender, PropertyChangedEventArgs e) {
+		void customMarshalType_custMarshaler_typeSigCreator_PropertyChanged(object? sender, PropertyChangedEventArgs e) {
 			if (e.PropertyName == nameof(CustomMarshalType_CustMarshaler_TypeSigCreator.TypeSigDnlibFullName))
 				OnPropertyChanged(nameof(CustomMarshalType_CustMarshaler_TypeHeader));
 			TypeStringUpdated();
 			HasErrorUpdated();
 		}
 
-		static TypeSigCreatorVM CreateTypeSigCreatorVM(ModuleDef ownerModule, IDecompilerService decompilerService, TypeDef ownerType, MethodDef ownerMethod, bool allowNullTypeSig, PropertyChangedEventHandler handler) {
+		static TypeSigCreatorVM CreateTypeSigCreatorVM(ModuleDef ownerModule, IDecompilerService decompilerService, TypeDef? ownerType, MethodDef? ownerMethod, bool allowNullTypeSig, PropertyChangedEventHandler handler) {
 			var typeSigCreatorOptions = new TypeSigCreatorOptions(ownerModule, decompilerService) {
 				IsLocal = false,
 				CanAddGenericTypeVar = true,
@@ -349,9 +347,9 @@ namespace dnSpy.AsmEditor.DnlibDialogs {
 				OwnerMethod = ownerMethod,
 				NullTypeSigAllowed = allowNullTypeSig,
 			};
-			if (ownerType != null && ownerType.GenericParameters.Count == 0)
+			if (!(ownerType is null) && ownerType.GenericParameters.Count == 0)
 				typeSigCreatorOptions.CanAddGenericTypeVar = false;
-			if (ownerMethod != null && ownerMethod.GenericParameters.Count > 0)
+			if (!(ownerMethod is null) && ownerMethod.GenericParameters.Count > 0)
 				typeSigCreatorOptions.CanAddGenericMethodVar = true;
 			var typeSigCreator = new TypeSigCreatorVM(typeSigCreatorOptions);
 			typeSigCreator.PropertyChanged += handler;
@@ -413,7 +411,7 @@ namespace dnSpy.AsmEditor.DnlibDialogs {
 			}
 		}
 
-		public MarshalType Type {
+		public MarshalType? Type {
 			get {
 				if (!IsEnabled)
 					return null;
@@ -423,29 +421,29 @@ namespace dnSpy.AsmEditor.DnlibDialogs {
 				}
 				else if (IsFixedSysStringMarshalType) {
 					int size = FixedSysStringMarshalType_Size_IsEnabled && !FixedSysStringMarshalType_Size.IsNull ?
-						(int)FixedSysStringMarshalType_Size.Value : -1;
+						(int)FixedSysStringMarshalType_Size.Value! : -1;
 					return new FixedSysStringMarshalType(size);
 				}
 				else if (IsSafeArrayMarshalType) {
-					var vt = (dnlib.DotNet.VariantType)SafeArrayMarshalType_VariantType.SelectedItem == VariantType.NotInitialized ?
+					var vt = (dnlib.DotNet.VariantType)SafeArrayMarshalType_VariantType.SelectedItem! == VariantType.NotInitialized ?
 						VariantType.NotInitialized : SafeArrayMarshalType_VT;
 					var userType = SafeArrayMarshalType_UserDefinedSubType_TypeSigCreator.TypeSig.ToTypeDefOrRef();
 					return new SafeArrayMarshalType(vt, userType);
 				}
 				else if (IsFixedArrayMarshalType) {
 					int size = FixedArrayMarshalType_Size_IsEnabled && !FixedArrayMarshalType_Size.IsNull ?
-						(int)FixedArrayMarshalType_Size.Value : -1;
-					var nt = (dnlib.DotNet.NativeType)FixedArrayMarshalType_NativeType.SelectedItem;
+						(int)FixedArrayMarshalType_Size.Value! : -1;
+					var nt = (dnlib.DotNet.NativeType)FixedArrayMarshalType_NativeType.SelectedItem!;
 					return new FixedArrayMarshalType(size, nt);
 				}
 				else if (IsArrayMarshalType) {
-					var nt = (dnlib.DotNet.NativeType)ArrayMarshalType_NativeType.SelectedItem;
+					var nt = (dnlib.DotNet.NativeType)ArrayMarshalType_NativeType.SelectedItem!;
 					int paramNum = ArrayMarshalType_ParamNum_IsEnabled && !ArrayMarshalType_ParamNum.IsNull ?
-						(int)ArrayMarshalType_ParamNum.Value : -1;
+						(int)ArrayMarshalType_ParamNum.Value! : -1;
 					int numElems = ArrayMarshalType_NumElems_IsEnabled && !ArrayMarshalType_NumElems.IsNull ?
-						(int)ArrayMarshalType_NumElems.Value : -1;
+						(int)ArrayMarshalType_NumElems.Value! : -1;
 					int flags = ArrayMarshalType_Flags_IsEnabled && !ArrayMarshalType_Flags.IsNull ?
-						(int)ArrayMarshalType_Flags.Value : -1;
+						(int)ArrayMarshalType_Flags.Value! : -1;
 					return new ArrayMarshalType(nt, paramNum, numElems, flags);
 				}
 				else if (IsCustomMarshalType) {
@@ -457,18 +455,18 @@ namespace dnSpy.AsmEditor.DnlibDialogs {
 				}
 				else if (IsInterfaceMarshalType) {
 					int iidParamIndex = InterfaceMarshalType_IidParamIndex_IsEnabled && !InterfaceMarshalType_IidParamIndex.IsNull ?
-						(int)InterfaceMarshalType_IidParamIndex.Value : -1;
-					return new InterfaceMarshalType((dnlib.DotNet.NativeType)NativeType.SelectedItem, iidParamIndex);
+						(int)InterfaceMarshalType_IidParamIndex.Value! : -1;
+					return new InterfaceMarshalType((dnlib.DotNet.NativeType)NativeType.SelectedItem!, iidParamIndex);
 				}
 				else if (IsMarshalType) {
-					return new MarshalType((dnlib.DotNet.NativeType)NativeType.SelectedItem);
+					return new MarshalType((dnlib.DotNet.NativeType)NativeType.SelectedItem!);
 				}
 				else
 					throw new InvalidOperationException();
 			}
 			set {
-				IsEnabled = value != null;
-				if (value == null)
+				IsEnabled = !(value is null);
+				if (value is null)
 					return;
 
 				switch (value.NativeType) {

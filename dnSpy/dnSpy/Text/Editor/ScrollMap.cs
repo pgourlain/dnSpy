@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -26,7 +26,7 @@ using Microsoft.VisualStudio.Text.Formatting;
 
 namespace dnSpy.Text.Editor {
 	sealed class ScrollMap : IScrollMap, IDisposable {
-		public event EventHandler MappingChanged;
+		public event EventHandler? MappingChanged;
 		public ITextView TextView { get; }
 		public bool AreElisionsExpanded { get; }
 		public double Start => 0;
@@ -44,7 +44,7 @@ namespace dnSpy.Text.Editor {
 			TextView.Closed += TextView_Closed;
 		}
 
-		void TextView_LayoutChanged(object sender, TextViewLayoutChangedEventArgs e) {
+		void TextView_LayoutChanged(object? sender, TextViewLayoutChangedEventArgs e) {
 			bool update = false;
 			if (e.OldViewState.ViewportHeight != e.NewViewState.ViewportHeight)
 				update = true;
@@ -54,10 +54,10 @@ namespace dnSpy.Text.Editor {
 				UpdateCachedState();
 		}
 
-		void TextView_Closed(object sender, EventArgs e) => Dispose();
-		void TextBuffer_ChangedLowPriority(object sender, TextContentChangedEventArgs e) => UpdateCachedState();
+		void TextView_Closed(object? sender, EventArgs e) => Dispose();
+		void TextBuffer_ChangedLowPriority(object? sender, TextContentChangedEventArgs e) => UpdateCachedState();
 
-		void Options_OptionChanged(object sender, EditorOptionChangedEventArgs e) {
+		void Options_OptionChanged(object? sender, EditorOptionChangedEventArgs e) {
 			if (e.OptionId == DefaultTextViewOptions.WordWrapStyleName)
 				UpdateCachedState();
 		}

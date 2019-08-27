@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -40,12 +40,12 @@ namespace dnSpy.Contracts.Hex.Tagging {
 		/// <summary>
 		/// Raised after tags have changed
 		/// </summary>
-		public abstract event EventHandler<HexTagsChangedEventArgs> TagsChanged;
+		public abstract event EventHandler<HexTagsChangedEventArgs>? TagsChanged;
 
 		/// <summary>
 		/// Raised on the original thread after tags have changed
 		/// </summary>
-		public abstract event EventHandler<HexBatchedTagsChangedEventArgs> BatchedTagsChanged;
+		public abstract event EventHandler<HexBatchedTagsChangedEventArgs>? BatchedTagsChanged;
 
 		/// <summary>
 		/// Returns all tags intersecting with <paramref name="span"/>

@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -34,12 +34,12 @@ namespace dnSpy.Contracts.Debugger.Breakpoints.Code {
 		/// <summary>
 		/// Can be used by code to add custom hit test conditions
 		/// </summary>
-		public abstract event EventHandler<DbgBreakpointHitCheckEventArgs> HitCheck;
+		public abstract event EventHandler<DbgBreakpointHitCheckEventArgs>? HitCheck;
 
 		/// <summary>
 		/// Raised when the breakpoint is hit and the process will be paused
 		/// </summary>
-		public abstract event EventHandler<DbgBreakpointHitEventArgs> Hit;
+		public abstract event EventHandler<DbgBreakpointHitEventArgs>? Hit;
 
 		/// <summary>
 		/// Gets the breakpoint options
@@ -109,7 +109,7 @@ namespace dnSpy.Contracts.Debugger.Breakpoints.Code {
 		/// <summary>
 		/// Raised when <see cref="BoundBreakpoints"/> is changed
 		/// </summary>
-		public abstract event EventHandler<DbgCollectionChangedEventArgs<DbgBoundCodeBreakpoint>> BoundBreakpointsChanged;
+		public abstract event EventHandler<DbgCollectionChangedEventArgs<DbgBoundCodeBreakpoint>>? BoundBreakpointsChanged;
 
 		/// <summary>
 		/// Gets the bound breakpoints warning/error message
@@ -119,7 +119,7 @@ namespace dnSpy.Contracts.Debugger.Breakpoints.Code {
 		/// <summary>
 		/// Raised when <see cref="BoundBreakpointsMessage"/> is changed
 		/// </summary>
-		public abstract event EventHandler BoundBreakpointsMessageChanged;
+		public abstract event EventHandler? BoundBreakpointsMessageChanged;
 
 		/// <summary>
 		/// Removes the breakpoint

@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -32,7 +32,7 @@ namespace dnSpy.Debugger.Breakpoints.Code.TextEditor {
 		public string SettingsToolTip => dnSpy_Debugger_Resources.Breakpoints_GlyphMargin_ShowSettingsToolTip;
 		public string ToggleBreakpointToolTip => breakpoint.IsEnabled ? dnSpy_Debugger_Resources.Breakpoints_GlyphMargin_DisableBreakpoint : dnSpy_Debugger_Resources.Breakpoints_GlyphMargin_EnableBreakpoint;
 
-		public event EventHandler BeforeExecuteCommand;
+		public event EventHandler? BeforeExecuteCommand;
 
 		readonly ShowCodeBreakpointSettingsService showCodeBreakpointSettingsService;
 		readonly DbgCodeBreakpoint breakpoint;

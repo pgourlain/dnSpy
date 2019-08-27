@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -20,6 +20,8 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Windows.Threading;
@@ -44,13 +46,13 @@ namespace dnSpy.Debugger.ToolWindows.Modules {
 		}
 
 		public void Save(ModuleVM[] modules) {
-			if (modules == null)
+			if (modules is null)
 				throw new ArgumentNullException(nameof(modules));
 			var list = new(DbgModule module, string filename)[modules.Length];
 			if (modules.Length == 1) {
 				var vm = modules[0];
 				var filename = new PickSaveFilename().GetFilename(GetModuleFilename(vm.Module), GetDefaultExtension(GetModuleFilename(vm.Module), vm.Module.IsExe), PickFilenameConstants.DotNetAssemblyOrModuleFilter);
-				if (string.IsNullOrEmpty(filename))
+				if (string2.IsNullOrEmpty(filename))
 					return;
 				list[0] = (vm.Module, filename);
 			}
@@ -58,6 +60,7 @@ namespace dnSpy.Debugger.ToolWindows.Modules {
 				var dir = new PickDirectory().GetDirectory(null);
 				if (!Directory.Exists(dir))
 					return;
+				Debug2.Assert(!(dir is null));
 				for (int i = 0; i < modules.Length; i++) {
 					var file = modules[i];
 					var filename = file.Module.Name;
@@ -72,7 +75,7 @@ namespace dnSpy.Debugger.ToolWindows.Modules {
 				messageBoxService.Show(string.Format(dnSpy_Debugger_Resources.ErrorOccurredX, error));
 		}
 
-		bool ShowDialog((DbgModule module, string filename)[] list, out string error) {
+		bool ShowDialog((DbgModule module, string filename)[] list, [NotNullWhen(false)] out string? error) {
 			error = null;
 			var data = new ProgressVM(Dispatcher.CurrentDispatcher, new PEFilesSaver(list));
 			var win = new ProgressDlg();
@@ -90,16 +93,16 @@ namespace dnSpy.Debugger.ToolWindows.Modules {
 			return false;
 		}
 
-		static string GetModuleFilename(DbgModule module) {
+		static string? GetModuleFilename(DbgModule module) {
 			if (module.IsDynamic)
 				return null;
 			return module.Name;
 		}
 
-		static string GetDefaultExtension(string name, bool isExe) {
+		static string GetDefaultExtension(string? name, bool isExe) {
 			try {
 				var ext = Path.GetExtension(name);
-				if (ext.Length > 0 && ext[0] == '.')
+				if (!(ext is null) && ext.Length > 0 && ext[0] == '.')
 					return ext.Substring(1);
 			}
 			catch {

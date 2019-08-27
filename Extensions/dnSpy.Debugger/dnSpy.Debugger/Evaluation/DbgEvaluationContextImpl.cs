@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -53,7 +53,7 @@ namespace dnSpy.Debugger.Evaluation {
 			runtime.CloseOnContinue(continueContext);
 		}
 
-		void DbgContinueContext_Closed(object sender, EventArgs e) {
+		void DbgContinueContext_Closed(object? sender, EventArgs e) {
 			continueContext.Closed -= DbgContinueContext_Closed;
 			if (!IsClosed && !Runtime.IsClosed) {
 				lock (lockObj) {

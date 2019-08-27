@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -36,20 +36,20 @@ namespace dnSpy.Controls {
 		/// <summary>
 		/// Raised when the DPI has changed
 		/// </summary>
-		event EventHandler<WindowDpiChangedEventArgs> DpiChanged;
+		event EventHandler<WindowDpiChangedEventArgs>? DpiChanged;
 	}
 
 	[Export(typeof(IDpiService))]
 	sealed class DpiService : IDpiService {
 		public Size MainWindowDpi { get; private set; }
-		public event EventHandler<WindowDpiChangedEventArgs> DpiChanged;
+		public event EventHandler<WindowDpiChangedEventArgs>? DpiChanged;
 
 		DpiService() {
-			Debug.Assert(Application.Current == null || Application.Current.Windows.Count == 0);
+			Debug2.Assert(Application.Current is null || Application.Current.Windows.Count == 0);
 			MetroWindow.MetroWindowCreated += MetroWindow_MetroWindowCreated;
 		}
 
-		void MetroWindow_MetroWindowCreated(object sender, MetroWindowCreatedEventArgs e) {
+		void MetroWindow_MetroWindowCreated(object? sender, MetroWindowCreatedEventArgs e) {
 			e.MetroWindow.WindowDpiChanged += MetroWindow_WindowDpiChanged;
 			e.MetroWindow.Closed += MetroWindow_Closed;
 			UpdateMainWindowDpi(e.MetroWindow);
@@ -60,14 +60,14 @@ namespace dnSpy.Controls {
 				MainWindowDpi = window.WindowDpi;
 		}
 
-		void MetroWindow_WindowDpiChanged(object sender, EventArgs e) {
-			var window = (MetroWindow)sender;
+		void MetroWindow_WindowDpiChanged(object? sender, EventArgs e) {
+			var window = (MetroWindow)sender!;
 			UpdateMainWindowDpi(window);
 			DpiChanged?.Invoke(this, new WindowDpiChangedEventArgs(window));
 		}
 
-		void MetroWindow_Closed(object sender, EventArgs e) {
-			var window = (MetroWindow)sender;
+		void MetroWindow_Closed(object? sender, EventArgs e) {
+			var window = (MetroWindow)sender!;
 			window.WindowDpiChanged -= MetroWindow_WindowDpiChanged;
 			window.Closed -= MetroWindow_Closed;
 		}

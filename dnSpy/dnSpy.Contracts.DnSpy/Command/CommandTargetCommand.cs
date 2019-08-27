@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -59,9 +59,9 @@ namespace dnSpy.Contracts.Command {
 			this.cmdId = cmdId;
 		}
 
-		event EventHandler ICommand.CanExecuteChanged {
-			add { CommandManager.RequerySuggested += value; }
-			remove { CommandManager.RequerySuggested -= value; }
+		event EventHandler? ICommand.CanExecuteChanged {
+			add => CommandManager.RequerySuggested += value;
+			remove => CommandManager.RequerySuggested -= value;
 		}
 
 		bool ICommand.CanExecute(object parameter) => commandTarget.CanExecute(group, cmdId) == CommandTargetStatus.Handled;

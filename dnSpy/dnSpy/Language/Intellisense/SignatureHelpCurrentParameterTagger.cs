@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -48,9 +48,9 @@ namespace dnSpy.Language.Intellisense {
 			signatureHelpParameterDocumentationClassificationTag = new ClassificationTag(classificationTypeRegistryService.GetClassificationType(ThemeClassificationTypeNames.SignatureHelpParameterDocumentation));
 		}
 
-		public ITagger<T> CreateTagger<T>(ITextBuffer buffer) where T : ITag {
+		public ITagger<T>? CreateTagger<T>(ITextBuffer buffer) where T : ITag {
 			var session = buffer.TryGetSignatureHelpSession();
-			if (session == null)
+			if (session is null)
 				return null;
 			if (buffer.ContentType.TypeName.EndsWith(SignatureHelpConstants.ExtendedSignatureHelpContentTypeSuffix))
 				return new SignatureHelpCurrentParameterTaggerEx(buffer, signatureHelpDocumentationClassificationTag, signatureHelpParameterClassificationTag, signatureHelpParameterDocumentationClassificationTag) as ITagger<T>;
@@ -59,7 +59,7 @@ namespace dnSpy.Language.Intellisense {
 	}
 
 	sealed class SignatureHelpCurrentParameterTagger : ITagger<IClassificationTag> {
-		public event EventHandler<SnapshotSpanEventArgs> TagsChanged { add { } remove { } }
+		public event EventHandler<SnapshotSpanEventArgs>? TagsChanged { add { } remove { } }
 
 		readonly ITextBuffer buffer;
 		readonly ISignatureHelpSession session;
@@ -75,7 +75,7 @@ namespace dnSpy.Language.Intellisense {
 			if (session.IsDismissed)
 				yield break;
 			var parameter = session.SelectedSignature?.CurrentParameter;
-			if (parameter == null)
+			if (parameter is null)
 				yield break;
 			bool usePrettyPrintedContent = buffer.GetUsePrettyPrintedContent();
 			var locus = usePrettyPrintedContent ? parameter.PrettyPrintedLocus : parameter.Locus;
@@ -89,7 +89,7 @@ namespace dnSpy.Language.Intellisense {
 	}
 
 	sealed class SignatureHelpCurrentParameterTaggerEx : ITagger<IClassificationTag> {
-		public event EventHandler<SnapshotSpanEventArgs> TagsChanged { add { } remove { } }
+		public event EventHandler<SnapshotSpanEventArgs>? TagsChanged { add { } remove { } }
 
 		readonly ITextBuffer buffer;
 		readonly ClassificationTag signatureHelpDocumentationClassificationTag;
@@ -105,8 +105,8 @@ namespace dnSpy.Language.Intellisense {
 
 		public IEnumerable<ITagSpan<IClassificationTag>> GetTags(NormalizedSnapshotSpanCollection spans) {
 			var context = buffer.TryGetSignatureHelpClassifierContext();
-			Debug.Assert(context != null);
-			if (context == null || context.Session.IsDismissed)
+			Debug2.Assert(!(context is null));
+			if (context is null || context.Session.IsDismissed)
 				yield break;
 			ClassificationTag tag;
 			if (context.Type == SignatureHelpClassifierContextTypes.SignatureDocumentation)

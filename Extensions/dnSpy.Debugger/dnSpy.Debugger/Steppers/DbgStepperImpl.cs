@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -28,13 +28,13 @@ namespace dnSpy.Debugger.Steppers {
 	sealed class DbgStepperImpl : DbgStepper {
 		public override DbgThread Thread => thread;
 		public override bool CanStep => !IsClosed && thread.Process.State == DbgProcessState.Paused && !IsStepping;
-		public override event EventHandler<DbgStepCompleteEventArgs> StepComplete;
+		public override event EventHandler<DbgStepCompleteEventArgs>? StepComplete;
 		DbgDispatcher Dispatcher => Thread.Process.DbgManager.Dispatcher;
 
 		public override bool IsStepping {
 			get {
 				lock (lockObj)
-					return stepperTag != null;
+					return !(stepperTag is null);
 			}
 		}
 
@@ -42,9 +42,9 @@ namespace dnSpy.Debugger.Steppers {
 
 		readonly object lockObj;
 		readonly DbgManagerImpl dbgManager;
-		readonly DbgThreadImpl thread;
+		DbgThreadImpl thread;
 		readonly DbgEngineStepper engineStepper;
-		object stepperTag;
+		object? stepperTag;
 		bool closeWhenStepComplete;
 
 		public DbgStepperImpl(DbgManagerImpl dbgManager, DbgThreadImpl thread, DbgEngineStepper engineStepper) {
@@ -52,29 +52,31 @@ namespace dnSpy.Debugger.Steppers {
 			this.dbgManager = dbgManager ?? throw new ArgumentNullException(nameof(dbgManager));
 			this.thread = thread ?? throw new ArgumentNullException(nameof(thread));
 			this.engineStepper = engineStepper ?? throw new ArgumentNullException(nameof(engineStepper));
-			thread.AddAutoClose(this);
 			engineStepper.StepComplete += DbgEngineStepper_StepComplete;
 		}
 
-		void DbgEngineStepper_StepComplete(object sender, DbgEngineStepCompleteEventArgs e) =>
+		void DbgEngineStepper_StepComplete(object? sender, DbgEngineStepCompleteEventArgs e) =>
 			Dispatcher.BeginInvoke(() => DbgEngineStepper_StepComplete_DbgThread(e));
 
 		void DbgEngineStepper_StepComplete_DbgThread(DbgEngineStepCompleteEventArgs e) {
 			Dispatcher.VerifyAccess();
 			bool wasStepping;
 			lock (lockObj) {
-				wasStepping = stepperTag != null && stepperTag == e.Tag;
+				wasStepping = !(stepperTag is null) && stepperTag == e.Tag;
 				stepperTag = null;
+				thread = (DbgThreadImpl?)e.Thread ?? thread;
 			}
-			var stepThread = (DbgThreadImpl)e.Thread ?? thread;
-			dbgManager.StepComplete_DbgThread(stepThread, e.Error);
+			if (IsClosed)
+				return;
+			var stepThread = (DbgThreadImpl?)e.Thread ?? thread;
+			dbgManager.StepComplete_DbgThread(stepThread, e.Error, e.ForciblyCanceled);
 			if (wasStepping)
 				RaiseStepComplete_DbgThread(stepThread, e.Error);
 		}
 
 		void RaiseStepComplete(string error) => Dispatcher.BeginInvoke(() => RaiseStepComplete_DbgThread(thread, error));
 
-		void RaiseStepComplete_DbgThread(DbgThread thread, string error) {
+		void RaiseStepComplete_DbgThread(DbgThread thread, string? error) {
 			Dispatcher.VerifyAccess();
 			StepComplete?.Invoke(this, new DbgStepCompleteEventArgs(thread, error));
 			if (closeWhenStepComplete)
@@ -83,11 +85,11 @@ namespace dnSpy.Debugger.Steppers {
 
 		internal void RaiseError_DbgThread(string error) {
 			Dispatcher.VerifyAccess();
-			if (error == null)
+			if (error is null)
 				throw new ArgumentNullException(nameof(error));
 			bool wasStepping;
 			lock (lockObj) {
-				wasStepping = stepperTag != null;
+				wasStepping = !(stepperTag is null);
 				stepperTag = null;
 			}
 			if (wasStepping)
@@ -111,9 +113,9 @@ namespace dnSpy.Debugger.Steppers {
 			}
 
 			bool canStep;
-			object stepperTagTmp;
+			object? stepperTagTmp;
 			lock (lockObj) {
-				canStep = stepperTag == null;
+				canStep = stepperTag is null;
 				if (canStep)
 					stepperTag = new object();
 				stepperTagTmp = stepperTag;
@@ -161,7 +163,7 @@ namespace dnSpy.Debugger.Steppers {
 		public override void Cancel() {
 			object stepperTagTmp;
 			lock (lockObj) {
-				if (stepperTag == null)
+				if (stepperTag is null)
 					return;
 				stepperTagTmp = stepperTag;
 				stepperTag = null;
@@ -172,7 +174,6 @@ namespace dnSpy.Debugger.Steppers {
 		public override void Close() => Thread.Process.DbgManager.Close(this);
 
 		protected override void CloseCore(DbgDispatcher dispatcher) {
-			thread.RemoveAutoClose(this);
 			engineStepper.StepComplete -= DbgEngineStepper_StepComplete;
 			engineStepper.Close(dispatcher);
 		}

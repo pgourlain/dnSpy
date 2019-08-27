@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -19,6 +19,7 @@
 
 using System;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 using System.Windows;
 using dnSpy.Contracts.Extension;
 
@@ -49,7 +50,7 @@ namespace dnSpy.Contracts.MVVM {
 
 		[ExportAutoLoaded(LoadType = AutoLoadedLoadType.BeforeExtensions)]
 		sealed class MefState : IAutoLoaded {
-			internal static MefState Instance;
+			internal static MefState? Instance;
 
 			[ImportingConstructor]
 			MefState([ImportMany] Lazy<IInitializeDataTemplate>[] entries) {
@@ -61,6 +62,7 @@ namespace dnSpy.Contracts.MVVM {
 		}
 
 		static void InitializePropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+			Debug2.Assert(!(MefState.Instance is null));
 			if ((bool)e.NewValue) {
 				foreach (var elem in MefState.Instance.entries)
 					elem.Value.Initialize(d);

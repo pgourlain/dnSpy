@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -40,15 +40,15 @@ namespace dnSpy.Text.Editor {
 		public VirtualSnapshotPoint Start => AnchorPoint < ActivePoint ? AnchorPoint : ActivePoint;
 		public VirtualSnapshotPoint End => AnchorPoint < ActivePoint ? ActivePoint : AnchorPoint;
 		public VirtualSnapshotSpan StreamSelectionSpan => new VirtualSnapshotSpan(Start, End);
-		public event EventHandler SelectionChanged;
+		public event EventHandler? SelectionChanged;
 
 		public bool IsActive {
-			get { return textSelectionLayer.IsActive; }
-			set { textSelectionLayer.IsActive = value; }
+			get => textSelectionLayer.IsActive;
+			set => textSelectionLayer.IsActive = value;
 		}
 
 		public bool ActivationTracksFocus {
-			get { return activationTracksFocus; }
+			get => activationTracksFocus;
 			set {
 				if (activationTracksFocus == value)
 					return;
@@ -87,7 +87,7 @@ namespace dnSpy.Text.Editor {
 		}
 
 		public TextSelectionMode Mode {
-			get { return mode; }
+			get => mode;
 			set {
 				if (mode == value)
 					return;
@@ -105,9 +105,9 @@ namespace dnSpy.Text.Editor {
 		VirtualSnapshotPoint anchorPoint, activePoint;
 
 		public TextSelection(IWpfTextView textView, IAdornmentLayer selectionLayer, IEditorFormatMap editorFormatMap) {
-			if (selectionLayer == null)
+			if (selectionLayer is null)
 				throw new ArgumentNullException(nameof(selectionLayer));
-			if (editorFormatMap == null)
+			if (editorFormatMap is null)
 				throw new ArgumentNullException(nameof(editorFormatMap));
 			TextView = textView ?? throw new ArgumentNullException(nameof(textView));
 			Mode = TextSelectionMode.Stream;
@@ -120,25 +120,25 @@ namespace dnSpy.Text.Editor {
 			ActivationTracksFocus = true;
 		}
 
-		void TextBuffer_ChangedHighPriority(object sender, TextContentChangedEventArgs e) {
+		void TextBuffer_ChangedHighPriority(object? sender, TextContentChangedEventArgs e) {
 			var newAnchorPoint = anchorPoint.TranslateTo(TextView.TextSnapshot);
 			var newActivePoint = activePoint.TranslateTo(TextView.TextSnapshot);
 			Select(newAnchorPoint, newActivePoint);
 		}
 
-		void Options_OptionChanged(object sender, EditorOptionChangedEventArgs e) {
+		void Options_OptionChanged(object? sender, EditorOptionChangedEventArgs e) {
 			if (e.OptionId == DefaultTextViewOptions.UseVirtualSpaceName) {
 				if (Mode == TextSelectionMode.Stream && !TextView.Options.IsVirtualSpaceEnabled())
 					Select(new VirtualSnapshotPoint(AnchorPoint.Position), new VirtualSnapshotPoint(ActivePoint.Position));
 			}
 		}
 
-		void TextView_GotAggregateFocus(object sender, EventArgs e) {
+		void TextView_GotAggregateFocus(object? sender, EventArgs e) {
 			if (ActivationTracksFocus)
 				IsActive = true;
 		}
 
-		void TextView_LostAggregateFocus(object sender, EventArgs e) {
+		void TextView_LostAggregateFocus(object? sender, EventArgs e) {
 			if (ActivationTracksFocus)
 				IsActive = false;
 		}
@@ -158,7 +158,7 @@ namespace dnSpy.Text.Editor {
 		}
 
 		public VirtualSnapshotSpan? GetSelectionOnTextViewLine(ITextViewLine line) {
-			if (line == null)
+			if (line is null)
 				throw new ArgumentNullException(nameof(line));
 			if (line.Snapshot != TextView.TextSnapshot)
 				throw new ArgumentException();
@@ -169,7 +169,7 @@ namespace dnSpy.Text.Editor {
 			}
 			if (Mode == TextSelectionMode.Stream) {
 				var spanTmp = line.ExtentIncludingLineBreak.Intersection(StreamSelectionSpan.SnapshotSpan);
-				if (spanTmp == null)
+				if (spanTmp is null)
 					return null;
 				var span = spanTmp.Value;
 				if (End > new VirtualSnapshotPoint(line.End))

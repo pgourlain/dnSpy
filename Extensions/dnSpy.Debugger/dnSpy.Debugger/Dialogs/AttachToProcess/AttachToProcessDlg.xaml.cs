@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -37,6 +38,9 @@ namespace dnSpy.Debugger.Dialogs.AttachToProcess {
 				if (DataContext is AttachToProcessVM vm) {
 					vm.PropertyChanged += AttachToProcessVM_PropertyChanged;
 					vm.AllItems.CollectionChanged += AllItems_CollectionChanged;
+					CommandBindings.Add(new CommandBinding(ApplicationCommands.Copy,
+						(s2, e2) => vm.Copy(vm.Sort(listView.SelectedItems.OfType<ProgramVM>()).ToArray()),
+						(s2, e2) => e2.CanExecute = listView.SelectedItems.Count != 0));
 				}
 			};
 			Loaded += OnLoaded;
@@ -54,44 +58,44 @@ namespace dnSpy.Debugger.Dialogs.AttachToProcess {
 			searchTextBox.SelectAll();
 		}
 
-		void AllItems_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
-			if (e.NewItems == null)
+		void AllItems_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e) {
+			if (e.NewItems is null)
 				return;
 			var vm = DataContext as AttachToProcessVM;
-			if (vm == null || vm.AllItems.Count != 1)
+			if (vm is null || vm.AllItems.Count != 1)
 				return;
 			FocusListViewElement();
 		}
 
 		void FocusListViewElement() {
 			var vm = DataContext as AttachToProcessVM;
-			if (vm == null || vm.AllItems.Count == 0)
+			if (vm is null || vm.AllItems.Count == 0)
 				return;
 			var obj = vm.AllItems[0];
 			listView.SelectedItem = obj;
 			SetFocus(listView, obj, DispatcherPriority.Background);
 		}
 
-		void OnLoaded(object sender, RoutedEventArgs e) {
+		void OnLoaded(object? sender, RoutedEventArgs e) {
 			listView.Focus();
 			var vm = DataContext as AttachToProcessVM;
-			if (listView.SelectedItem == null && vm != null && vm.AllItems.Count > 0)
+			if (listView.SelectedItem is null && !(vm is null) && vm.AllItems.Count > 0)
 				FocusListViewElement();
 		}
 
-		void AttachToProcessVM_PropertyChanged(object sender, PropertyChangedEventArgs e) {
+		void AttachToProcessVM_PropertyChanged(object? sender, PropertyChangedEventArgs e) {
 			if (e.PropertyName == nameof(AttachToProcessVM.IsRefreshing)) {
 				// Make sure Refresh button gets updated
 				CommandManager.InvalidateRequerySuggested();
 			}
 		}
 
-		void ListView_MouseDoubleClick(object sender, MouseButtonEventArgs e) {
+		void ListView_MouseDoubleClick(object? sender, MouseButtonEventArgs e) {
 			if (!UIUtilities.IsLeftDoubleClick<ListViewItem>(listView, e))
 				return;
 
 			var vm = DataContext as ViewModelBase;
-			if (vm == null || vm.HasError)
+			if (vm is null || vm.HasError)
 				return;
 			okButton_Click(this, e);
 		}

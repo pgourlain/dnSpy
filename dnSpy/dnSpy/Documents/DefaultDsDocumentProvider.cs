@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -17,6 +17,7 @@
     along with dnSpy.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+using System;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
 using dnlib.DotNet;
@@ -28,40 +29,55 @@ namespace dnSpy.Documents {
 	sealed class DefaultDsDocumentProvider : IDsDocumentProvider {
 		public double Order => DocumentConstants.ORDER_DEFAULT_DOCUMENT_PROVIDER;
 
-		public IDsDocument Create(IDsDocumentService documentService, DsDocumentInfo documentInfo) {
+		public IDsDocument? Create(IDsDocumentService documentService, DsDocumentInfo documentInfo) {
+			if (documentInfo.Type == DocumentConstants.DOCUMENTTYPE_INMEMORY) {
+				var getFileData = documentInfo.Data as Func<(byte[]? filedata, bool isFileLayout)>;
+				Debug2.Assert(!(getFileData is null));
+				if (!(getFileData is null)) {
+					var info = getFileData();
+					if (!(info.filedata is null))
+						return documentService.CreateDocument(documentInfo, info.filedata, documentInfo.Name, info.isFileLayout);
+				}
+				return null;
+			}
+
 			var filename = GetFilename(documentInfo);
-			if (filename != null)
+			if (!(filename is null))
 				return documentService.CreateDocument(documentInfo, filename);
 			return null;
 		}
 
-		public IDsDocumentNameKey CreateKey(IDsDocumentService documentService, DsDocumentInfo documentInfo) {
+		public IDsDocumentNameKey? CreateKey(IDsDocumentService documentService, DsDocumentInfo documentInfo) {
 			var filename = GetFilename(documentInfo);
-			if (filename != null)
+			if (!(filename is null))
 				return new FilenameKey(filename);
 			return null;
 		}
 
-		static string GetFilename(DsDocumentInfo documentInfo) {
+		static string? GetFilename(DsDocumentInfo documentInfo) {
 			if (documentInfo.Type == DocumentConstants.DOCUMENTTYPE_FILE)
 				return documentInfo.Name;
 			if (documentInfo.Type == DocumentConstants.DOCUMENTTYPE_GAC)
 				return GetGacFilename(documentInfo.Name);
 			if (documentInfo.Type == DocumentConstants.DOCUMENTTYPE_REFASM)
 				return GetRefFileFilename(documentInfo.Name);
+			if (documentInfo.Type == DocumentConstants.DOCUMENTTYPE_INMEMORY) {
+				if (!string.IsNullOrEmpty(documentInfo.Name))
+					return documentInfo.Name;
+			}
 			return null;
 		}
 
-		static string GetGacFilename(string asmFullName) => GacInfo.FindInGac(new AssemblyNameInfo(asmFullName));
+		static string? GetGacFilename(string asmFullName) => GacInfo.FindInGac(new AssemblyNameInfo(asmFullName));
 
-		static string GetRefFileFilename(string s) {
+		static string? GetRefFileFilename(string s) {
 			int index = s.LastIndexOf(DocumentConstants.REFERENCE_ASSEMBLY_SEPARATOR);
 			Debug.Assert(index >= 0);
 			if (index < 0)
 				return null;
 
 			var f = GetGacFilename(s.Substring(0, index));
-			if (f != null)
+			if (!(f is null))
 				return f;
 			return s.Substring(index + DocumentConstants.REFERENCE_ASSEMBLY_SEPARATOR.Length).Trim();
 		}

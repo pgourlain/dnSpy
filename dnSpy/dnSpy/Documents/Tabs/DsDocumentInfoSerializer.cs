@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -35,6 +35,10 @@ namespace dnSpy.Documents.Tabs {
 		}
 
 		public static void Save(ISettingsSection section, DsDocumentInfo info) {
+			// Assume that instances with a non-null Data property can't be serialized
+			if (!(info.Data is null))
+				return;
+
 			section.Attribute(DOCUMENTINFO_NAME_ATTR, info.Name);
 			if (info.Type != DocumentConstants.DOCUMENTTYPE_FILE)
 				section.Attribute(DOCUMENTINFO_TYPE_ATTR, info.Type);

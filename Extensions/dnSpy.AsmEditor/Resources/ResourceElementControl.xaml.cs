@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -36,12 +36,12 @@ namespace dnSpy.AsmEditor.Resources {
 			Loaded += ResourceElementControl_Loaded;
 		}
 
-		void ResourceElementControl_Loaded(object sender, RoutedEventArgs e) {
+		void ResourceElementControl_Loaded(object? sender, RoutedEventArgs e) {
 			var vm = DataContext as ResourceElementVM;
-			Debug.Assert(vm != null);
-			if (vm != null && !string.IsNullOrEmpty(vm.Name) && vm.IsSingleLineValue)
+			Debug2.Assert(!(vm is null));
+			if (!(vm is null) && !string.IsNullOrEmpty(vm.Name) && vm.IsSingleLineValue)
 				valueTextBox.Focus();
-			else if (vm != null && !string.IsNullOrEmpty(vm.Name) && vm.IsMultiLineValue)
+			else if (!(vm is null) && !string.IsNullOrEmpty(vm.Name) && vm.IsMultiLineValue)
 				multiLineTextBox.Focus();
 			else
 				nameTextBox.Focus();

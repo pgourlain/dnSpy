@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -32,10 +32,10 @@ namespace dnSpy.Debugger.DotNet.Code {
 		readonly IDecompilerService decompilerService;
 		readonly Lazy<DbgDotNetDecompilerGuidProvider, IDbgDotNetDecompilerGuidProviderMetadata>[] dbgDotNetDecompilerGuidProviders;
 
-		public override event EventHandler<EventArgs> DecompilerChanged;
+		public override event EventHandler<EventArgs>? DecompilerChanged;
 
-		public override IDecompiler Decompiler => decompiler;
-		IDecompiler decompiler;
+		public override IDecompiler Decompiler => decompiler!;
+		IDecompiler? decompiler;
 
 		[ImportingConstructor]
 		DbgDotNetDecompilerServiceImpl(IDecompilerService decompilerService, DbgLanguageService dbgLanguageService, [ImportMany] IEnumerable<Lazy<DbgDotNetDecompilerGuidProvider, IDbgDotNetDecompilerGuidProviderMetadata>> dbgDotNetDecompilerGuidProviders) {
@@ -45,7 +45,7 @@ namespace dnSpy.Debugger.DotNet.Code {
 			SetDecompiler(dbgLanguageService.GetCurrentLanguage(PredefinedDbgRuntimeKindGuids.DotNet_Guid));
 		}
 
-		void DbgLanguageService_LanguageChanged(object sender, DbgLanguageChangedEventArgs e) {
+		void DbgLanguageService_LanguageChanged(object? sender, DbgLanguageChangedEventArgs e) {
 			if (e.RuntimeKindGuid == PredefinedDbgRuntimeKindGuids.DotNet_Guid)
 				SetDecompiler(e.Language);
 		}
@@ -53,7 +53,7 @@ namespace dnSpy.Debugger.DotNet.Code {
 		Guid GetDecompilerGuid(DbgLanguage language) {
 			foreach (var lz in dbgDotNetDecompilerGuidProviders) {
 				var guid = lz.Value.GetDecompilerGuid(language);
-				if (guid != null)
+				if (!(guid is null))
 					return guid.Value;
 			}
 			return DecompilerConstants.LANGUAGE_CSHARP;
@@ -62,7 +62,7 @@ namespace dnSpy.Debugger.DotNet.Code {
 		void SetDecompiler(DbgLanguage language) => SetDecompiler(decompilerService.FindOrDefault(GetDecompilerGuid(language)));
 
 		void SetDecompiler(IDecompiler newDecompiler) {
-			if (newDecompiler == null)
+			if (newDecompiler is null)
 				throw new ArgumentNullException(nameof(newDecompiler));
 			if (decompiler == newDecompiler)
 				return;

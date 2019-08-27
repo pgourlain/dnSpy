@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -22,17 +22,17 @@ using dnSpy.Contracts.Debugger.Attach;
 
 namespace dnSpy.Debugger.Dialogs.AttachToProcess {
 	abstract class AttachProgramOptionsAggregatorFactory {
-		public abstract AttachProgramOptionsAggregator Create();
+		public abstract AttachProgramOptionsAggregator Create(string[]? providerNames);
 	}
 
 	abstract class AttachProgramOptionsAggregator : IDisposable {
-		public abstract event EventHandler<AttachProgramOptionsAddedEventArgs> AttachProgramOptionsAdded;
-		public abstract event EventHandler Completed;
+		public abstract event EventHandler<AttachProgramOptionsAddedEventArgs>? AttachProgramOptionsAdded;
+		public abstract event EventHandler? Completed;
 		public abstract void Start();
 		public abstract void Dispose();
 	}
 
-	struct AttachProgramOptionsAddedEventArgs {
+	readonly struct AttachProgramOptionsAddedEventArgs {
 		public AttachProgramOptions[] AttachProgramOptions { get; }
 		public AttachProgramOptionsAddedEventArgs(AttachProgramOptions[] attachProgramOptions) =>
 			AttachProgramOptions = attachProgramOptions ?? throw new ArgumentNullException(nameof(attachProgramOptions));

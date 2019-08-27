@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -36,15 +36,15 @@ namespace dnSpy.Output {
 
 	[Export(typeof(IOutputContent))]
 	sealed class OutputContent : IOutputContent {
-		public object UIObject => OutputControl;
-		public IInputElement FocusedElement => OutputService.FocusedElement;
-		public FrameworkElement ZoomElement => OutputControl;
+		public object? UIObject => OutputControl;
+		public IInputElement? FocusedElement => OutputService.FocusedElement;
+		public FrameworkElement? ZoomElement => OutputControl;
 		public double ZoomLevel => OutputService.ZoomLevel;
 		IOutputServiceInternal OutputService => vmOutput.Value;
 
 		OutputControl OutputControl {
 			get {
-				if (outputControl.DataContext == null)
+				if (outputControl.DataContext is null)
 					outputControl.DataContext = OutputService;
 				return outputControl;
 			}
@@ -91,7 +91,7 @@ namespace dnSpy.Output {
 			outputControl.PreviewKeyDown += OutputControl_PreviewKeyDown;
 		}
 
-		void OutputControl_PreviewKeyDown(object sender, KeyEventArgs e) {
+		void OutputControl_PreviewKeyDown(object? sender, KeyEventArgs e) {
 			if (!waitingForSecondKey && e.KeyboardDevice.Modifiers == ModifierKeys.Control && e.Key == Key.E) {
 				waitingForSecondKey = true;
 				e.Handled = true;
@@ -110,8 +110,8 @@ namespace dnSpy.Output {
 
 		void SelectLog(int tmpIndex) {
 			var vm = OutputService.SelectLog(tmpIndex);
-			Debug.Assert(vm != null);
-			if (vm == null)
+			Debug2.Assert(!(vm is null));
+			if (vm is null)
 				return;
 			vm.FocusedElement?.Focus();
 			// Must use Loaded prio or the normal text editor could get focus

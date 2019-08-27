@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -39,7 +39,7 @@ namespace dnSpy.Contracts.Hex.Files {
 		/// <summary>
 		/// Raised after a new <see cref="HexBufferFileService"/> is created
 		/// </summary>
-		public abstract event EventHandler<BufferFileServiceCreatedEventArgs> BufferFileServiceCreated;
+		public abstract event EventHandler<BufferFileServiceCreatedEventArgs>? BufferFileServiceCreated;
 	}
 
 	/// <summary>

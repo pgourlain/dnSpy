@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -24,7 +24,7 @@ using dnSpy.Contracts.Hex.Editor;
 
 namespace dnSpy.Hex.Editor {
 	sealed class HexScrollMapImpl : HexScrollMap, IDisposable {
-		public override event EventHandler MappingChanged;
+		public override event EventHandler? MappingChanged;
 		public override HexView HexView { get; }
 		public override double Start => 0;
 		public override double End => end;
@@ -40,13 +40,13 @@ namespace dnSpy.Hex.Editor {
 			HexView.Closed += HexView_Closed;
 		}
 
-		void HexView_LayoutChanged(object sender, HexViewLayoutChangedEventArgs e) {
+		void HexView_LayoutChanged(object? sender, HexViewLayoutChangedEventArgs e) {
 			if (e.OldViewState.ViewportHeight != e.NewViewState.ViewportHeight)
 				UpdateCachedState();
 		}
 
-		void HexView_Closed(object sender, EventArgs e) => Dispose();
-		void HexView_BufferLinesChanged(object sender, BufferLinesChangedEventArgs e) => UpdateCachedState();
+		void HexView_Closed(object? sender, EventArgs e) => Dispose();
+		void HexView_BufferLinesChanged(object? sender, BufferLinesChangedEventArgs e) => UpdateCachedState();
 
 		void UpdateCachedState() {
 			var lineCount = HexView.BufferLines.LineCount;

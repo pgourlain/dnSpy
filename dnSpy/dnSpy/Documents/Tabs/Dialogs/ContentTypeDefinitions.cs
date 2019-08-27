@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -23,21 +23,21 @@ using Microsoft.VisualStudio.Utilities;
 
 namespace dnSpy.Documents.Tabs.Dialogs {
 	static class ContentTypeDefinitions {
-#pragma warning disable 0169
+#pragma warning disable CS0169
 		[Export]
 		[Name(ContentTypes.TabsDialog)]
 		[BaseDefinition(ContentTypes.Text)]
-		static readonly ContentTypeDefinition TabsDialog;
+		static readonly ContentTypeDefinition? TabsDialog;
 
 		[Export]
 		[Name(ContentTypes.GacDialog)]
 		[BaseDefinition(ContentTypes.Text)]
-		static readonly ContentTypeDefinition GacDialog;
+		static readonly ContentTypeDefinition? GacDialog;
 
 		[Export]
 		[Name(ContentTypes.DocListDialog)]
 		[BaseDefinition(ContentTypes.Text)]
-		static readonly ContentTypeDefinition DocListDialog;
-#pragma warning restore 0169
+		static readonly ContentTypeDefinition? DocListDialog;
+#pragma warning restore CS0169
 	}
 }

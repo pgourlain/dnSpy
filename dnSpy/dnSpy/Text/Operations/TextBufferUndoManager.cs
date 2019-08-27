@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -48,12 +48,12 @@ namespace dnSpy.Text.Operations {
 			TextBuffer.PostChanged += TextBuffer_PostChanged;
 		}
 
-		void TextBuffer_Changed(object sender, TextContentChangedEventArgs e) {
+		void TextBuffer_Changed(object? sender, TextContentChangedEventArgs e) {
 			if (e.EditTag != undoRedoEditTag && e.Changes.Count > 0)
 				changes.Add(new ChangeInfo(e.Changes, e.BeforeVersion.VersionNumber, e.AfterVersion.VersionNumber));
 		}
 
-		void TextBuffer_PostChanged(object sender, EventArgs e) {
+		void TextBuffer_PostChanged(object? sender, EventArgs e) {
 			if (changes.Count > 0) {
 				using (var transaction = TextBufferUndoHistory.CreateTransaction("Text Buffer Change")) {
 					foreach (var info in changes)

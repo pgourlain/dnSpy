@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -44,6 +44,7 @@ namespace dnSpy.Documents.TreeView {
 	[Export, Export(typeof(IDocumentTreeView))]
 	sealed class DocumentTreeView : IDocumentTreeView, ITreeViewListener {
 		readonly DocumentTreeNodeDataContext context;
+		readonly AssemblyExplorerMostRecentlyUsedList? mruList;
 		readonly Lazy<IDsDocumentNodeProvider, IDsDocumentNodeProviderMetadata>[] dsDocumentNodeProvider;
 		readonly Lazy<IDocumentTreeNodeDataFinder, IDocumentTreeNodeDataFinderMetadata>[] nodeFinders;
 
@@ -55,26 +56,26 @@ namespace dnSpy.Documents.TreeView {
 		IEnumerable<DsDocumentNode> TopNodes => TreeView.Root.Children.Select(a => (DsDocumentNode)a.Data);
 		public IDotNetImageService DotNetImageService { get; }
 		public IWpfCommands WpfCommands { get; }
-		public event EventHandler<NotifyDocumentTreeViewCollectionChangedEventArgs> CollectionChanged;
+		public event EventHandler<NotifyDocumentTreeViewCollectionChangedEventArgs>? CollectionChanged;
 
 		void CallCollectionChanged(NotifyDocumentTreeViewCollectionChangedEventArgs eventArgs) =>
 			CollectionChanged?.Invoke(this, eventArgs);
-		public event EventHandler<DocumentTreeNodeActivatedEventArgs> NodeActivated;
+		public event EventHandler<DocumentTreeNodeActivatedEventArgs>? NodeActivated;
 
 		public bool RaiseNodeActivated(DocumentTreeNodeData node) {
-			if (node == null)
+			if (node is null)
 				throw new ArgumentNullException(nameof(node));
-			if (NodeActivated == null)
+			if (NodeActivated is null)
 				return false;
 			var e = new DocumentTreeNodeActivatedEventArgs(node);
 			NodeActivated(this, e);
 			return e.Handled;
 		}
 
-		public event EventHandler<TreeViewSelectionChangedEventArgs> SelectionChanged;
+		public event EventHandler<TreeViewSelectionChangedEventArgs>? SelectionChanged;
 		bool disable_SelectionChanged = false;
 
-		void TreeView_SelectionChanged(object sender, TreeViewSelectionChangedEventArgs e) {
+		void TreeView_SelectionChanged(object? sender, TreeViewSelectionChangedEventArgs e) {
 			if (disable_SelectionChanged)
 				return;
 			SelectionChanged?.Invoke(this, e);
@@ -91,18 +92,17 @@ namespace dnSpy.Documents.TreeView {
 		}
 
 		[ImportingConstructor]
-		DocumentTreeView(ITreeViewService treeViewService, IDecompilerService decompilerService, IDsDocumentService documentService, IDocumentTreeViewSettings documentTreeViewSettings, IMenuService menuService, IDotNetImageService dotNetImageService, IWpfCommandService wpfCommandService, IResourceNodeFactory resourceNodeFactory, IAppSettings appSettings, [ImportMany] IEnumerable<Lazy<IDsDocumentNodeProvider, IDsDocumentNodeProviderMetadata>> dsDocumentNodeProviders, [ImportMany] IEnumerable<Lazy<IDocumentTreeNodeDataFinder, IDocumentTreeNodeDataFinderMetadata>> mefFinders, ITreeViewNodeTextElementProvider treeViewNodeTextElementProvider)
-			: this(true, null, treeViewService, decompilerService, documentService, documentTreeViewSettings, menuService, dotNetImageService, wpfCommandService, resourceNodeFactory, appSettings, dsDocumentNodeProviders, mefFinders, treeViewNodeTextElementProvider) {
+		DocumentTreeView(ITreeViewService treeViewService, IDecompilerService decompilerService, IDsDocumentService documentService, IDocumentTreeViewSettings documentTreeViewSettings, IMenuService menuService, IDotNetImageService dotNetImageService, IWpfCommandService wpfCommandService, IResourceNodeFactory resourceNodeFactory, [ImportMany] IEnumerable<Lazy<IDsDocumentNodeProvider, IDsDocumentNodeProviderMetadata>> dsDocumentNodeProviders, [ImportMany] IEnumerable<Lazy<IDocumentTreeNodeDataFinder, IDocumentTreeNodeDataFinderMetadata>> mefFinders, ITreeViewNodeTextElementProvider treeViewNodeTextElementProvider, AssemblyExplorerMostRecentlyUsedList mruList)
+			: this(true, null, treeViewService, decompilerService, documentService, documentTreeViewSettings, menuService, dotNetImageService, wpfCommandService, resourceNodeFactory, dsDocumentNodeProviders, mefFinders, treeViewNodeTextElementProvider, mruList) {
 		}
 
 		readonly IDecompilerService decompilerService;
 		readonly IDocumentTreeViewSettings documentTreeViewSettings;
-		readonly IAppSettings appSettings;
 
-		public DocumentTreeView(bool isGlobal, IDocumentTreeNodeFilter filter, ITreeViewService treeViewService, IDecompilerService decompilerService, IDsDocumentService documentService, IDocumentTreeViewSettings documentTreeViewSettings, IMenuService menuService, IDotNetImageService dotNetImageService, IWpfCommandService wpfCommandService, IResourceNodeFactory resourceNodeFactory, IAppSettings appSettings, [ImportMany] IEnumerable<Lazy<IDsDocumentNodeProvider, IDsDocumentNodeProviderMetadata>> dsDocumentNodeProvider, [ImportMany] IEnumerable<Lazy<IDocumentTreeNodeDataFinder, IDocumentTreeNodeDataFinderMetadata>> mefFinders, ITreeViewNodeTextElementProvider treeViewNodeTextElementProvider) {
+		public DocumentTreeView(bool isGlobal, IDocumentTreeNodeFilter? filter, ITreeViewService treeViewService, IDecompilerService decompilerService, IDsDocumentService documentService, IDocumentTreeViewSettings documentTreeViewSettings, IMenuService menuService, IDotNetImageService dotNetImageService, IWpfCommandService wpfCommandService, IResourceNodeFactory resourceNodeFactory, [ImportMany] IEnumerable<Lazy<IDsDocumentNodeProvider, IDsDocumentNodeProviderMetadata>> dsDocumentNodeProvider, [ImportMany] IEnumerable<Lazy<IDocumentTreeNodeDataFinder, IDocumentTreeNodeDataFinderMetadata>> mefFinders, ITreeViewNodeTextElementProvider treeViewNodeTextElementProvider, AssemblyExplorerMostRecentlyUsedList? mruList) {
 			this.decompilerService = decompilerService;
 			this.documentTreeViewSettings = documentTreeViewSettings;
-			this.appSettings = appSettings;
+			this.mruList = mruList;
 
 			context = new DocumentTreeNodeDataContext(this, resourceNodeFactory, filter ?? FilterNothingDocumentTreeNodeFilter.Instance, treeViewNodeTextElementProvider) {
 				SyntaxHighlight = documentTreeViewSettings.SyntaxHighlight,
@@ -111,7 +111,6 @@ namespace dnSpy.Documents.TreeView {
 				ShowAssemblyPublicKeyToken = documentTreeViewSettings.ShowAssemblyPublicKeyToken,
 				ShowToken = documentTreeViewSettings.ShowToken,
 				Decompiler = decompilerService.Decompiler,
-				UseNewRenderer = appSettings.UseNewRenderer_DocumentTreeView,
 				DeserializeResources = documentTreeViewSettings.DeserializeResources,
 				CanDragAndDrop = isGlobal,
 			};
@@ -137,7 +136,6 @@ namespace dnSpy.Documents.TreeView {
 			documentService.CollectionChanged += DocumentService_CollectionChanged;
 			decompilerService.DecompilerChanged += DecompilerService_DecompilerChanged;
 			documentTreeViewSettings.PropertyChanged += DocumentTreeViewSettings_PropertyChanged;
-			appSettings.PropertyChanged += AppSettings_PropertyChanged;
 
 			WpfCommands = wpfCommandService.GetCommands(ControlConstants.GUID_DOCUMENT_TREEVIEW);
 
@@ -173,10 +171,9 @@ namespace dnSpy.Documents.TreeView {
 			DocumentService.CollectionChanged -= DocumentService_CollectionChanged;
 			decompilerService.DecompilerChanged -= DecompilerService_DecompilerChanged;
 			documentTreeViewSettings.PropertyChanged -= DocumentTreeViewSettings_PropertyChanged;
-			appSettings.PropertyChanged -= AppSettings_PropertyChanged;
+			TreeView.SelectItems(Array.Empty<TreeNodeData>());
 			DocumentService.Clear();
 			TreeView.Root.Children.Clear();
-			TreeView.SelectItems(Array.Empty<TreeNodeData>());
 			TreeView.Dispose();
 			context.Clear();
 		}
@@ -184,14 +181,6 @@ namespace dnSpy.Documents.TreeView {
 		void RefilterNodes() {
 			context.FilterVersion++;
 			((RootNode)TreeView.Root.Data).Refilter();
-		}
-
-		void AppSettings_PropertyChanged(object sender, PropertyChangedEventArgs e) {
-			var appSettings = (IAppSettings)sender;
-			if (e.PropertyName == nameof(appSettings.UseNewRenderer_DocumentTreeView)) {
-				context.UseNewRenderer = appSettings.UseNewRenderer_DocumentTreeView;
-				RefreshNodes();
-			}
 		}
 
 		void InitializeDocumentTreeNodeGroups() {
@@ -217,8 +206,8 @@ namespace dnSpy.Documents.TreeView {
 				a();
 		}
 
-		void DocumentTreeViewSettings_PropertyChanged(object sender, PropertyChangedEventArgs e) {
-			var documentTreeViewSettings = (IDocumentTreeViewSettings)sender;
+		void DocumentTreeViewSettings_PropertyChanged(object? sender, PropertyChangedEventArgs e) {
+			var documentTreeViewSettings = (IDocumentTreeViewSettings)sender!;
 			switch (e.PropertyName) {
 			case nameof(documentTreeViewSettings.SyntaxHighlight):
 				context.SyntaxHighlight = documentTreeViewSettings.SyntaxHighlight;
@@ -256,9 +245,9 @@ namespace dnSpy.Documents.TreeView {
 			}
 		}
 
-		public event EventHandler<EventArgs> NodesTextChanged;
+		public event EventHandler<EventArgs>? NodesTextChanged;
 		void NotifyNodesTextRefreshed() => NodesTextChanged?.Invoke(this, EventArgs.Empty);
-		void DecompilerService_DecompilerChanged(object sender, EventArgs e) => UpdateDecompiler(((IDecompilerService)sender).Decompiler);
+		void DecompilerService_DecompilerChanged(object? sender, EventArgs e) => UpdateDecompiler(((IDecompilerService)sender!).Decompiler);
 
 		void UpdateDecompiler(IDecompiler newDecompiler) {
 			context.Decompiler = newDecompiler;
@@ -268,7 +257,7 @@ namespace dnSpy.Documents.TreeView {
 		}
 
 		void IDocumentTreeView.SetDecompiler(IDecompiler decompiler) {
-			if (decompiler == null)
+			if (decompiler is null)
 				return;
 			UpdateDecompiler(decompiler);
 		}
@@ -289,18 +278,19 @@ namespace dnSpy.Documents.TreeView {
 
 		void RefreshNodes() => TreeView.RefreshAllNodes();
 
-		void DocumentService_CollectionChanged(object sender, NotifyDocumentCollectionChangedEventArgs e) {
+		void DocumentService_CollectionChanged(object? sender, NotifyDocumentCollectionChangedEventArgs e) {
 			switch (e.Type) {
 			case NotifyDocumentCollectionType.Add:
 				DsDocumentNode newNode;
 
 				var addDocumentInfo = e.Data as AddDocumentInfo;
 				int index;
-				if (addDocumentInfo != null) {
+				if (!(addDocumentInfo is null)) {
 					newNode = addDocumentInfo.DsDocumentNode;
 					index = addDocumentInfo.Index;
-					if (newNode.TreeNode == null)
+					if (newNode.TreeNode is null)
 						TreeView.Create(newNode);
+					Debug2.Assert(!(newNode.TreeNode is null));
 				}
 				else {
 					newNode = CreateNode(null, e.Documents[0]);
@@ -325,10 +315,11 @@ namespace dnSpy.Documents.TreeView {
 				var list = new List<(DsDocumentNode docNode, int index)>(e.Documents.Select(a => {
 					bool b = dict2.TryGetValue(a, out var node);
 					Debug.Assert(b);
+					Debug2.Assert(!(node is null));
 					int j = -1;
 					b = b && dict.TryGetValue(node, out j);
 					Debug.Assert(b);
-					return (node, (b ? j : -1));
+					return (node, b ? j : -1);
 				}));
 				list.Sort((a, b) => b.index.CompareTo(a.index));
 				var removed = new List<DsDocumentNode>();
@@ -352,7 +343,7 @@ namespace dnSpy.Documents.TreeView {
 				break;
 
 			default:
-				Debug.Fail(string.Format("Unknown event type: {0}", e.Type));
+				Debug.Fail($"Unknown event type: {e.Type}");
 				break;
 			}
 		}
@@ -368,10 +359,10 @@ namespace dnSpy.Documents.TreeView {
 			}
 		}
 
-		public DsDocumentNode CreateNode(DsDocumentNode owner, IDsDocument document) {
+		public DsDocumentNode CreateNode(DsDocumentNode? owner, IDsDocument document) {
 			foreach (var provider in dsDocumentNodeProvider) {
 				var result = provider.Value.Create(this, owner, document);
-				if (result != null)
+				if (!(result is null))
 					return result;
 			}
 
@@ -380,7 +371,7 @@ namespace dnSpy.Documents.TreeView {
 
 		void ITreeViewListener.OnEvent(ITreeView treeView, TreeViewListenerEventArgs e) {
 			if (e.Event == TreeViewListenerEvent.NodeCreated) {
-				Debug.Assert(context != null);
+				Debug2.Assert(!(context is null));
 				var node = (ITreeNode)e.Argument;
 				if (node.Data is DocumentTreeNodeData d)
 					d.Context = context;
@@ -415,8 +406,8 @@ namespace dnSpy.Documents.TreeView {
 		public FieldNode Create(FieldDef field) =>
 			(FieldNode)TreeView.Create(new FieldNodeImpl(DocumentTreeNodeGroups.GetGroup(DocumentTreeNodeGroupType.FieldTreeNodeGroupType), field)).Data;
 
-		public DocumentTreeNodeData FindNode(object @ref) {
-			if (@ref == null)
+		public DocumentTreeNodeData? FindNode(object? @ref) {
+			if (@ref is null)
 				return null;
 			if (@ref is DocumentTreeNodeData)
 				return (DocumentTreeNodeData)@ref;
@@ -428,7 +419,7 @@ namespace dnSpy.Documents.TreeView {
 				return FindNode((ModuleDef)@ref);
 			if (@ref is ITypeDefOrRef)
 				return FindNode(((ITypeDefOrRef)@ref).ResolveTypeDef());
-			if (@ref is IMethod && ((IMethod)@ref).MethodSig != null)
+			if (@ref is IMethod && !(((IMethod)@ref).MethodSig is null))
 				return FindNode(((IMethod)@ref).ResolveMethodDef());
 			if (@ref is IField)
 				return FindNode(((IField)@ref).ResolveFieldDef());
@@ -436,6 +427,8 @@ namespace dnSpy.Documents.TreeView {
 				return FindNode((PropertyDef)@ref);
 			if (@ref is EventDef)
 				return FindNode((EventDef)@ref);
+			if (@ref is ISourceVariable sv && sv.Variable is Parameter p && p.ParamDef is ParamDef pd)
+				return FindNode(pd.DeclaringMethod);
 			if (@ref is ParamDef)
 				return FindNode(((ParamDef)@ref).DeclaringMethod);
 			if (@ref is NamespaceRef nsRef) {
@@ -444,20 +437,20 @@ namespace dnSpy.Documents.TreeView {
 
 			foreach (var finder in nodeFinders) {
 				var node = finder.Value.FindNode(this, @ref);
-				if (node != null)
+				if (!(node is null))
 					return node;
 			}
 
 			return null;
 		}
 
-		public DsDocumentNode FindNode(IDsDocument document) {
-			if (document == null)
+		public DsDocumentNode? FindNode(IDsDocument? document) {
+			if (document is null)
 				return null;
 			return Find(TopNodes, document);
 		}
 
-		DsDocumentNode Find(IEnumerable<DsDocumentNode> nodes, IDsDocument document) {
+		DsDocumentNode? Find(IEnumerable<DsDocumentNode> nodes, IDsDocument document) {
 			foreach (var n in nodes) {
 				if (n.Document == document)
 					return n;
@@ -465,14 +458,14 @@ namespace dnSpy.Documents.TreeView {
 					continue;
 				n.TreeNode.EnsureChildrenLoaded();
 				var found = Find(n.TreeNode.DataChildren.OfType<DsDocumentNode>(), document);
-				if (found != null)
+				if (!(found is null))
 					return found;
 			}
 			return null;
 		}
 
-		public AssemblyDocumentNode FindNode(AssemblyDef asm) {
-			if (asm == null)
+		public AssemblyDocumentNode? FindNode(AssemblyDef? asm) {
+			if (asm is null)
 				return null;
 
 			foreach (var n in TopNodes.OfType<AssemblyDocumentNode>()) {
@@ -483,8 +476,8 @@ namespace dnSpy.Documents.TreeView {
 			return null;
 		}
 
-		public ModuleDocumentNode FindNode(ModuleDef mod) {
-			if (mod == null)
+		public ModuleDocumentNode? FindNode(ModuleDef? mod) {
+			if (mod is null)
 				return null;
 
 			foreach (var n in TopNodes.OfType<AssemblyDocumentNode>()) {
@@ -504,30 +497,30 @@ namespace dnSpy.Documents.TreeView {
 			return null;
 		}
 
-		public TypeNode FindNode(TypeDef td) {
-			if (td == null)
+		public TypeNode? FindNode(TypeDef? td) {
+			if (td is null)
 				return null;
 
 			var types = new List<TypeDef>();
-			for (var t = td; t != null; t = t.DeclaringType)
+			for (var t = td; !(t is null); t = t.DeclaringType)
 				types.Add(t);
 			types.Reverse();
 
 			var modNode = FindNode(types[0].Module);
-			if (modNode == null)
+			if (modNode is null)
 				return null;
 
 			var nsNode = modNode.FindNode(types[0].Namespace);
-			if (nsNode == null)
+			if (nsNode is null)
 				return null;
 
 			var typeNode = FindNode(nsNode, types[0]);
-			if (typeNode == null)
+			if (typeNode is null)
 				return null;
 
 			for (int i = 1; i < types.Count; i++) {
 				var childNode = FindNode(typeNode, types[i]);
-				if (childNode == null)
+				if (childNode is null)
 					return null;
 				typeNode = childNode;
 			}
@@ -535,8 +528,8 @@ namespace dnSpy.Documents.TreeView {
 			return typeNode;
 		}
 
-		TypeNode FindNode(NamespaceNode nsNode, TypeDef type) {
-			if (nsNode == null || type == null)
+		TypeNode? FindNode(NamespaceNode? nsNode, TypeDef? type) {
+			if (nsNode is null || type is null)
 				return null;
 
 			nsNode.TreeNode.EnsureChildrenLoaded();
@@ -548,8 +541,8 @@ namespace dnSpy.Documents.TreeView {
 			return null;
 		}
 
-		TypeNode FindNode(TypeNode typeNode, TypeDef type) {
-			if (typeNode == null || type == null)
+		TypeNode? FindNode(TypeNode? typeNode, TypeDef? type) {
+			if (typeNode is null || type is null)
 				return null;
 
 			typeNode.TreeNode.EnsureChildrenLoaded();
@@ -561,18 +554,18 @@ namespace dnSpy.Documents.TreeView {
 			return null;
 		}
 
-		public NamespaceNode FindNamespaceNode(IDsDocument module, string @namespace) {
+		public NamespaceNode? FindNamespaceNode(IDsDocument? module, string? @namespace) {
 			if (FindNode(module) is ModuleDocumentNode modNode)
 				return modNode.FindNode(@namespace);
 			return null;
 		}
 
-		public MethodNode FindNode(MethodDef md) {
-			if (md == null)
+		public MethodNode? FindNode(MethodDef? md) {
+			if (md is null)
 				return null;
 
 			var typeNode = FindNode(md.DeclaringType);
-			if (typeNode == null)
+			if (typeNode is null)
 				return null;
 
 			typeNode.TreeNode.EnsureChildrenLoaded();
@@ -600,12 +593,12 @@ namespace dnSpy.Documents.TreeView {
 			return null;
 		}
 
-		public FieldNode FindNode(FieldDef fd) {
-			if (fd == null)
+		public FieldNode? FindNode(FieldDef? fd) {
+			if (fd is null)
 				return null;
 
 			var typeNode = FindNode(fd.DeclaringType);
-			if (typeNode == null)
+			if (typeNode is null)
 				return null;
 
 			typeNode.TreeNode.EnsureChildrenLoaded();
@@ -617,12 +610,12 @@ namespace dnSpy.Documents.TreeView {
 			return null;
 		}
 
-		public PropertyNode FindNode(PropertyDef pd) {
-			if (pd == null)
+		public PropertyNode? FindNode(PropertyDef? pd) {
+			if (pd is null)
 				return null;
 
 			var typeNode = FindNode(pd.DeclaringType);
-			if (typeNode == null)
+			if (typeNode is null)
 				return null;
 
 			typeNode.TreeNode.EnsureChildrenLoaded();
@@ -634,12 +627,12 @@ namespace dnSpy.Documents.TreeView {
 			return null;
 		}
 
-		public EventNode FindNode(EventDef ed) {
-			if (ed == null)
+		public EventNode? FindNode(EventDef? ed) {
+			if (ed is null)
 				return null;
 
 			var typeNode = FindNode(ed.DeclaringType);
-			if (typeNode == null)
+			if (typeNode is null)
 				return null;
 
 			typeNode.TreeNode.EnsureChildrenLoaded();
@@ -661,9 +654,8 @@ namespace dnSpy.Documents.TreeView {
 				if (node is AssemblyDocumentNode asmNode) {
 					asmNode.TreeNode.EnsureChildrenLoaded();
 					foreach (var c in asmNode.TreeNode.DataChildren) {
-						modNode = c as ModuleDocumentNode;
-						if (modNode != null)
-							yield return modNode;
+						if (c is ModuleDocumentNode modNode2)
+							yield return modNode2;
 					}
 					continue;
 				}
@@ -687,10 +679,10 @@ namespace dnSpy.Documents.TreeView {
 		}
 
 		public void AddNode(DsDocumentNode documentNode, int index) {
-			if (documentNode == null)
+			if (documentNode is null)
 				throw new ArgumentNullException(nameof(documentNode));
 			Debug.Assert(!TreeView.Root.DataChildren.Contains(documentNode));
-			Debug.Assert(documentNode.TreeNode.Parent == null);
+			Debug2.Assert(documentNode.TreeNode.Parent is null);
 			DocumentService.ForceAdd(documentNode.Document, false, new AddDocumentInfo(documentNode, index));
 			Debug.Assert(TreeView.Root.DataChildren.Contains(documentNode));
 		}
@@ -732,7 +724,7 @@ namespace dnSpy.Documents.TreeView {
 			if (movedNodes.Count == 0)
 				return;
 
-			int insertIndex = children.IndexOf(insertNode);
+			int insertIndex = children.IndexOf(insertNode!);
 			if (insertIndex < 0)
 				insertIndex = children.Count;
 			for (int i = 0; i < movedNodes.Count; i++)
@@ -742,16 +734,57 @@ namespace dnSpy.Documents.TreeView {
 		}
 
 		void OnDropFiles(int index, string[] filenames) {
+			Debug2.Assert(!(mruList is null));
+			if (mruList is null)
+				return;
 			if (!context.CanDragAndDrop)
 				return;
+			filenames = GetFiles(filenames);
 
 			var origFilenames = filenames;
-			var existingFiles = new HashSet<string>(DocumentService.GetDocuments().Select(a => a.Filename ?? string.Empty), StringComparer.OrdinalIgnoreCase);
-			filenames = filenames.Where(a => File.Exists(a) && !existingFiles.Contains(a)).Distinct(StringComparer.OrdinalIgnoreCase).OrderBy(a => Path.GetFileNameWithoutExtension(a), StringComparer.CurrentCultureIgnoreCase).ToArray();
-			TreeNodeData newSelectedNode = null;
+			var documents = DocumentService.GetDocuments();
+			var toDoc = new Dictionary<string, IDsDocument>(StringComparer.OrdinalIgnoreCase);
+			foreach (var document in documents) {
+				var filename = document.Filename ?? string.Empty;
+				toDoc[filename] = document;
+			}
+			foreach (var filename in filenames) {
+				if (File.Exists(filename) && toDoc.TryGetValue(filename, out var doc))
+					doc.IsAutoLoaded = false;
+			}
+			filenames = filenames.Where(a => File.Exists(a) && !toDoc.ContainsKey(a)).Distinct(StringComparer.OrdinalIgnoreCase).OrderBy(a => Path.GetFileNameWithoutExtension(a), StringComparer.CurrentCultureIgnoreCase).ToArray();
+			TreeNodeData? newSelectedNode = null;
+
+#if HAS_COMREFERENCE
+			IWshRuntimeLibrary.WshShell? ws = null;
+			try {
+				ws = new IWshRuntimeLibrary.WshShell();
+			}
+			catch {
+				ws = null;
+			}
+#endif
+
 			for (int i = 0, j = 0; i < filenames.Length; i++) {
+#if HAS_COMREFERENCE
+				// Resolve shortcuts
+				if (!(ws is null)) {
+					try {
+						// The method seems to only accept files with a lnk extension. If it has no such
+						// extension, it's not a shortcut and we won't get a slow thrown exception.
+						if (filenames[i].EndsWith(".lnk", StringComparison.OrdinalIgnoreCase)) {
+							var sc = (IWshRuntimeLibrary.IWshShortcut)ws.CreateShortcut(filenames[i]);
+							filenames[i] = sc.TargetPath;
+						}
+					}
+					catch {
+						ws = null;
+					}
+				}
+#endif
+
 				var document = DocumentService.TryCreateOnly(DsDocumentInfo.CreateDocument(filenames[i]));
-				if (document == null)
+				if (document is null)
 					continue;
 
 				if (filenames.Length > 1) {
@@ -777,28 +810,40 @@ namespace dnSpy.Documents.TreeView {
 
 				var node = CreateNode(null, document);
 				DocumentService.ForceAdd(document, false, new AddDocumentInfo(node, index + j++));
-				if (newSelectedNode == null)
+				mruList.Add(document.Filename);
+				if (newSelectedNode is null)
 					newSelectedNode = node;
 
-				existingFiles.Add(document.Filename);
+				toDoc[document.Filename] = document;
 			}
 
-			if (filenames.Any() && !filenames.Any(f => existingFiles.Contains(f)))
+			if (filenames.Any() && !filenames.Any(f => toDoc.ContainsKey(f)))
 				MsgBox.Instance.Show(dnSpy_Resources.AssemblyExplorer_AllFilesFilteredOut);
 
-			if (newSelectedNode == null) {
+			if (newSelectedNode is null) {
 				var filename = origFilenames.FirstOrDefault(a => File.Exists(a));
-				if (filename != null) {
+				if (!(filename is null)) {
 					var key = new FilenameKey(filename);
 					var document = DocumentService.GetDocuments().FirstOrDefault(a => key.Equals(a.Key));
 					newSelectedNode = FindNode(document);
 				}
 			}
-			if (newSelectedNode != null)
+			if (!(newSelectedNode is null))
 				TreeView.SelectItems(new[] { newSelectedNode });
 		}
 
-		DsDocumentNode[] GetNewSortedNodes() {
+		static string[] GetFiles(string[] filenames) {
+			var result = new List<string>(filenames.Length);
+			foreach (var filename in filenames) {
+				if (File.Exists(filename))
+					result.Add(filename);
+				else if (Directory.Exists(filename))
+					result.AddRange(Directory.GetFiles(filename, "*", SearchOption.AllDirectories));
+			}
+			return result.ToArray();
+		}
+
+		DsDocumentNode[]? GetNewSortedNodes() {
 			var origOrder = TopNodes.ToArray();
 			var documents = origOrder.Select((a, i) => (a, i)).ToList();
 			documents.Sort(DsDocumentNodeComparer.Instance);
@@ -808,11 +853,11 @@ namespace dnSpy.Documents.TreeView {
 			return sorted;
 		}
 
-		public bool CanSortTopNodes => GetNewSortedNodes() != null;
+		public bool CanSortTopNodes => !(GetNewSortedNodes() is null);
 
 		public void SortTopNodes() {
 			var sortedDocuments = GetNewSortedNodes();
-			if (sortedDocuments == null)
+			if (sortedDocuments is null)
 				return;
 
 			var selectedNodes = TreeView.SelectedItems;

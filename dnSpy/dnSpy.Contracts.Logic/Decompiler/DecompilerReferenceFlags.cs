@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -49,5 +49,10 @@ namespace dnSpy.Contracts.Decompiler {
 		/// Reference shouldn't be highlighted
 		/// </summary>
 		Hidden						= 0x00000008,
+
+		/// <summary>
+		/// Don't allow to follow the reference
+		/// </summary>
+		NoFollow					= 0x00000010,
 	}
 }

@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -53,7 +53,7 @@ namespace dnSpy.Text.Editor {
 	}
 
 	sealed class CurrentLineHighlighter {
-#pragma warning disable 0169
+#pragma warning disable CS0169
 		[Export(typeof(AdornmentLayerDefinition))]
 		[Name(PredefinedAdornmentLayers.CurrentLineHighlighter)]
 		[Order(After = PredefinedDsAdornmentLayers.BottomLayer, Before = PredefinedDsAdornmentLayers.TopLayer)]
@@ -63,13 +63,13 @@ namespace dnSpy.Text.Editor {
 		[Order(Before = PredefinedAdornmentLayers.TextMarker)]
 		[Order(Before = PredefinedDsAdornmentLayers.GlyphTextMarker)]
 		[Order(After = PredefinedAdornmentLayers.Outlining)]
-		static AdornmentLayerDefinition theAdornmentLayerDefinition;
-#pragma warning restore 0169
+		static AdornmentLayerDefinition? theAdornmentLayerDefinition;
+#pragma warning restore CS0169
 
 		readonly IWpfTextView wpfTextView;
 		readonly IEditorFormatMap editorFormatMap;
 		readonly CurrentLineHighlighterElement currentLineHighlighterElement;
-		IAdornmentLayer adornmentLayer;
+		IAdornmentLayer? adornmentLayer;
 		bool isActive;
 		bool selectionIsEmpty;
 		bool enabled;
@@ -83,7 +83,7 @@ namespace dnSpy.Text.Editor {
 			UpdateEnableState();
 		}
 
-		void Options_OptionChanged(object sender, EditorOptionChangedEventArgs e) {
+		void Options_OptionChanged(object? sender, EditorOptionChangedEventArgs e) {
 			if (e.OptionId == DefaultWpfViewOptions.EnableHighlightCurrentLineName)
 				UpdateEnableState();
 		}
@@ -92,7 +92,7 @@ namespace dnSpy.Text.Editor {
 		void UpdateEnableState() {
 			enabled = wpfTextView.Options.IsHighlightCurrentLineEnabled();
 			if (enabled) {
-				if (adornmentLayer == null)
+				if (adornmentLayer is null)
 					adornmentLayer = wpfTextView.GetAdornmentLayer(PredefinedAdornmentLayers.CurrentLineHighlighter);
 				if (!hasHookedEvents) {
 					RegisterEnabledEvents();
@@ -137,6 +137,7 @@ namespace dnSpy.Text.Editor {
 				adornmentLayer?.RemoveAllAdornments();
 				return;
 			}
+			Debug2.Assert(!(adornmentLayer is null));
 
 			var line = wpfTextView.Caret.ContainingTextViewLine;
 			if (line.IsVisible()) {
@@ -150,10 +151,10 @@ namespace dnSpy.Text.Editor {
 				adornmentLayer.RemoveAllAdornments();
 		}
 
-		void WpfTextView_LayoutChanged(object sender, TextViewLayoutChangedEventArgs e) => PositionLineElement();
-		void Caret_PositionChanged(object sender, CaretPositionChangedEventArgs e) => PositionLineElement();
+		void WpfTextView_LayoutChanged(object? sender, TextViewLayoutChangedEventArgs e) => PositionLineElement();
+		void Caret_PositionChanged(object? sender, CaretPositionChangedEventArgs e) => PositionLineElement();
 
-		void Selection_SelectionChanged(object sender, EventArgs e) {
+		void Selection_SelectionChanged(object? sender, EventArgs e) {
 			bool newSelectionIsEmpty = wpfTextView.Selection.IsEmpty;
 			if (selectionIsEmpty == newSelectionIsEmpty)
 				return;
@@ -161,8 +162,8 @@ namespace dnSpy.Text.Editor {
 			PositionLineElement();
 		}
 
-		void WpfTextView_GotAggregateFocus(object sender, EventArgs e) => UpdateFocus();
-		void WpfTextView_LostAggregateFocus(object sender, EventArgs e) => UpdateFocus();
+		void WpfTextView_GotAggregateFocus(object? sender, EventArgs e) => UpdateFocus();
+		void WpfTextView_LostAggregateFocus(object? sender, EventArgs e) => UpdateFocus();
 
 		void UpdateFocus() {
 			bool newIsActive = wpfTextView.HasAggregateFocus;
@@ -178,14 +179,14 @@ namespace dnSpy.Text.Editor {
 			currentLineHighlighterElement.BackgroundBrush = ResourceDictionaryUtilities.GetBackgroundBrush(props);
 		}
 
-		void EditorFormatMap_FormatMappingChanged(object sender, FormatItemsEventArgs e) {
+		void EditorFormatMap_FormatMappingChanged(object? sender, FormatItemsEventArgs e) {
 			if ((isActive && e.ChangedItems.Contains(ThemeClassificationTypeNameKeys.CurrentLine)) ||
 				(!isActive && e.ChangedItems.Contains(ThemeClassificationTypeNameKeys.CurrentLineNoFocus))) {
 				UpdateLineElementBrushes();
 			}
 		}
 
-		void WpfTextView_Closed(object sender, EventArgs e) {
+		void WpfTextView_Closed(object? sender, EventArgs e) {
 			wpfTextView.Closed -= WpfTextView_Closed;
 			wpfTextView.Options.OptionChanged -= Options_OptionChanged;
 			UnregisterEnabledEvents();
@@ -196,8 +197,8 @@ namespace dnSpy.Text.Editor {
 	sealed class CurrentLineHighlighterElement : UIElement {
 		const int PEN_THICKNESS = 2;
 
-		public Brush BackgroundBrush {
-			get { return backgroundBrush; }
+		public Brush? BackgroundBrush {
+			get => backgroundBrush;
 			set {
 				if (!BrushComparer.Equals(backgroundBrush, value)) {
 					backgroundBrush = value;
@@ -205,14 +206,14 @@ namespace dnSpy.Text.Editor {
 				}
 			}
 		}
-		Brush backgroundBrush;
+		Brush? backgroundBrush;
 
-		public Brush ForegroundBrush {
-			get { return foregroundBrush; }
+		public Brush? ForegroundBrush {
+			get => foregroundBrush;
 			set {
 				if (!BrushComparer.Equals(foregroundBrush, value)) {
 					foregroundBrush = value;
-					if (foregroundBrush == null)
+					if (foregroundBrush is null)
 						pen = null;
 					else {
 						pen = new Pen(foregroundBrush, PEN_THICKNESS);
@@ -224,17 +225,17 @@ namespace dnSpy.Text.Editor {
 				}
 			}
 		}
-		Brush foregroundBrush;
-		Pen pen;
+		Brush? foregroundBrush;
+		Pen? pen;
 
 		Rect geometryRect;
-		Geometry geometry;
+		Geometry? geometry;
 
 		public void SetLine(ITextViewLine line, double width) {
-			if (line == null)
+			if (line is null)
 				throw new ArgumentNullException(nameof(line));
 			var newRect = new Rect(PEN_THICKNESS / 2, PEN_THICKNESS / 2, Math.Max(0, width - PEN_THICKNESS), Math.Max(0, line.TextHeight + WpfTextViewLine.DEFAULT_BOTTOM_SPACE - PEN_THICKNESS));
-			if (geometry != null && newRect == geometryRect)
+			if (!(geometry is null) && newRect == geometryRect)
 				return;
 			geometryRect = newRect;
 			if (geometryRect.Height == 0 || geometryRect.Width == 0)
@@ -249,7 +250,7 @@ namespace dnSpy.Text.Editor {
 
 		protected override void OnRender(DrawingContext drawingContext) {
 			base.OnRender(drawingContext);
-			if (geometry != null)
+			if (!(geometry is null))
 				drawingContext.DrawGeometry(BackgroundBrush, pen, geometry);
 		}
 	}

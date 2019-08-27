@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -52,8 +52,8 @@ namespace dnSpy.Search {
 			cmds.Add(SearchRoutedCommand, Search, CanSearch);
 		}
 
-		void CanSearch(object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = true;
-		void Search(object sender, ExecutedRoutedEventArgs e) => toolWindowService.Show(SearchToolWindowContent.THE_GUID);
+		void CanSearch(object? sender, CanExecuteRoutedEventArgs e) => e.CanExecute = true;
+		void Search(object? sender, ExecutedRoutedEventArgs e) => toolWindowService.Show(SearchToolWindowContent.THE_GUID);
 	}
 
 	[ExportToolBarButton(Icon = DsImagesAttribute.Search, Group = ToolBarConstants.GROUP_APP_TB_MAIN_SEARCH, Order = 0)]
@@ -62,7 +62,7 @@ namespace dnSpy.Search {
 			: base(SearchCommandLoader.SearchRoutedCommand) {
 		}
 
-		public override string GetToolTip(IToolBarItemContext context) =>
+		public override string? GetToolTip(IToolBarItemContext context) =>
 			ToolTipHelper.AddKeyboardShortcut(dnSpy_Resources.SearchAssembliesToolBarToolTip, dnSpy_Resources.ShortCutKeyCtrlShiftK);
 	}
 
@@ -84,14 +84,14 @@ namespace dnSpy.Search {
 
 		public override void Execute(IMenuItemContext context) {
 			var res = GetReference(context);
-			if (res == null)
+			if (res is null)
 				return;
 			searchService.Value.FollowResult(res, newTab);
 		}
 
-		public override bool IsVisible(IMenuItemContext context) => GetReference(context) != null;
+		public override bool IsVisible(IMenuItemContext context) => !(GetReference(context) is null);
 
-		ISearchResult GetReference(IMenuItemContext context) {
+		ISearchResult? GetReference(IMenuItemContext context) {
 			if (context.CreatorObject.Guid != new Guid(MenuConstants.GUIDOBJ_SEARCH_GUID))
 				return null;
 			return context.Find<ISearchResult>();
@@ -174,15 +174,15 @@ namespace dnSpy.Search {
 		public override void Execute(IMenuItemContext context) => searchSettings.SearchDecompiledData = !searchSettings.SearchDecompiledData;
 	}
 
-	[ExportMenuItem(Header = "res:SearchWindow_SearchGacAssemblies", Group = MenuConstants.GROUP_CTX_SEARCH_OPTIONS, Order = 50)]
-	sealed class SearchGacAssembliesCtxMenuCommand : MenuItemBase {
+	[ExportMenuItem(Header = "res:SearchWindow_SearchFrameworkAssemblies", Group = MenuConstants.GROUP_CTX_SEARCH_OPTIONS, Order = 50)]
+	sealed class SearchFrameworkAssembliesCtxMenuCommand : MenuItemBase {
 		readonly SearchSettingsImpl searchSettings;
 
 		[ImportingConstructor]
-		SearchGacAssembliesCtxMenuCommand(SearchSettingsImpl searchSettings) => this.searchSettings = searchSettings;
+		SearchFrameworkAssembliesCtxMenuCommand(SearchSettingsImpl searchSettings) => this.searchSettings = searchSettings;
 
 		public override bool IsVisible(IMenuItemContext context) => context.CreatorObject.Guid == new Guid(MenuConstants.GUIDOBJ_SEARCH_GUID);
-		public override bool IsChecked(IMenuItemContext context) => searchSettings.SearchGacAssemblies;
-		public override void Execute(IMenuItemContext context) => searchSettings.SearchGacAssemblies = !searchSettings.SearchGacAssemblies;
+		public override bool IsChecked(IMenuItemContext context) => searchSettings.SearchFrameworkAssemblies;
+		public override void Execute(IMenuItemContext context) => searchSettings.SearchFrameworkAssemblies = !searchSettings.SearchFrameworkAssemblies;
 	}
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Windows.Media;
@@ -17,18 +17,18 @@ namespace Example2.Extension {
 
 		// Disable compiler warnings. The fields aren't referenced, just exported so
 		// the metadata can be added to some table. The fields will always be null.
-#pragma warning disable 0169
+#pragma warning disable CS0169
 		// Export the classes that define the name, and base types
 		[Export(typeof(ClassificationTypeDefinition))]
 		[Name(HexColor1_ClassificationTypeName)]
 		[BaseDefinition(PredefinedClassificationTypeNames.FormalLanguage)]
-		static ClassificationTypeDefinition HexColor1ClassificationTypeDefinition;
+		static ClassificationTypeDefinition? HexColor1ClassificationTypeDefinition;
 
 		[Export(typeof(ClassificationTypeDefinition))]
 		[Name(HexColor2_ClassificationTypeName)]
 		[BaseDefinition(PredefinedClassificationTypeNames.FormalLanguage)]
-		static ClassificationTypeDefinition HexColor2ClassificationTypeDefinition;
-#pragma warning restore 0169
+		static ClassificationTypeDefinition? HexColor2ClassificationTypeDefinition;
+#pragma warning restore CS0169
 
 		// Export the classes that define the colors and order
 		[Export(typeof(EditorFormatDefinition))]
@@ -62,7 +62,7 @@ namespace Example2.Extension {
 		[ImportingConstructor]
 		HexTaggerProviderImpl(IClassificationTypeRegistryService classificationTypeRegistryService) => this.classificationTypeRegistryService = classificationTypeRegistryService;
 
-		public override IHexTagger<T> CreateTagger<T>(HexBuffer buffer) =>
+		public override IHexTagger<T>? CreateTagger<T>(HexBuffer buffer) =>
 			new HexTaggerImpl(classificationTypeRegistryService) as IHexTagger<T>;
 	}
 
@@ -72,7 +72,7 @@ namespace Example2.Extension {
 		// This event must be raised when you detect changes to spans in the document. If
 		// your GetTags() method does async work, you should raise it when the async work
 		// is completed.
-		public override event EventHandler<HexBufferSpanEventArgs> TagsChanged {
+		public override event EventHandler<HexBufferSpanEventArgs>? TagsChanged {
 			add { }
 			remove { }
 		}

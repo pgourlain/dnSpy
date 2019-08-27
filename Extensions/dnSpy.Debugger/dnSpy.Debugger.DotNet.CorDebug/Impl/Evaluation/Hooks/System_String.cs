@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -26,7 +26,7 @@ namespace dnSpy.Debugger.DotNet.CorDebug.Impl.Evaluation.Hooks {
 
 		public System_String(ICorDebugRuntime runtime) => this.runtime = runtime;
 
-		public override DbgDotNetValue CreateInstance(DmdConstructorInfo ctor, object[] arguments) {
+		public override DbgDotNetValue? CreateInstance(DmdConstructorInfo ctor, object?[] arguments) {
 			var appDomain = ctor.AppDomain;
 			var ps = ctor.GetMethodSignature().GetParameterTypes();
 			switch (ps.Count) {
@@ -44,6 +44,8 @@ namespace dnSpy.Debugger.DotNet.CorDebug.Impl.Evaluation.Hooks {
 				// String(char[] value)
 				if (ps[0].IsSZArray && ps[0].GetElementType() == appDomain.System_Char) {
 					var value = runtime.ValueConverter.ToCharArray(arguments[0]);
+					if (value is null)
+						break;//TODO: simulate throw
 					var s = new string(value);
 					return SyntheticValueFactory.TryCreateSyntheticValue(appDomain.System_String, s);
 				}
@@ -73,6 +75,8 @@ namespace dnSpy.Debugger.DotNet.CorDebug.Impl.Evaluation.Hooks {
 				// String(char[] value, int startIndex, int length)
 				if (ps[0].IsSZArray && ps[0].GetElementType() == appDomain.System_Char && ps[1] == appDomain.System_Int32 && ps[2] == appDomain.System_Int32) {
 					var value = runtime.ValueConverter.ToCharArray(arguments[0]);
+					if (value is null)
+						break;//TODO: simulate throw
 					int startIndex = runtime.ValueConverter.ToInt32(arguments[1]);
 					int length = runtime.ValueConverter.ToInt32(arguments[2]);
 					var s = new string(value, startIndex, length);

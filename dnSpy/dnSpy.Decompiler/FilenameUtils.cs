@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -40,15 +40,15 @@ namespace dnSpy.Decompiler {
 				text = text.Substring(0, pos);
 			text = text.Trim();
 
-			char[] textChars = null;
+			char[]? textChars = null;
 			for (int i = 0; i < text.Length; i++) {
 				if (invalidFileNameChars.Contains(text[i])) {
-					if (textChars == null)
+					if (textChars is null)
 						textChars = text.ToCharArray();
 					textChars[i] = '-';
 				}
 			}
-			if (textChars != null)
+			if (!(textChars is null))
 				text = new string(textChars);
 
 			if (ReservedFileNames.Contains(text))
@@ -62,10 +62,10 @@ namespace dnSpy.Decompiler {
 		internal static string GetRelativePath(string sourceDir, string destFile) {
 			sourceDir = Path.GetFullPath(sourceDir);
 			destFile = Path.GetFullPath(destFile);
-			if (!Path.GetPathRoot(sourceDir).Equals(Path.GetPathRoot(destFile), StringComparison.OrdinalIgnoreCase))
+			if (!Path.GetPathRoot(sourceDir)!.Equals(Path.GetPathRoot(destFile), StringComparison.OrdinalIgnoreCase))
 				return destFile;
 			var sourceDirs = GetPathNames(sourceDir);
-			var destDirs = GetPathNames(Path.GetDirectoryName(destFile));
+			var destDirs = GetPathNames(Path.GetDirectoryName(destFile)!);
 
 			var hintPath = string.Empty;
 			int i;
@@ -87,7 +87,7 @@ namespace dnSpy.Decompiler {
 			var root = Path.GetPathRoot(path);
 			while (path != root) {
 				list.Add(Path.GetFileName(path));
-				path = Path.GetDirectoryName(path);
+				path = Path.GetDirectoryName(path)!;
 			}
 			list.Add(root);
 			list.Reverse();

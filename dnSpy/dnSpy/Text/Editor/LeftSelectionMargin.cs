@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -43,7 +43,7 @@ namespace dnSpy.Text.Editor {
 			this.editorOperationsFactoryService = editorOperationsFactoryService;
 		}
 
-		public IWpfTextViewMargin CreateMargin(IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin marginContainer) =>
+		public IWpfTextViewMargin? CreateMargin(IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin marginContainer) =>
 			new LeftSelectionMargin(wpfTextViewMarginProviderCollectionProvider, wpfTextViewHost, editorOperationsFactoryService.GetEditorOperations(wpfTextViewHost.TextView));
 	}
 
@@ -61,7 +61,7 @@ namespace dnSpy.Text.Editor {
 			Background = Brushes.Transparent;
 		}
 
-		void TextView_ZoomLevelChanged(object sender, ZoomLevelChangedEventArgs e) => LayoutTransform = e.ZoomTransform;
+		void TextView_ZoomLevelChanged(object? sender, ZoomLevelChangedEventArgs e) => LayoutTransform = e.ZoomTransform;
 		protected override void DisposeInternal() => wpfTextViewHost.TextView.ZoomLevelChanged -= TextView_ZoomLevelChanged;
 
 		protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e) {

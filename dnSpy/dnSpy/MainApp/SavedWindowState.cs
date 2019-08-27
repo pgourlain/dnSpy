@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -35,8 +35,8 @@ namespace dnSpy.MainApp {
 		public SavedWindowState(MetroWindow window) {
 			Bounds = window.RestoreBounds;
 			var source = PresentationSource.FromVisual(window);
-			Debug.Assert(source != null);
-			if (source != null) {
+			Debug2.Assert(!(source is null));
+			if (!(source is null)) {
 				var t = Bounds;
 				t = Rect.Transform(Bounds, source.CompositionTarget.TransformToDevice);
 				Bounds = new Rect(t.TopLeft, Bounds.Size);
@@ -73,14 +73,14 @@ namespace dnSpy.MainApp {
 			window.ContentRendered += Window_ContentRendered;
 		}
 
-		void Window_ContentRendered(object sender, EventArgs e) {
+		void Window_ContentRendered(object? sender, EventArgs e) {
 			window.ContentRendered -= Window_ContentRendered;
 			if (!settings.IsFullScreen)
 				WindowUtils.SetState(window, settings.WindowState);
 			window.IsFullScreen = settings.IsFullScreen;
 		}
 
-		void Window_SourceInitialized(object sender, EventArgs e) {
+		void Window_SourceInitialized(object? sender, EventArgs e) {
 			window.SourceInitialized -= Window_SourceInitialized;
 			if (settings.Bounds == Rect.Empty) {
 				window.Height = defaultWindowLocation.Height;
@@ -93,7 +93,6 @@ namespace dnSpy.MainApp {
 				window.Left = rect.Left;
 				window.Height = rect.Height;
 				window.Width = rect.Width;
-				window.DisableDpiScalingAtStartup = savedSettings != null;
 			}
 		}
 

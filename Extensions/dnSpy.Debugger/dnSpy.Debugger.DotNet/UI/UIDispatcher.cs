@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -27,10 +27,10 @@ using dnSpy.Contracts.App;
 namespace dnSpy.Debugger.DotNet.UI {
 	[Export(typeof(UIDispatcher))]
 	sealed class UIDispatcher {
-		static readonly FieldInfo _disableProcessingCountFieldInfo;
+		static readonly FieldInfo? _disableProcessingCountFieldInfo;
 		static UIDispatcher() {
 			_disableProcessingCountFieldInfo = typeof(Dispatcher).GetField("_disableProcessingCount", BindingFlags.NonPublic | BindingFlags.Instance);
-			Debug.Assert(_disableProcessingCountFieldInfo != null);
+			Debug2.Assert(!(_disableProcessingCountFieldInfo is null) && _disableProcessingCountFieldInfo.FieldType == typeof(int));
 		}
 
 		Dispatcher Dispatcher { get; }
@@ -42,9 +42,9 @@ namespace dnSpy.Debugger.DotNet.UI {
 		public bool CheckAccess() => Dispatcher.CheckAccess();
 
 		public bool IsProcessingDisabled() {
-			if (_disableProcessingCountFieldInfo == null)
+			if (_disableProcessingCountFieldInfo is null || _disableProcessingCountFieldInfo.FieldType != typeof(int))
 				return false;
-			return (int)_disableProcessingCountFieldInfo.GetValue(Dispatcher) > 0;
+			return (int)_disableProcessingCountFieldInfo.GetValue(Dispatcher)! > 0;
 		}
 
 		public void Invoke(Action callback) {

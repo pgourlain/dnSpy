@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -22,7 +22,7 @@ using System.Collections.Specialized;
 
 namespace dnSpy.Debugger.UI {
 	sealed class BulkObservableCollection<T> : List<T>, INotifyCollectionChanged {
-		public event NotifyCollectionChangedEventHandler CollectionChanged;
+		public event NotifyCollectionChangedEventHandler? CollectionChanged;
 
 		public new void Insert(int index, T item) {
 			base.Insert(index, item);

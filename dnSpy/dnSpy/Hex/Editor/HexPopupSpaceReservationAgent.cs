@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -33,11 +33,11 @@ using VSTF = Microsoft.VisualStudio.Text.Formatting;
 
 namespace dnSpy.Hex.Editor {
 	sealed class HexPopupSpaceReservationAgent : HexSpaceReservationAgent {
-		bool IsVisible => popup.Child != null;
+		bool IsVisible => !(popup.Child is null);
 		public override bool HasFocus => IsVisible && popup.IsKeyboardFocusWithin;
 		public override bool IsMouseOver => IsVisible && popup.IsMouseOver;
-		public override event EventHandler GotFocus;
-		public override event EventHandler LostFocus;
+		public override event EventHandler? GotFocus;
+		public override event EventHandler? LostFocus;
 
 		readonly HexSpaceReservationManager spaceReservationManager;
 		readonly WpfHexView wpfHexView;
@@ -68,8 +68,8 @@ namespace dnSpy.Hex.Editor {
 			};
 		}
 
-		void Content_GotFocus(object sender, RoutedEventArgs e) => GotFocus?.Invoke(this, EventArgs.Empty);
-		void Content_LostFocus(object sender, RoutedEventArgs e) => LostFocus?.Invoke(this, EventArgs.Empty);
+		void Content_GotFocus(object? sender, RoutedEventArgs e) => GotFocus?.Invoke(this, EventArgs.Empty);
+		void Content_LostFocus(object? sender, RoutedEventArgs e) => LostFocus?.Invoke(this, EventArgs.Empty);
 
 		internal void Update(HexLineSpan lineSpan, VSTA.PopupStyles style) {
 			if (lineSpan.IsDefault)
@@ -110,7 +110,7 @@ namespace dnSpy.Hex.Editor {
 
 		IList<VSTF.TextBounds> GetTextBounds(HexViewLine line) {
 			if (lineSpan.IsTextSpan) {
-				if (lineSpan.TextSpan.Value.Length == 0) {
+				if (lineSpan.TextSpan!.Value.Length == 0) {
 					if (line.BufferSpan.Contains(lineSpan.BufferSpan)) {
 						var bounds = line.GetCharacterBounds(lineSpan.TextSpan.Value.Start);
 						// It's just a point, so use zero width
@@ -126,7 +126,7 @@ namespace dnSpy.Hex.Editor {
 				var fullSpan = lineSpan.BufferSpan;
 				if (fullSpan.Length == 0) {
 					if (line.BufferSpan.Contains(fullSpan))
-						return line.GetNormalizedTextBounds(fullSpan, lineSpan.SelectionFlags.Value);
+						return line.GetNormalizedTextBounds(fullSpan, lineSpan.SelectionFlags!.Value);
 					return Array.Empty<VSTF.TextBounds>();
 				}
 				else
@@ -153,9 +153,9 @@ namespace dnSpy.Hex.Editor {
 		Rect ToScreenRect(Rect wpfRect) => new Rect(ToScreenPoint(wpfRect.TopLeft), ToScreenPoint(wpfRect.BottomRight));
 		Point ToScreenPoint(Point point) => wpfHexView.VisualElement.PointToScreen(point);
 
-		public override Geometry PositionAndDisplay(Geometry reservedSpace) {
+		public override Geometry? PositionAndDisplay(Geometry reservedSpace) {
 			var spanBoundsTmp = GetVisualSpanBounds();
-			if (spanBoundsTmp == null || spanBoundsTmp.Value.IsEmpty)
+			if (spanBoundsTmp is null || spanBoundsTmp.Value.IsEmpty)
 				return null;
 			var spanBounds = WpfHexViewRectToScreenRect(spanBoundsTmp.Value);
 			var desiredSize = ToScreenSize(PopupSize);
@@ -175,7 +175,7 @@ namespace dnSpy.Hex.Editor {
 				}
 			}
 
-			if (popupRect == null)
+			if (popupRect is null)
 				return null;
 			var viewRelativeRect = HexPopupHelper.TransformFromDevice(wpfHexView, popupRect.Value);
 
@@ -201,7 +201,7 @@ namespace dnSpy.Hex.Editor {
 		}
 
 		Rect GetClosest(Rect spanBounds, Rect? rect, Rect candidate, VSTA.PopupStyles style) {
-			if (rect == null)
+			if (rect is null)
 				return candidate;
 			double rectDist, candidateDist;
 			if ((style & VSTA.PopupStyles.PositionLeftOrRight) != 0) {
@@ -305,7 +305,7 @@ namespace dnSpy.Hex.Editor {
 
 		bool IsMouseOverSpan(MouseEventArgs e) {
 			var rect = GetVisualSpanBounds();
-			if (rect == null)
+			if (rect is null)
 				return false;
 			var point = e.MouseDevice.GetPosition(wpfHexView.VisualElement);
 			point.X += wpfHexView.ViewportLeft;
@@ -321,30 +321,30 @@ namespace dnSpy.Hex.Editor {
 			return false;
 		}
 
-		void Content_MouseLeave(object sender, MouseEventArgs e) {
+		void Content_MouseLeave(object? sender, MouseEventArgs e) {
 			if (!popup.IsOpen)
 				return;
 			if (!IsMouseOverValidLocation(e))
 				spaceReservationManager.RemoveAgent(this);
 		}
 
-		void VisualElement_PreviewMouseMove(object sender, MouseEventArgs e) {
+		void VisualElement_PreviewMouseMove(object? sender, MouseEventArgs e) {
 			if (!popup.IsOpen)
 				return;
 			if (!IsMouseOverValidLocation(e))
 				spaceReservationManager.RemoveAgent(this);
 		}
 
-		void WpfHexView_LostAggregateFocus(object sender, EventArgs e) => spaceReservationManager.RemoveAgent(this);
-		void Window_LocationChanged(object sender, EventArgs e) => spaceReservationManager.RemoveAgent(this);
-		void Content_SizeChanged(object sender, SizeChangedEventArgs e) => wpfHexView.QueueSpaceReservationStackRefresh();
+		void WpfHexView_LostAggregateFocus(object? sender, EventArgs e) => spaceReservationManager.RemoveAgent(this);
+		void Window_LocationChanged(object? sender, EventArgs e) => spaceReservationManager.RemoveAgent(this);
+		void Content_SizeChanged(object? sender, SizeChangedEventArgs e) => wpfHexView.QueueSpaceReservationStackRefresh();
 
 		void AddEvents() {
 			wpfHexView.LostAggregateFocus += WpfHexView_LostAggregateFocus;
 			if (content is FrameworkElement fwElem)
 				fwElem.SizeChanged += Content_SizeChanged;
 			var window = Window.GetWindow(wpfHexView.VisualElement);
-			if (window != null)
+			if (!(window is null))
 				window.LocationChanged += Window_LocationChanged;
 			content.GotFocus += Content_GotFocus;
 			content.LostFocus += Content_LostFocus;
@@ -360,7 +360,7 @@ namespace dnSpy.Hex.Editor {
 			if (content is FrameworkElement fwElem)
 				fwElem.SizeChanged -= Content_SizeChanged;
 			var window = Window.GetWindow(wpfHexView.VisualElement);
-			if (window != null)
+			if (!(window is null))
 				window.LocationChanged -= Window_LocationChanged;
 			content.GotFocus -= Content_GotFocus;
 			content.LostFocus -= Content_LostFocus;

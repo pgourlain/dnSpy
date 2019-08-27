@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -18,26 +18,30 @@
 */
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using dnSpy.Contracts.Documents;
 using dnSpy.Contracts.MVVM.Dialogs;
+using dnSpy.Documents.TreeView;
 
 namespace dnSpy.Documents {
 	sealed class DsDocumentLoader : IProgressTask, IDsDocumentLoader {
 		readonly IDsDocumentService documentService;
 		readonly Window ownerWindow;
+		readonly AssemblyExplorerMostRecentlyUsedList? mruList;
 		readonly HashSet<IDsDocument> hash;
 		readonly List<IDsDocument> loadedDocuments;
-		DocumentToLoad[] documentsToLoad;
+		DocumentToLoad[]? documentsToLoad;
 
 		public bool IsIndeterminate => false;
 		public double ProgressMinimum => 0;
 		public double ProgressMaximum { get; set; }
 
-		public DsDocumentLoader(IDsDocumentService documentService, Window ownerWindow) {
+		public DsDocumentLoader(IDsDocumentService documentService, Window ownerWindow, AssemblyExplorerMostRecentlyUsedList? mruList) {
 			this.documentService = documentService;
 			this.ownerWindow = ownerWindow;
+			this.mruList = mruList;
 			loadedDocuments = new List<IDsDocument>();
 			hash = new HashSet<IDsDocument>();
 		}
@@ -52,7 +56,7 @@ namespace dnSpy.Documents {
 					Load(f);
 			}
 			else
-				ProgressDlg.Show(this, "dnSpy", ownerWindow);
+				ProgressDlg.Show(this, MainApp.Constants.DnSpy, ownerWindow);
 
 			return loadedDocuments.ToArray();
 		}
@@ -61,13 +65,18 @@ namespace dnSpy.Documents {
 			if (f.Info.Type == DocumentConstants.DOCUMENTTYPE_FILE && string.IsNullOrEmpty(f.Info.Name))
 				return;
 			var document = documentService.TryGetOrCreate(f.Info, f.IsAutoLoaded);
-			if (document != null && !hash.Contains(document)) {
+			if (!(document is null) && !hash.Contains(document)) {
 				loadedDocuments.Add(document);
 				hash.Add(document);
+				if (!f.IsAutoLoaded) {
+					document.IsAutoLoaded = f.IsAutoLoaded;
+					mruList?.Add(document.Filename);
+				}
 			}
 		}
 
 		public void Execute(IProgress progress) {
+			Debug2.Assert(!(documentsToLoad is null));
 			for (int i = 0; i < documentsToLoad.Length; i++) {
 				progress.ThrowIfCancellationRequested();
 				var f = documentsToLoad[i];

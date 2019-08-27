@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -28,21 +28,21 @@ namespace dnSpy.Text {
 		public ITextBuffer DocumentBuffer => textBuffer;
 		readonly ITextBuffer textBuffer;
 
-		EventHandler<TextDataModelContentTypeChangedEventArgs> realContentTypeChanged;
-		public event EventHandler<TextDataModelContentTypeChangedEventArgs> ContentTypeChanged {
+		EventHandler<TextDataModelContentTypeChangedEventArgs>? realContentTypeChanged;
+		public event EventHandler<TextDataModelContentTypeChangedEventArgs>? ContentTypeChanged {
 			add {
-				if (realContentTypeChanged == null)
+				if (realContentTypeChanged is null)
 					textBuffer.ContentTypeChanged += TextBuffer_ContentTypeChanged;
 				realContentTypeChanged += value;
 			}
 			remove {
 				realContentTypeChanged -= value;
-				if (realContentTypeChanged == null)
+				if (realContentTypeChanged is null)
 					textBuffer.ContentTypeChanged -= TextBuffer_ContentTypeChanged;
 			}
 		}
 
-		void TextBuffer_ContentTypeChanged(object sender, ContentTypeChangedEventArgs e) =>
+		void TextBuffer_ContentTypeChanged(object? sender, ContentTypeChangedEventArgs e) =>
 			realContentTypeChanged?.Invoke(this, new TextDataModelContentTypeChangedEventArgs(e.BeforeContentType, e.AfterContentType));
 
 		public TextDataModel(ITextBuffer textBuffer) => this.textBuffer = textBuffer ?? throw new ArgumentNullException(nameof(textBuffer));

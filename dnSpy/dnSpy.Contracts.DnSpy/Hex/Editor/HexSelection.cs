@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -98,7 +98,7 @@ namespace dnSpy.Contracts.Hex.Editor {
 		/// <summary>
 		/// Raised when the selection is changed
 		/// </summary>
-		public abstract event EventHandler SelectionChanged;
+		public abstract event EventHandler? SelectionChanged;
 
 		/// <summary>
 		/// Gets the active point

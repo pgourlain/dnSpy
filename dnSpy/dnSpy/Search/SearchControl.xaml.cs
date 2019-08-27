@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -29,13 +29,13 @@ namespace dnSpy.Search {
 
 		public SearchControl() => InitializeComponent();
 
-		void searchListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e) {
+		void searchListBox_MouseDoubleClick(object? sender, MouseButtonEventArgs e) {
 			if (!UIUtilities.IsLeftDoubleClick<ListBoxItem>(searchListBox, e))
 				return;
 			e.Handled = true;
 			SearchListBoxDoubleClick?.Invoke(this, EventArgs.Empty);
 		}
 
-		public event EventHandler SearchListBoxDoubleClick;
+		public event EventHandler? SearchListBoxDoubleClick;
 	}
 }

@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -29,18 +29,16 @@ namespace dnSpy.Hex.Intellisense {
 		UIElement IHexPopupIntellisensePresenter.SurfaceElement => control;
 		VSTA.PopupStyles IHexPopupIntellisensePresenter.PopupStyles => VSTA.PopupStyles.PositionClosest;
 		string IHexPopupIntellisensePresenter.SpaceReservationManagerName => HexIntellisenseSpaceReservationManagerNames.QuickInfoSpaceReservationManagerName;
-		event EventHandler IHexPopupIntellisensePresenter.SurfaceElementChanged { add { } remove { } }
-		event EventHandler<VSLI.ValueChangedEventArgs<VSTA.PopupStyles>> IHexPopupIntellisensePresenter.PopupStylesChanged { add { } remove { } }
-		public event EventHandler PresentationSpanChanged;
+		event EventHandler? IHexPopupIntellisensePresenter.SurfaceElementChanged { add { } remove { } }
+		event EventHandler<VSLI.ValueChangedEventArgs<VSTA.PopupStyles>>? IHexPopupIntellisensePresenter.PopupStylesChanged { add { } remove { } }
+		public event EventHandler? PresentationSpanChanged;
 
 		public double Opacity {
-			get { return control.Opacity; }
-			set { control.Opacity = value; }
+			get => control.Opacity;
+			set => control.Opacity = value;
 		}
 
-		public HexBufferSpanSelection PresentationSpan {
-			get { return presentationSpan; }
-		}
+		public HexBufferSpanSelection PresentationSpan => presentationSpan;
 
 		void SetPresentationSpan(HexBufferSpanSelection newValue, HexCellPosition triggerPoint) {
 			// Make sure that the popup is shown in the right column
@@ -58,7 +56,7 @@ namespace dnSpy.Hex.Intellisense {
 			session.ApplicableToSpanChanged += Session_ApplicableToSpanChanged;
 		}
 
-		void Session_ApplicableToSpanChanged(object sender, EventArgs e) {
+		void Session_ApplicableToSpanChanged(object? sender, EventArgs e) {
 			if (session.IsDismissed)
 				return;
 			SetPresentationSpan(session.ApplicableToSpan, session.TriggerPoint);

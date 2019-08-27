@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -27,11 +27,11 @@ using dnSpy.Hex.MEF;
 namespace dnSpy.Hex.Editor {
 	abstract class WpfHexViewMarginProviderCollection {
 		public abstract WpfHexViewMarginInfo[] Margins { get; }
-		public abstract event EventHandler MarginsChanged;
+		public abstract event EventHandler? MarginsChanged;
 		public abstract void Dispose();
 	}
 
-	struct WpfHexViewMarginInfo {
+	readonly struct WpfHexViewMarginInfo {
 		public WpfHexViewMarginProvider Provider { get; }
 		public IWpfHexViewMarginMetadata Metadata { get; }
 		public WpfHexViewMargin Margin { get; }
@@ -50,14 +50,14 @@ namespace dnSpy.Hex.Editor {
 		WpfHexViewMarginInfo[] currentMargins;
 
 		public override WpfHexViewMarginInfo[] Margins => currentMargins;
-		public override event EventHandler MarginsChanged;
+		public override event EventHandler? MarginsChanged;
 
 		public WpfHexViewMarginProviderCollectionImpl(Lazy<WpfHexViewMarginProvider, IWpfHexViewMarginMetadata>[] wpfHexViewMarginProviders, WpfHexViewHost wpfHexViewHost, WpfHexViewMargin marginContainer, string marginContainerName) {
-			if (wpfHexViewMarginProviders == null)
+			if (wpfHexViewMarginProviders is null)
 				throw new ArgumentNullException(nameof(wpfHexViewMarginProviders));
-			if (wpfHexViewHost == null)
+			if (wpfHexViewHost is null)
 				throw new ArgumentNullException(nameof(wpfHexViewHost));
-			if (marginContainerName == null)
+			if (marginContainerName is null)
 				throw new ArgumentNullException(nameof(marginContainerName));
 			this.wpfHexViewMarginProviders = wpfHexViewMarginProviders.Where(a =>
 				StringComparer.OrdinalIgnoreCase.Equals(marginContainerName, a.Metadata.MarginContainer) &&
@@ -86,7 +86,7 @@ namespace dnSpy.Hex.Editor {
 				}
 				else {
 					var margin = lazy.Value.CreateMargin(wpfHexViewHost, marginContainer);
-					if (margin != null)
+					if (!(margin is null))
 						newInfos.Add(new WpfHexViewMarginInfo(lazy.Value, lazy.Metadata, margin));
 				}
 			}
@@ -114,7 +114,7 @@ namespace dnSpy.Hex.Editor {
 			return true;
 		}
 
-		void WpfHexViewHost_Closed(object sender, EventArgs e) => Dispose();
+		void WpfHexViewHost_Closed(object? sender, EventArgs e) => Dispose();
 
 		public override void Dispose() {
 			wpfHexViewHost.Closed -= WpfHexViewHost_Closed;

@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -80,11 +80,6 @@ namespace dnSpy.Contracts.Documents.TreeView {
 		/// Show MD token
 		/// </summary>
 		bool ShowToken { get; }
-
-		/// <summary>
-		/// true to use the new optimized renderer. It doesn't support all unicode chars or word wrapping
-		/// </summary>
-		bool UseNewRenderer { get; }
 
 		/// <summary>
 		/// true to deserialize resources

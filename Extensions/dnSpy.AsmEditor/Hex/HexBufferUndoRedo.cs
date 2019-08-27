@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -41,10 +41,10 @@ namespace dnSpy.AsmEditor.Hex {
 				buffer.Changed -= Buffer_Changed;
 		}
 
-		void Buffer_Changed(object sender, HexContentChangedEventArgs e) {
+		void Buffer_Changed(object? sender, HexContentChangedEventArgs e) {
 			if (e.EditTag == HexBufferUndoRedo.UndoRedoObject)
 				return;
-			var buffer = (HexBuffer)sender;
+			var buffer = (HexBuffer)sender!;
 			var desc = dnSpy_AsmEditor_Resources.Hex_Undo_Message_InsertBytes;
 			var cmd = new HexBufferUndoCommand(buffer, e.Changes, e.BeforeVersion.ReiteratedVersionNumber, e.AfterVersion.ReiteratedVersionNumber, desc);
 			undoCommandService.Add(cmd);

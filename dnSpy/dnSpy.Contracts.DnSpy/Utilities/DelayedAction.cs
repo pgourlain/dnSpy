@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -40,7 +40,7 @@ namespace dnSpy.Contracts.Utilities {
 			dispatcherTimer = new DispatcherTimer(TimeSpan.FromMilliseconds(milliseconds), DispatcherPriority.Send, StartIt, Dispatcher.CurrentDispatcher);
 		}
 
-		void StartIt(object sender, EventArgs e) {
+		void StartIt(object? sender, EventArgs e) {
 			dispatcherTimer.Stop();
 			action();
 		}

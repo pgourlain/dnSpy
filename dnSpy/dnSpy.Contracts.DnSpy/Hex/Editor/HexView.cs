@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -41,7 +41,7 @@ namespace dnSpy.Contracts.Hex.Editor {
 		/// <summary>
 		/// Raised after <see cref="BufferLines"/> is changed
 		/// </summary>
-		public abstract event EventHandler<BufferLinesChangedEventArgs> BufferLinesChanged;
+		public abstract event EventHandler<BufferLinesChangedEventArgs>? BufferLinesChanged;
 
 		/// <summary>
 		/// Gets the command target
@@ -151,42 +151,42 @@ namespace dnSpy.Contracts.Hex.Editor {
 		/// <summary>
 		/// Raised after the view is closed
 		/// </summary>
-		public abstract event EventHandler Closed;
+		public abstract event EventHandler? Closed;
 
 		/// <summary>
 		/// Raised when the view or one of its adornments got focus
 		/// </summary>
-		public abstract event EventHandler GotAggregateFocus;
+		public abstract event EventHandler? GotAggregateFocus;
 
 		/// <summary>
 		/// Raised when the view and all its adornments lost focus
 		/// </summary>
-		public abstract event EventHandler LostAggregateFocus;
+		public abstract event EventHandler? LostAggregateFocus;
 
 		/// <summary>
 		/// Raised when the layout is changed
 		/// </summary>
-		public abstract event EventHandler<HexViewLayoutChangedEventArgs> LayoutChanged;
+		public abstract event EventHandler<HexViewLayoutChangedEventArgs>? LayoutChanged;
 
 		/// <summary>
 		/// Raised when viewport height is changed
 		/// </summary>
-		public abstract event EventHandler ViewportHeightChanged;
+		public abstract event EventHandler? ViewportHeightChanged;
 
 		/// <summary>
 		/// Raised when viewport width is changed
 		/// </summary>
-		public abstract event EventHandler ViewportWidthChanged;
+		public abstract event EventHandler? ViewportWidthChanged;
 
 		/// <summary>
 		/// Raised when viewport left is changed
 		/// </summary>
-		public abstract event EventHandler ViewportLeftChanged;
+		public abstract event EventHandler? ViewportLeftChanged;
 
 		/// <summary>
 		/// Raised when the mouse has hovered long enough over something in the view
 		/// </summary>
-		public abstract event EventHandler<HexMouseHoverEventArgs> MouseHover;
+		public abstract event EventHandler<HexMouseHoverEventArgs>? MouseHover;
 
 		/// <summary>
 		/// Constructor
@@ -254,7 +254,7 @@ namespace dnSpy.Contracts.Hex.Editor {
 		/// <summary>
 		/// Gets the old instance. This value can be null.
 		/// </summary>
-		public HexBufferLineFormatter OldBufferLines { get; }
+		public HexBufferLineFormatter? OldBufferLines { get; }
 
 		/// <summary>
 		/// Gets the new instance. This instance is never null.
@@ -264,9 +264,9 @@ namespace dnSpy.Contracts.Hex.Editor {
 		/// <summary>
 		/// Constructor
 		/// </summary>
-		/// <param name="oldBufferLines">Old instance</param>
+		/// <param name="oldBufferLines">Old instance or null</param>
 		/// <param name="newBufferLines">New instance</param>
-		public BufferLinesChangedEventArgs(HexBufferLineFormatter oldBufferLines, HexBufferLineFormatter newBufferLines) {
+		public BufferLinesChangedEventArgs(HexBufferLineFormatter? oldBufferLines, HexBufferLineFormatter newBufferLines) {
 			OldBufferLines = oldBufferLines;
 			NewBufferLines = newBufferLines ?? throw new ArgumentNullException(nameof(newBufferLines));
 		}

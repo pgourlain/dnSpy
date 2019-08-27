@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -29,7 +29,7 @@ using Microsoft.VisualStudio.Text.Classification;
 namespace dnSpy.Text.Classification {
 	sealed class CategoryEditorFormatMap : IEditorFormatMap {
 		public bool IsInBatchUpdate { get; private set; }
-		public event EventHandler<FormatItemsEventArgs> FormatMappingChanged;
+		public event EventHandler<FormatItemsEventArgs>? FormatMappingChanged;
 
 		readonly Dispatcher dispatcher;
 		readonly IEditorFormatDefinitionService editorFormatDefinitionService;
@@ -79,7 +79,7 @@ namespace dnSpy.Text.Classification {
 		}
 
 		public ResourceDictionary GetProperties(string key) {
-			if (key == null)
+			if (key is null)
 				throw new ArgumentNullException(nameof(key));
 			if (resourceDicts.TryGetValue(key, out var resDict))
 				return resDict;
@@ -91,7 +91,7 @@ namespace dnSpy.Text.Classification {
 		public void AddProperties(string key, ResourceDictionary properties) =>
 			SetProperties(key, properties);
 		public void SetProperties(string key, ResourceDictionary properties) {
-			if (key == null)
+			if (key is null)
 				throw new ArgumentNullException(nameof(key));
 			resourceDicts[key] = properties;
 			if (IsInBatchUpdate)

@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -19,6 +19,7 @@
 
 using System;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 using System.IO;
 using dnSpy.Contracts.Images;
 using dnSpy.Contracts.Menus;
@@ -38,7 +39,7 @@ namespace dnSpy.Debugger.DbgUI {
 
 			protected DocumentViewerCommand(Lazy<Debugger> debugger) => this.debugger = debugger;
 
-			protected sealed override Context CreateContext(IMenuItemContext context) {
+			protected sealed override Context? CreateContext(IMenuItemContext context) {
 				if (context.CreatorObject.Guid != new Guid(MenuConstants.GUIDOBJ_DOCUMENTVIEWERCONTROL_GUID))
 					return null;
 				return new Context();
@@ -52,10 +53,11 @@ namespace dnSpy.Debugger.DbgUI {
 				: base(debugger) {
 			}
 
-			public override string GetHeader(Context context) {
+			public override string? GetHeader(Context context) {
 				var filename = debugger.Value.GetCurrentExecutableFilename();
 				if (!File.Exists(filename))
 					return null;
+				Debug2.Assert(!(filename is null));
 				return string.Format(dnSpy_Debugger_Resources.DebugProgramX, UIUtilities.EscapeMenuItemHeader(Path.GetFileName(filename)));
 			}
 
@@ -70,7 +72,7 @@ namespace dnSpy.Debugger.DbgUI {
 				: base(debugger) {
 			}
 
-			public override string GetHeader(Context context) {
+			public override string? GetHeader(Context context) {
 				switch (debugger.Value.GetToggleCreateBreakpointKind()) {
 				case ToggleCreateBreakpointKind.Add:	return dnSpy_Debugger_Resources.AddBreakpointCommand;
 				case ToggleCreateBreakpointKind.Delete:	return dnSpy_Debugger_Resources.DeleteBreakpointCommand;
@@ -92,7 +94,7 @@ namespace dnSpy.Debugger.DbgUI {
 				: base(debugger) {
 			}
 
-			public override string GetHeader(Context context) {
+			public override string? GetHeader(Context context) {
 				switch (debugger.Value.GetToggleEnableBreakpointKind()) {
 				case ToggleEnableBreakpointKind.Enable:	return dnSpy_Debugger_Resources.EnableBreakpointCommand2;
 				case ToggleEnableBreakpointKind.Disable:return dnSpy_Debugger_Resources.DisableBreakpointCommand2;
@@ -126,6 +128,17 @@ namespace dnSpy.Debugger.DbgUI {
 
 			public override void Execute(Context context) => debugger.Value.SetNextStatement();
 			public override bool IsVisible(Context context) => debugger.Value.CanSetNextStatement;
+		}
+
+		[ExportMenuItem(Icon = DsImagesAttribute.DisassemblyWindow, Header = "res:GoToDisassemblyCommand2", Group = MenuConstants.GROUP_CTX_DOCVIEWER_DEBUG, Order = 50)]
+		sealed class GoToDisassemblyDocumentViewerCommand : DocumentViewerCommand {
+			[ImportingConstructor]
+			public GoToDisassemblyDocumentViewerCommand(Lazy<Debugger> debugger)
+				: base(debugger) {
+			}
+
+			public override void Execute(Context context) => debugger.Value.GoToDisassembly();
+			public override bool IsVisible(Context context) => debugger.Value.CanGoToDisassembly;
 		}
 	}
 }

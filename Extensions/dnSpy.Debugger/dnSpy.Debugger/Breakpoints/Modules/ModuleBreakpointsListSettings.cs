@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -61,8 +61,8 @@ namespace dnSpy.Debugger.Breakpoints.Modules {
 			dbgDispatcherProvider.Dbg(() => ignoreSave = false);
 		}
 
-		void DbgModuleBreakpointsService_BreakpointsChanged(object sender, DbgCollectionChangedEventArgs<DbgModuleBreakpoint> e) => Save();
-		void DbgModuleBreakpointsService_BreakpointsModified(object sender, DbgBreakpointsModifiedEventArgs e) => Save();
+		void DbgModuleBreakpointsService_BreakpointsChanged(object? sender, DbgCollectionChangedEventArgs<DbgModuleBreakpoint> e) => Save();
+		void DbgModuleBreakpointsService_BreakpointsModified(object? sender, DbgBreakpointsModifiedEventArgs e) => Save();
 
 		void Save() {
 			dbgDispatcherProvider.VerifyAccess();

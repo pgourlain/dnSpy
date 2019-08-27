@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -32,11 +32,11 @@ namespace dnSpy.Decompiler.MSBuild {
 			// Mono doesn't support the constructors that we need
 
 			Type[] paramTypes;
-			ConstructorInfo ctorInfo;
+			ConstructorInfo? ctorInfo;
 
 			paramTypes = new Type[] { typeof(string), typeof(Func<Type, string>) };
 			ctorInfo = typeof(ResXResourceWriter).GetConstructor(paramTypes);
-			if (ctorInfo != null) {
+			if (!(ctorInfo is null)) {
 				var dynMethod = new DynamicMethod("ResXResourceWriter-ctor", typeof(ResXResourceWriter), paramTypes);
 				var ilg = dynMethod.GetILGenerator();
 				ilg.Emit(OpCodes.Ldarg_0);
@@ -48,7 +48,7 @@ namespace dnSpy.Decompiler.MSBuild {
 
 			paramTypes = new Type[] { typeof(string), typeof(object), typeof(Func<Type, string>) };
 			ctorInfo = typeof(ResXDataNode).GetConstructor(paramTypes);
-			if (ctorInfo != null) {
+			if (!(ctorInfo is null)) {
 				var dynMethod = new DynamicMethod("ResXDataNode-ctor", typeof(ResXDataNode), paramTypes);
 				var ilg = dynMethod.GetILGenerator();
 				ilg.Emit(OpCodes.Ldarg_0);
@@ -56,11 +56,11 @@ namespace dnSpy.Decompiler.MSBuild {
 				ilg.Emit(OpCodes.Ldarg_2);
 				ilg.Emit(OpCodes.Newobj, ctorInfo);
 				ilg.Emit(OpCodes.Ret);
-				delegateResXDataNodeConstructor = (Func<string, object, Func<Type, string>, ResXDataNode>)dynMethod.CreateDelegate(typeof(Func<string, object, Func<Type, string>, ResXDataNode>));
+				delegateResXDataNodeConstructor = (Func<string, object?, Func<Type, string>, ResXDataNode>)dynMethod.CreateDelegate(typeof(Func<string, object?, Func<Type, string>, ResXDataNode>));
 			}
 		}
-		static readonly Func<string, Func<Type, string>, ResXResourceWriter> delegateResXResourceWriterConstructor;
-		static readonly Func<string, object, Func<Type, string>, ResXDataNode> delegateResXDataNodeConstructor;
+		static readonly Func<string, Func<Type, string>, ResXResourceWriter>? delegateResXResourceWriterConstructor;
+		static readonly Func<string, object?, Func<Type, string>, ResXDataNode>? delegateResXDataNodeConstructor;
 
 		public override string Description => dnSpy_Decompiler_Resources.MSBuild_CreateResXFile;
 		public override BuildAction BuildAction => BuildAction.EmbeddedResource;
@@ -97,11 +97,11 @@ namespace dnSpy.Decompiler.MSBuild {
 		string TypeNameConverter(Type type) {
 			var newAsm = new AssemblyNameInfo(type.Assembly.GetName());
 			if (!newToOldAsm.TryGetValue(newAsm, out var oldAsm))
-				return type.AssemblyQualifiedName;
+				return type.AssemblyQualifiedName ?? throw new ArgumentException();
 			if (type.IsGenericType)
-				return type.AssemblyQualifiedName;
+				return type.AssemblyQualifiedName ?? throw new ArgumentException();
 			if (AssemblyNameComparer.CompareAll.Equals(oldAsm, newAsm))
-				return type.AssemblyQualifiedName;
+				return type.AssemblyQualifiedName ?? throw new ArgumentException();
 			return $"{type.FullName}, {oldAsm.FullName}";
 		}
 
@@ -109,14 +109,14 @@ namespace dnSpy.Decompiler.MSBuild {
 			var list = new List<ResXDataNode>();
 			int errors = 0;
 			try {
-				using (var reader = new ResourceReader(embeddedResource.GetResourceStream())) {
+				using (var reader = new ResourceReader(embeddedResource.CreateReader().AsStream())) {
 					var iter = reader.GetEnumerator();
 					while (iter.MoveNext()) {
 						ctx.CancellationToken.ThrowIfCancellationRequested();
-						string key = null;
+						string? key = null;
 						try {
 							key = iter.Key as string;
-							if (key == null)
+							if (key is null)
 								continue;
 							var value = iter.Value;
 							// ResXDataNode ctor checks if the input is serializable, which this stream isn't.

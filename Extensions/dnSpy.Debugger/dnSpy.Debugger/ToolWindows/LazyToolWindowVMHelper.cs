@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -79,7 +79,7 @@ namespace dnSpy.Debugger.ToolWindows {
 
 		readonly ILazyToolWindowVM vm;
 		readonly UIDispatcher uiDispatcher;
-		DispatcherTimer timer;
+		DispatcherTimer? timer;
 
 		public LazyToolWindowVMHelper(ILazyToolWindowVM vm, UIDispatcher uiDispatcher) {
 			this.vm = vm ?? throw new ArgumentNullException(nameof(vm));
@@ -101,14 +101,14 @@ namespace dnSpy.Debugger.ToolWindows {
 		}
 
 		void StopTimer() {
-			if (timer != null) {
+			if (!(timer is null)) {
 				timer.Tick -= Timer_Tick_UI;
 				timer.Stop();
 				timer = null;
 			}
 		}
 
-		void Timer_Tick_UI(object sender, EventArgs e) {
+		void Timer_Tick_UI(object? sender, EventArgs e) {
 			if (timer != sender)
 				return;
 			StopTimer();
@@ -157,7 +157,7 @@ namespace dnSpy.Debugger.ToolWindows {
 		protected override void OnHide() => dbgManager.Value.IsDebuggingChanged -= DbgManager_IsDebuggingChanged;
 		protected override void OnIsVisibleChanged() => CheckCanLazyInitialize();
 
-		void DbgManager_IsDebuggingChanged(object sender, EventArgs e) {
+		void DbgManager_IsDebuggingChanged(object? sender, EventArgs e) {
 			if (!dbgManager.Value.IsDebugging) {
 				UI(() => {
 					// We've already checked IsDebugging above. It's possible that it's now

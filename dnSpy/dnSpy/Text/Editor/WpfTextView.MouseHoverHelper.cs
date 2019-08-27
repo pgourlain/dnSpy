@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -48,7 +48,7 @@ namespace dnSpy.Text.Editor {
 				owner.IsVisibleChanged += WpfTextView_IsVisibleChanged;
 			}
 
-			void WpfTextView_MouseMove(object sender, MouseEventArgs e) {
+			void WpfTextView_MouseMove(object? sender, MouseEventArgs e) {
 				if (owner.IsClosed || owner.IsMouseOverOverlayLayerElement(e)) {
 					ClearMouseHoverPositionAndStopTimer();
 					return;
@@ -59,7 +59,7 @@ namespace dnSpy.Text.Editor {
 				var loc = MouseLocation.TryCreateTextOnly(owner, e, fullLineHeight: false);
 				int? newPosition;
 
-				if (loc == null)
+				if (loc is null)
 					newPosition = null;
 				else if (loc.Position.IsInVirtualSpace)
 					newPosition = null;
@@ -83,29 +83,29 @@ namespace dnSpy.Text.Editor {
 				}
 			}
 
-			void WpfTextView_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e) {
+			void WpfTextView_IsVisibleChanged(object? sender, DependencyPropertyChangedEventArgs e) {
 				if (owner.IsClosed || !owner.IsVisible)
 					ClearMouseHoverPositionAndStopTimer();
 				else
 					UpdateTimer();
 			}
 
-			void WpfTextView_MouseDown(object sender, MouseButtonEventArgs e) => StopTimer();
-			void WpfTextView_MouseLeftButtonDown(object sender, MouseButtonEventArgs e) => StopTimer();
-			void WpfTextView_MouseRightButtonDown(object sender, MouseButtonEventArgs e) => StopTimer();
-			void WpfTextView_MouseLeave(object sender, MouseEventArgs e) => ClearMouseHoverPositionAndStopTimer();
+			void WpfTextView_MouseDown(object? sender, MouseButtonEventArgs e) => StopTimer();
+			void WpfTextView_MouseLeftButtonDown(object? sender, MouseButtonEventArgs e) => StopTimer();
+			void WpfTextView_MouseRightButtonDown(object? sender, MouseButtonEventArgs e) => StopTimer();
+			void WpfTextView_MouseLeave(object? sender, MouseEventArgs e) => ClearMouseHoverPositionAndStopTimer();
 
-			public event EventHandler<MouseHoverEventArgs> MouseHover {
+			public event EventHandler<MouseHoverEventArgs>? MouseHover {
 				add {
 					if (owner.IsClosed)
 						return;
-					if (value == null)
+					if (value is null)
 						return;
 					handlers.Add(new MouseHoverHandler(value));
 					UpdateTimer();
 				}
 				remove {
-					if (value == null)
+					if (value is null)
 						return;
 					for (int i = 0; i < handlers.Count; i++) {
 						if (handlers[i].Handler == value) {
@@ -127,16 +127,16 @@ namespace dnSpy.Text.Editor {
 				timer.Stop();
 				timerStart = null;
 			}
-			Stopwatch timerStart;
+			Stopwatch? timerStart;
 
-			void Timer_Tick(object sender, EventArgs e) {
-				if (owner.IsClosed || !owner.IsVisible || position == null || position.Value > owner.TextSnapshot.Length) {
+			void Timer_Tick(object? sender, EventArgs e) {
+				if (owner.IsClosed || !owner.IsVisible || position is null || position.Value > owner.TextSnapshot.Length) {
 					ClearMouseHoverPositionAndStopTimer();
 					return;
 				}
-				Debug.Assert(timerStart != null);
+				Debug2.Assert(!(timerStart is null));
 				var list = GetHandlersToNotify();
-				if (list != null) {
+				if (!(list is null)) {
 					var mhe = new MouseHoverEventArgs(owner, position.Value, owner.BufferGraph.CreateMappingPoint(new SnapshotPoint(owner.TextSnapshot, position.Value), PointTrackingMode.Positive));
 					foreach (var h in list) {
 						h.Raised = true;
@@ -147,20 +147,20 @@ namespace dnSpy.Text.Editor {
 			}
 
 			long GetElapsedTimerStartTicks() {
-				if (timerStart == null)
+				if (timerStart is null)
 					return 0;
 				return timerStart.ElapsedMilliseconds * 10000;
 			}
 
-			List<MouseHoverHandler> GetHandlersToNotify() {
-				List<MouseHoverHandler> list = null;
+			List<MouseHoverHandler>? GetHandlersToNotify() {
+				List<MouseHoverHandler>? list = null;
 				long elapsedTicks = GetElapsedTimerStartTicks();
 				foreach (var h in handlers) {
 					if (h.Raised)
 						continue;
 					// If it's close enough to the requested time, notify the handler.
 					if (h.DelayTicks - h.DelayTicks / 10 <= elapsedTicks) {
-						if (list == null)
+						if (list is null)
 							list = new List<MouseHoverHandler>();
 						list.Add(h);
 					}
@@ -175,7 +175,7 @@ namespace dnSpy.Text.Editor {
 				if (ticksLeft < 0)
 					StopTimer();
 				else {
-					if (timerStart == null)
+					if (timerStart is null)
 						timerStart = Stopwatch.StartNew();
 					timer.Interval = TimeSpan.FromTicks(Math.Max(10000, ticksLeft));
 					timer.Start();
@@ -183,7 +183,7 @@ namespace dnSpy.Text.Editor {
 			}
 
 			long GetTicksLeft() {
-				if (position == null)
+				if (position is null)
 					return -1;
 				bool found = false;
 				long ticks = long.MaxValue;

@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -85,30 +85,30 @@ namespace dnSpy.AsmEditor.MethodBody {
 				this.appService = appService;
 			}
 
-			public override bool IsEnabled(CodeContext context) => !EditILInstructionsCommand.IsVisibleInternal(context.MenuItemContextOrNull) && context.IsDefinition && EditMethodBodyILCommand.CanExecute(context.Nodes);
+			public override bool IsEnabled(CodeContext context) => !EditILInstructionsCommand.IsVisibleInternal(context.MenuItemContext) && context.IsDefinition && EditMethodBodyILCommand.CanExecute(context.Nodes);
 			public override void Execute(CodeContext context) => EditMethodBodyILCommand.Execute(methodAnnotations, undoCommandService, appService, context.Nodes);
 		}
 
 		static bool CanExecute(DocumentTreeNodeData[] nodes) => nodes.Length == 1 && nodes[0] is MethodNode;
 
-		internal static void Execute(Lazy<IMethodAnnotations> methodAnnotations, Lazy<IUndoCommandService> undoCommandService, IAppService appService, DocumentTreeNodeData[] nodes, uint[] offsets = null) {
+		internal static void Execute(Lazy<IMethodAnnotations> methodAnnotations, Lazy<IUndoCommandService> undoCommandService, IAppService appService, DocumentTreeNodeData[] nodes, uint[]? offsets = null) {
 			if (!CanExecute(nodes))
 				return;
 
 			var methodNode = (MethodNode)nodes[0];
 
 			var module = nodes[0].GetModule();
-			Debug.Assert(module != null);
-			if (module == null)
+			Debug2.Assert(!(module is null));
+			if (module is null)
 				throw new InvalidOperationException();
 
 			var data = new MethodBodyVM(new MethodBodyOptions(methodNode.MethodDef), module, appService.DecompilerService, methodNode.MethodDef.DeclaringType, methodNode.MethodDef);
 			var win = new MethodBodyDlg();
 			win.DataContext = data;
 			win.Owner = appService.MainWindow;
-			win.Title = string.Format("{0} - {1}", win.Title, methodNode.ToString());
+			win.Title = $"{win.Title} - {methodNode.ToString()}";
 
-			if (data.IsCilBody && offsets != null)
+			if (data.IsCilBody && !(offsets is null))
 				data.CilBodyVM.Select(offsets);
 
 			if (win.ShowDialog() != true)
@@ -163,22 +163,22 @@ namespace dnSpy.AsmEditor.MethodBody {
 
 		public override bool IsVisible(IMenuItemContext context) => IsVisibleInternal(context);
 
-		internal static bool IsVisibleInternal(IMenuItemContext context) => IsVisible(BodyCommandUtils.GetStatements(context));
-		static bool IsVisible(IList<MethodSourceStatement> list) =>
-			list != null &&
+		internal static bool IsVisibleInternal(IMenuItemContext? context) => IsVisible(BodyCommandUtils.GetStatements(context, FindByTextPositionOptions.None));
+		static bool IsVisible(IList<MethodSourceStatement>? list) =>
+			!(list is null) &&
 			list.Count != 0 &&
-			list[0].Method.Body != null &&
+			!(list[0].Method.Body is null) &&
 			list[0].Method.Body.Instructions.Count > 0;
 
-		public override void Execute(IMenuItemContext context) => Execute(BodyCommandUtils.GetStatements(context));
+		public override void Execute(IMenuItemContext context) => Execute(BodyCommandUtils.GetStatements(context, FindByTextPositionOptions.None));
 
-		void Execute(IList<MethodSourceStatement> list) {
-			if (list == null)
+		void Execute(IList<MethodSourceStatement>? list) {
+			if (list is null)
 				return;
 
 			var method = list[0].Method;
 			var methodNode = appService.DocumentTreeView.FindNode(method);
-			if (methodNode == null) {
+			if (methodNode is null) {
 				MsgBox.Instance.Show(string.Format(dnSpy_AsmEditor_Resources.Error_CouldNotFindMethod, method));
 				return;
 			}
@@ -186,19 +186,19 @@ namespace dnSpy.AsmEditor.MethodBody {
 			EditMethodBodyILCommand.Execute(methodAnnotations, undoCommandService, appService, new DocumentTreeNodeData[] { methodNode }, BodyCommandUtils.GetInstructionOffsets(method, list));
 		}
 
-		event EventHandler ICommand.CanExecuteChanged {
-			add { CommandManager.RequerySuggested += value; }
-			remove { CommandManager.RequerySuggested -= value; }
+		event EventHandler? ICommand.CanExecuteChanged {
+			add => CommandManager.RequerySuggested += value;
+			remove => CommandManager.RequerySuggested -= value;
 		}
 
-		IList<MethodSourceStatement> GetStatements() {
+		IList<MethodSourceStatement>? GetStatements() {
 			var documentViewer = appService.DocumentTabService.ActiveTab.TryGetDocumentViewer();
-			if (documentViewer == null)
+			if (documentViewer is null)
 				return null;
 			if (!documentViewer.UIObject.IsKeyboardFocusWithin)
 				return null;
 
-			return BodyCommandUtils.GetStatements(documentViewer, documentViewer.Caret.Position.BufferPosition);
+			return BodyCommandUtils.GetStatements(documentViewer, documentViewer.Caret.Position.BufferPosition, FindByTextPositionOptions.None);
 		}
 
 		void ICommand.Execute(object parameter) => Execute(GetStatements());

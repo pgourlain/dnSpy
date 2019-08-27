@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -42,16 +42,16 @@ namespace dnSpy.Debugger.ToolWindows.Threads {
 
 	[Export(typeof(IThreadsContent))]
 	sealed class ThreadsContent : IThreadsContent {
-		public object UIObject => threadsControl;
-		public IInputElement FocusedElement => threadsControl.ListView;
-		public FrameworkElement ZoomElement => threadsControl;
+		public object? UIObject => threadsControl;
+		public IInputElement? FocusedElement => threadsControl.ListView;
+		public FrameworkElement? ZoomElement => threadsControl;
 		public ListView ListView => threadsControl.ListView;
 		public ThreadsOperations Operations { get; }
 
 		readonly ThreadsControl threadsControl;
 		readonly IThreadsVM threadsVM;
 
-		sealed class ControlVM {
+		sealed class ControlVM : ViewModelBase {
 			public IThreadsVM VM { get; }
 			ThreadsOperations Operations { get; }
 
@@ -91,7 +91,7 @@ namespace dnSpy.Debugger.ToolWindows.Threads {
 			wpfCommandService.Add(ControlConstants.GUID_DEBUGGER_THREADS_LISTVIEW, threadsControl.ListView);
 		}
 
-		void ThreadsControl_ThreadsListViewDoubleClick(object sender, EventArgs e) {
+		void ThreadsControl_ThreadsListViewDoubleClick(object? sender, EventArgs e) {
 			bool newTab = Keyboard.Modifiers == ModifierKeys.Shift || Keyboard.Modifiers == ModifierKeys.Control;
 			if (!Operations.IsEditingValues && Operations.CanSwitchToThread)
 				Operations.SwitchToThread(newTab);

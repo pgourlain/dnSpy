@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -25,8 +25,8 @@ using dnSpy.Contracts.Debugger.Breakpoints.Code;
 
 namespace dnSpy.Debugger.Breakpoints.Code {
 	abstract class BoundCodeBreakpointsService {
-		public abstract event EventHandler<DbgCollectionChangedEventArgs<DbgCodeBreakpoint>> BreakpointsChanged;
-		public abstract event EventHandler<DbgBreakpointsModifiedEventArgs> BreakpointsModified;
+		public abstract event EventHandler<DbgCollectionChangedEventArgs<DbgCodeBreakpoint>>? BreakpointsChanged;
+		public abstract event EventHandler<DbgBreakpointsModifiedEventArgs>? BreakpointsModified;
 		public abstract DbgCodeBreakpoint[] Breakpoints { get; }
 		public abstract DbgBoundCodeBreakpoint[] AddBoundBreakpoints_DbgThread(IList<DbgBoundCodeBreakpoint> boundBreakpoints);
 		public abstract void RemoveBoundBreakpoints_DbgThread(IList<DbgBoundCodeBreakpoint> boundBreakpoints);
@@ -35,8 +35,8 @@ namespace dnSpy.Debugger.Breakpoints.Code {
 
 	[Export(typeof(BoundCodeBreakpointsService))]
 	sealed class BoundCodeBreakpointsServiceImpl : BoundCodeBreakpointsService {
-		public override event EventHandler<DbgCollectionChangedEventArgs<DbgCodeBreakpoint>> BreakpointsChanged;
-		public override event EventHandler<DbgBreakpointsModifiedEventArgs> BreakpointsModified;
+		public override event EventHandler<DbgCollectionChangedEventArgs<DbgCodeBreakpoint>>? BreakpointsChanged;
+		public override event EventHandler<DbgBreakpointsModifiedEventArgs>? BreakpointsModified;
 		public override DbgCodeBreakpoint[] Breakpoints => dbgCodeBreakpointsService.Breakpoints;
 
 		readonly DbgManager dbgManager;
@@ -52,13 +52,13 @@ namespace dnSpy.Debugger.Breakpoints.Code {
 			dbgManager.IsDebuggingChanged += DbgManager_IsDebuggingChanged;
 		}
 
-		void DbgCodeBreakpointsService_BreakpointsChanged(object sender, DbgCollectionChangedEventArgs<DbgCodeBreakpoint> e) =>
+		void DbgCodeBreakpointsService_BreakpointsChanged(object? sender, DbgCollectionChangedEventArgs<DbgCodeBreakpoint> e) =>
 			BreakpointsChanged?.Invoke(this, e);
 
-		void DbgCodeBreakpointsService_BreakpointsModified(object sender, DbgBreakpointsModifiedEventArgs e) =>
+		void DbgCodeBreakpointsService_BreakpointsModified(object? sender, DbgBreakpointsModifiedEventArgs e) =>
 			BreakpointsModified?.Invoke(this, e);
 
-		void DbgManager_IsDebuggingChanged(object sender, EventArgs e) =>
+		void DbgManager_IsDebuggingChanged(object? sender, EventArgs e) =>
 			dbgCodeBreakpointsService.UpdateIsDebugging_DbgThread(dbgManager.IsDebugging);
 
 		public override DbgBoundCodeBreakpoint[] AddBoundBreakpoints_DbgThread(IList<DbgBoundCodeBreakpoint> boundBreakpoints) =>

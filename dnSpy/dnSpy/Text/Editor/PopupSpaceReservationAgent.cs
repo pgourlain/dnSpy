@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -32,11 +32,11 @@ using Microsoft.VisualStudio.Text.Formatting;
 
 namespace dnSpy.Text.Editor {
 	sealed class PopupSpaceReservationAgent : ISpaceReservationAgent {
-		bool IsVisible => popup.Child != null;
+		bool IsVisible => !(popup.Child is null);
 		public bool HasFocus => IsVisible && popup.IsKeyboardFocusWithin;
 		public bool IsMouseOver => IsVisible && popup.IsMouseOver;
-		public event EventHandler GotFocus;
-		public event EventHandler LostFocus;
+		public event EventHandler? GotFocus;
+		public event EventHandler? LostFocus;
 
 		readonly ISpaceReservationManager spaceReservationManager;
 		readonly IWpfTextView wpfTextView;
@@ -65,8 +65,8 @@ namespace dnSpy.Text.Editor {
 			};
 		}
 
-		void Content_GotFocus(object sender, RoutedEventArgs e) => GotFocus?.Invoke(this, EventArgs.Empty);
-		void Content_LostFocus(object sender, RoutedEventArgs e) => LostFocus?.Invoke(this, EventArgs.Empty);
+		void Content_GotFocus(object? sender, RoutedEventArgs e) => GotFocus?.Invoke(this, EventArgs.Empty);
+		void Content_LostFocus(object? sender, RoutedEventArgs e) => LostFocus?.Invoke(this, EventArgs.Empty);
 
 		internal void Update(ITrackingSpan visualSpan, PopupStyles style) {
 			if ((style & (PopupStyles.DismissOnMouseLeaveText | PopupStyles.DismissOnMouseLeaveTextOrContent)) == (PopupStyles.DismissOnMouseLeaveText | PopupStyles.DismissOnMouseLeaveTextOrContent))
@@ -137,9 +137,9 @@ namespace dnSpy.Text.Editor {
 		Rect ToScreenRect(Rect wpfRect) => new Rect(ToScreenPoint(wpfRect.TopLeft), ToScreenPoint(wpfRect.BottomRight));
 		Point ToScreenPoint(Point point) => wpfTextView.VisualElement.PointToScreen(point);
 
-		public Geometry PositionAndDisplay(Geometry reservedSpace) {
+		public Geometry? PositionAndDisplay(Geometry reservedSpace) {
 			var spanBoundsTmp = GetVisualSpanBounds();
-			if (spanBoundsTmp == null || spanBoundsTmp.Value.IsEmpty)
+			if (spanBoundsTmp is null || spanBoundsTmp.Value.IsEmpty)
 				return null;
 			var spanBounds = WpfTextViewRectToScreenRect(spanBoundsTmp.Value);
 			var desiredSize = ToScreenSize(PopupSize);
@@ -159,7 +159,7 @@ namespace dnSpy.Text.Editor {
 				}
 			}
 
-			if (popupRect == null)
+			if (popupRect is null)
 				return null;
 			var viewRelativeRect = PopupHelper.TransformFromDevice(wpfTextView, popupRect.Value);
 
@@ -185,7 +185,7 @@ namespace dnSpy.Text.Editor {
 		}
 
 		Rect GetClosest(Rect spanBounds, Rect? rect, Rect candidate, PopupStyles style) {
-			if (rect == null)
+			if (rect is null)
 				return candidate;
 			double rectDist, candidateDist;
 			if ((style & PopupStyles.PositionLeftOrRight) != 0) {
@@ -289,7 +289,7 @@ namespace dnSpy.Text.Editor {
 
 		bool IsMouseOverSpan(MouseEventArgs e) {
 			var rect = GetVisualSpanBounds();
-			if (rect == null)
+			if (rect is null)
 				return false;
 			var point = e.MouseDevice.GetPosition(wpfTextView.VisualElement);
 			point.X += wpfTextView.ViewportLeft;
@@ -305,30 +305,30 @@ namespace dnSpy.Text.Editor {
 			return false;
 		}
 
-		void Content_MouseLeave(object sender, MouseEventArgs e) {
+		void Content_MouseLeave(object? sender, MouseEventArgs e) {
 			if (!popup.IsOpen)
 				return;
 			if (!IsMouseOverValidLocation(e))
 				spaceReservationManager.RemoveAgent(this);
 		}
 
-		void VisualElement_PreviewMouseMove(object sender, MouseEventArgs e) {
+		void VisualElement_PreviewMouseMove(object? sender, MouseEventArgs e) {
 			if (!popup.IsOpen)
 				return;
 			if (!IsMouseOverValidLocation(e))
 				spaceReservationManager.RemoveAgent(this);
 		}
 
-		void WpfTextView_LostAggregateFocus(object sender, EventArgs e) => spaceReservationManager.RemoveAgent(this);
-		void Window_LocationChanged(object sender, EventArgs e) => spaceReservationManager.RemoveAgent(this);
-		void Content_SizeChanged(object sender, SizeChangedEventArgs e) => wpfTextView.QueueSpaceReservationStackRefresh();
+		void WpfTextView_LostAggregateFocus(object? sender, EventArgs e) => spaceReservationManager.RemoveAgent(this);
+		void Window_LocationChanged(object? sender, EventArgs e) => spaceReservationManager.RemoveAgent(this);
+		void Content_SizeChanged(object? sender, SizeChangedEventArgs e) => wpfTextView.QueueSpaceReservationStackRefresh();
 
 		void AddEvents() {
 			wpfTextView.LostAggregateFocus += WpfTextView_LostAggregateFocus;
 			if (content is FrameworkElement fwElem)
 				fwElem.SizeChanged += Content_SizeChanged;
 			var window = Window.GetWindow(wpfTextView.VisualElement);
-			if (window != null)
+			if (!(window is null))
 				window.LocationChanged += Window_LocationChanged;
 			content.GotFocus += Content_GotFocus;
 			content.LostFocus += Content_LostFocus;
@@ -344,7 +344,7 @@ namespace dnSpy.Text.Editor {
 			if (content is FrameworkElement fwElem)
 				fwElem.SizeChanged -= Content_SizeChanged;
 			var window = Window.GetWindow(wpfTextView.VisualElement);
-			if (window != null)
+			if (!(window is null))
 				window.LocationChanged -= Window_LocationChanged;
 			content.GotFocus -= Content_GotFocus;
 			content.LostFocus -= Content_LostFocus;

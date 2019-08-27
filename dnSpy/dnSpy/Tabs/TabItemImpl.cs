@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -30,7 +30,7 @@ namespace dnSpy.Tabs {
 		readonly ITabContent tabContent;
 
 		public bool IsActive {
-			get { return isActive; }
+			get => isActive;
 			set {
 				if (isActive != value) {
 					isActive = value;
@@ -45,7 +45,7 @@ namespace dnSpy.Tabs {
 			readonly TabItemImpl impl;
 
 			public bool IsSelected {
-				get { return isSelected; }
+				get => isSelected;
 				set {
 					if (isSelected != value) {
 						isSelected = value;
@@ -58,8 +58,8 @@ namespace dnSpy.Tabs {
 			public bool IsActive => impl.IsActive;
 			internal void IsActiveChanged() => OnPropertyChanged(nameof(IsActive));
 
-			public object ToolTip => impl.tabContent.ToolTip;
-			public string Header => impl.tabContent.Title;
+			public object? ToolTip => impl.tabContent.ToolTip;
+			public string? Header => impl.tabContent.Title;
 			public ICommand CloseCommand => new RelayCommand(a => impl.Close(), a => impl.CanClose);
 
 			public TheHeader(TabItemImpl impl) {
@@ -76,14 +76,14 @@ namespace dnSpy.Tabs {
 		}
 
 		internal TabGroup Owner {
-			get { return tabGroup; }
-			set { tabGroup = value; }
+			get => tabGroup;
+			set => tabGroup = value;
 		}
 		TabGroup tabGroup;
 
 		readonly TheHeader theHeader;
 
-		public TabItemImpl(TabGroup tabGroup, ITabContent tabContent, object objStyle) {
+		public TabItemImpl(TabGroup tabGroup, ITabContent tabContent, object? objStyle) {
 			this.tabGroup = tabGroup;
 			this.tabContent = tabContent;
 			Content = tabContent.UIObject;
@@ -109,10 +109,10 @@ namespace dnSpy.Tabs {
 			}
 		}
 
-		void GotKeyboardFocus2(object sender, KeyboardFocusChangedEventArgs e) =>
+		void GotKeyboardFocus2(object? sender, KeyboardFocusChangedEventArgs e) =>
 			tabContent.OnVisibilityChanged(TabContentVisibilityEvent.GotKeyboardFocus);
 
-		void LostKeyboardFocus2(object sender, KeyboardFocusChangedEventArgs e) =>
+		void LostKeyboardFocus2(object? sender, KeyboardFocusChangedEventArgs e) =>
 			tabContent.OnVisibilityChanged(TabContentVisibilityEvent.LostKeyboardFocus);
 
 		protected override void OnSelected(RoutedEventArgs e) {
@@ -145,7 +145,7 @@ namespace dnSpy.Tabs {
 				npc.PropertyChanged -= TabContent_PropertyChanged;
 		}
 
-		void TabContent_PropertyChanged(object sender, PropertyChangedEventArgs e) {
+		void TabContent_PropertyChanged(object? sender, PropertyChangedEventArgs e) {
 			theHeader.TabContentPropertyChanged(e.PropertyName);
 			if (e.PropertyName == nameof(tabContent.UIObject))
 				Content = tabContent.UIObject;

@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -19,13 +19,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading;
 using dnlib.DotNet;
 using dnlib.IO;
 using dnSpy.Contracts.Decompiler;
+using dnSpy.Contracts.DnSpy.Properties;
 using dnSpy.Contracts.Images;
-using dnSpy.Contracts.Properties;
 using dnSpy.Contracts.Text;
 using dnSpy.Contracts.TreeView;
 using dnSpy.Contracts.Utilities;
@@ -34,7 +33,7 @@ namespace dnSpy.Contracts.Documents.TreeView.Resources {
 	/// <summary>
 	/// Resource node base class
 	/// </summary>
-	public abstract class ResourceNode : DocumentTreeNodeData, IResourceDataProvider {
+	public abstract class ResourceNode : DocumentTreeNodeData, IResourceNode {
 		/// <summary>
 		/// Gets the resource
 		/// </summary>
@@ -46,8 +45,14 @@ namespace dnSpy.Contracts.Documents.TreeView.Resources {
 		public string Name => Resource.Name;
 
 		/// <inheritdoc/>
-		protected sealed override void WriteCore(ITextColorWriter output, IDecompiler decompiler, DocumentNodeWriteOptions options) =>
+		protected sealed override void WriteCore(ITextColorWriter output, IDecompiler decompiler, DocumentNodeWriteOptions options) {
 			output.WriteFilename(Resource.Name);
+			if ((options & DocumentNodeWriteOptions.ToolTip) != 0) {
+				output.WriteLine();
+				WriteFilename(output);
+			}
+		}
+
 		/// <inheritdoc/>
 		protected sealed override ImageReference? GetExpandedIcon(IDotNetImageService dnImgMgr) => null;
 
@@ -72,20 +77,20 @@ namespace dnSpy.Contracts.Documents.TreeView.Resources {
 		/// <summary>
 		/// Gets the offset of the resource
 		/// </summary>
-		public ulong FileOffset {
+		public uint FileOffset {
 			get {
 				GetModuleOffset(out var fo);
-				return (ulong)fo;
+				return (uint)fo;
 			}
 		}
 
 		/// <summary>
 		/// Gets the length of the resource
 		/// </summary>
-		public ulong Length {
+		public uint Length {
 			get {
 				var er = Resource as EmbeddedResource;
-				return er == null ? 0 : (ulong)er.Data.Length;
+				return er is null ? 0 : er.Length;
 			}
 		}
 
@@ -95,30 +100,33 @@ namespace dnSpy.Contracts.Documents.TreeView.Resources {
 		public uint RVA {
 			get {
 				var module = GetModuleOffset(out var fo);
-				if (module == null)
+				if (module is null)
 					return 0;
 
-				return (uint)module.MetaData.PEImage.ToRVA(fo);
+				return (uint)module.Metadata.PEImage.ToRVA(fo);
 			}
 		}
 
-		ModuleDefMD GetModuleOffset(out FileOffset fileOffset) {
+		ModuleDefMD? GetModuleOffset(out FileOffset fileOffset) =>
+			GetModuleOffset(this, Resource, out fileOffset);
+
+		internal static ModuleDefMD? GetModuleOffset(DocumentTreeNodeData node, Resource resource, out FileOffset fileOffset) {
 			fileOffset = 0;
 
-			var er = Resource as EmbeddedResource;
-			if (er == null)
+			var er = resource as EmbeddedResource;
+			if (er is null)
 				return null;
 
-			var module = this.GetModule() as ModuleDefMD;//TODO: Support CorModuleDef
-			if (module == null)
+			var module = node.GetModule() as ModuleDefMD;//TODO: Support CorModuleDef
+			if (module is null)
 				return null;
 
-			fileOffset = er.Data.FileOffset;
+			fileOffset = (FileOffset)er.CreateReader().StartOffset;
 			return module;
 		}
 
 		/// <inheritdoc/>
-		public override ITreeNodeGroup TreeNodeGroup => treeNodeGroup;
+		public override ITreeNodeGroup? TreeNodeGroup => treeNodeGroup;
 		readonly ITreeNodeGroup treeNodeGroup;
 
 		/// <summary>
@@ -143,20 +151,20 @@ namespace dnSpy.Contracts.Documents.TreeView.Resources {
 			output.WriteOffsetComment(this, showOffset);
 			const string LTR = "\u200E";
 			output.Write(NameUtilities.CleanName(Name) + LTR, this, DecompilerReferenceFlags.Local | DecompilerReferenceFlags.Definition, BoxedTextColor.Comment);
-			string extra = null;
+			string? extra = null;
 			switch (Resource.ResourceType) {
 			case ResourceType.AssemblyLinked:
 				extra = ((AssemblyLinkedResource)Resource).Assembly.FullName;
 				break;
 			case ResourceType.Linked:
 				var file = ((LinkedResource)Resource).File;
-				extra = string.Format("{0}, {1}, {2}", file.Name, file.ContainsNoMetaData ? "ContainsNoMetaData" : "ContainsMetaData", SimpleTypeConverter.ByteArrayToString(file.HashValue));
+				extra = $"{file.Name}, {(file.ContainsNoMetadata ? "ContainsNoMetaData" : "ContainsMetaData")}, {SimpleTypeConverter.ByteArrayToString(file.HashValue)}";
 				break;
 			case ResourceType.Embedded:
-				extra = string.Format(dnSpy_Contracts_DnSpy_Resources.NumberOfBytes, ((EmbeddedResource)Resource).Data.Length);
+				extra = string.Format(dnSpy_Contracts_DnSpy_Resources.NumberOfBytes, ((EmbeddedResource)Resource).Length);
 				break;
 			}
-			output.Write(string.Format(" ({0}{1}, {2})", extra == null ? string.Empty : string.Format("{0}, ", extra), Resource.ResourceType, Resource.Attributes), BoxedTextColor.Comment);
+			output.Write($" ({(extra is null ? string.Empty : $"{extra}, ")}{Resource.ResourceType}, {Resource.Attributes})", BoxedTextColor.Comment);
 			decompiler.WriteCommentEnd(output, true);
 			output.WriteLine();
 		}
@@ -167,7 +175,7 @@ namespace dnSpy.Contracts.Documents.TreeView.Resources {
 		/// <param name="token">Cancellation token</param>
 		/// <param name="canDecompile">true if the data can be decompiled</param>
 		/// <returns></returns>
-		public virtual string ToString(CancellationToken token, bool canDecompile) => null;
+		public virtual string? ToString(CancellationToken token, bool canDecompile) => null;
 
 		/// <inheritdoc/>
 		public IEnumerable<ResourceData> GetResourceData(ResourceDataType type) {
@@ -193,10 +201,45 @@ namespace dnSpy.Contracts.Documents.TreeView.Resources {
 		/// <returns></returns>
 		protected virtual IEnumerable<ResourceData> GetSerializedData() {
 			if (Resource is EmbeddedResource er)
-				yield return new ResourceData(Resource.Name, token => new MemoryStream(er.GetResourceData()));
+				yield return new ResourceData(Resource.Name, token => er.CreateReader().AsStream());
 		}
 
 		/// <inheritdoc/>
 		public sealed override FilterType GetFilterType(IDocumentTreeNodeFilter filter) => filter.GetResult(this).FilterType;
+
+		sealed class Data {
+			public readonly Resource Resource;
+			public Data(Resource resource) => Resource = resource;
+		}
+
+		/// <summary>
+		/// Gets the resource or null
+		/// </summary>
+		/// <param name="node">Node</param>
+		/// <returns></returns>
+		public static Resource? GetResource(DocumentTreeNodeData node) {
+			if (node is ResourceNode resourceNode)
+				return resourceNode.Resource;
+			if (node.TryGetData(out Data? data))
+				return data.Resource;
+			return null;
+		}
+
+		/// <summary>
+		/// Adds the resource to a resource node
+		/// </summary>
+		/// <param name="node">Node</param>
+		/// <param name="resource">Resource</param>
+		public static void AddResource(DocumentTreeNodeData node, Resource resource) {
+			if (node is ResourceNode resourceNode) {
+				if (resourceNode.Resource != resource)
+					throw new InvalidOperationException();
+			}
+			else {
+				if (node.TryGetData<Data>(out _))
+					throw new InvalidOperationException();
+				node.AddData(new Data(resource));
+			}
+		}
 	}
 }

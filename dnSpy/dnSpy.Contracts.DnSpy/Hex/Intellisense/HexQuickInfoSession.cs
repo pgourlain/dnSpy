@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -43,7 +43,7 @@ namespace dnSpy.Contracts.Hex.Intellisense {
 		/// <summary>
 		/// Raised after <see cref="ApplicableToSpan"/> is changed
 		/// </summary>
-		public abstract event EventHandler ApplicableToSpanChanged;
+		public abstract event EventHandler? ApplicableToSpanChanged;
 
 		/// <summary>
 		/// true if the mouse is tracked

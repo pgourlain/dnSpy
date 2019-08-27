@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -64,8 +64,8 @@ namespace dnSpy.Bookmarks.Impl {
 			uiDispatcher.UI(() => ignoreSave = false);
 		}
 
-		void BookmarksService_BookmarksChanged(object sender, CollectionChangedEventArgs<Bookmark> e) => Save();
-		void BookmarksService_BookmarksModified(object sender, BookmarksModifiedEventArgs e) => Save();
+		void BookmarksService_BookmarksChanged(object? sender, CollectionChangedEventArgs<Bookmark> e) => Save();
+		void BookmarksService_BookmarksModified(object? sender, BookmarksModifiedEventArgs e) => Save();
 
 		void Save() {
 			uiDispatcher.VerifyAccess();

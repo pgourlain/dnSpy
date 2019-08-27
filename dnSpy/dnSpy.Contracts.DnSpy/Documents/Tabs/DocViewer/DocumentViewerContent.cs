@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using dnSpy.Contracts.Decompiler;
 using dnSpy.Contracts.Text;
 
@@ -58,14 +59,14 @@ namespace dnSpy.Contracts.Documents.Tabs.DocViewer {
 		/// <param name="referenceCollection">References</param>
 		/// <param name="customDataDict">Custom data dictionary</param>
 		internal DocumentViewerContent(string text, CachedTextColorsCollection colorCollection, SpanDataCollection<ReferenceInfo> referenceCollection, Dictionary<string, object> customDataDict) {
-			if (colorCollection == null)
+			if (colorCollection is null)
 				throw new ArgumentNullException(nameof(colorCollection));
 			colorCollection.Freeze();
 			Text = text ?? throw new ArgumentNullException(nameof(text));
 			ColorCollection = colorCollection;
 			ReferenceCollection = referenceCollection ?? throw new ArgumentNullException(nameof(referenceCollection));
 			this.customDataDict = customDataDict ?? throw new ArgumentNullException(nameof(customDataDict));
-			MethodDebugInfos = (IReadOnlyList<MethodDebugInfo>)GetCustomData<ReadOnlyCollection<MethodDebugInfo>>(DocumentViewerContentDataIds.DebugInfo) ?? Array.Empty<MethodDebugInfo>();
+			MethodDebugInfos = (IReadOnlyList<MethodDebugInfo>?)GetCustomData<ReadOnlyCollection<MethodDebugInfo>>(DocumentViewerContentDataIds.DebugInfo) ?? Array.Empty<MethodDebugInfo>();
 		}
 
 		/// <summary>
@@ -76,8 +77,8 @@ namespace dnSpy.Contracts.Documents.Tabs.DocViewer {
 		/// <param name="data">Updated with data</param>
 		/// <returns></returns>
 		public bool TryGetCustomData<TData>(string id, out TData data) {
-			if (!customDataDict.TryGetValue(id, out object obj)) {
-				data = default;
+			if (!customDataDict.TryGetValue(id, out var obj)) {
+				data = default!;
 				return false;
 			}
 
@@ -91,9 +92,10 @@ namespace dnSpy.Contracts.Documents.Tabs.DocViewer {
 		/// <typeparam name="TData">Type of data</typeparam>
 		/// <param name="id">Key, eg., <see cref="DocumentViewerContentDataIds.DebugInfo"/></param>
 		/// <returns></returns>
+		[return: MaybeNull]
 		public TData GetCustomData<TData>(string id) {
-			if (!customDataDict.TryGetValue(id, out object obj))
-				return default;
+			if (!customDataDict.TryGetValue(id, out var obj))
+				return default!;
 			return (TData)obj;
 		}
 	}

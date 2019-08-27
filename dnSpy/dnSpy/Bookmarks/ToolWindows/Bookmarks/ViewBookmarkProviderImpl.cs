@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -28,14 +28,14 @@ using dnSpy.UI;
 namespace dnSpy.Bookmarks.ToolWindows.Bookmarks {
 	[Export(typeof(ViewBookmarkProvider))]
 	sealed class ViewBookmarkProviderImpl : ViewBookmarkProvider {
-		public override event EventHandler BookmarksViewOrderChanged;
+		public override event EventHandler? BookmarksViewOrderChanged;
 		public override IList<Bookmark> BookmarksViewOrder => allBookmarks;
 		public override Bookmark DefaultBookmark => allBookmarks.FirstOrDefault();
 
 		readonly UIDispatcher uiDispatcher;
 		readonly BookmarksService bookmarksService;
 		readonly Lazy<IBookmarksVM> bookmarksVM;
-		Bookmark activeBookmark;
+		Bookmark? activeBookmark;
 		Bookmark[] allBookmarks;
 
 		[ImportingConstructor]
@@ -57,11 +57,11 @@ namespace dnSpy.Bookmarks.ToolWindows.Bookmarks {
 			BookmarksVM_OnShowChanged();
 		}
 
-		void BookmarksVM_OnShowChanged(object sender, EventArgs e) => BookmarksVM_OnShowChanged();
+		void BookmarksVM_OnShowChanged(object? sender, EventArgs e) => BookmarksVM_OnShowChanged();
 		void BookmarksVM_OnShowChanged() => UpdateBookmarks_UI();
-		void BookmarksVM_AllItemsFiltered(object sender, EventArgs e) => UpdateBookmarks_UI();
+		void BookmarksVM_AllItemsFiltered(object? sender, EventArgs e) => UpdateBookmarks_UI();
 
-		void BookmarksService_BookmarksChanged(object sender, CollectionChangedEventArgs<Bookmark> e) =>
+		void BookmarksService_BookmarksChanged(object? sender, CollectionChangedEventArgs<Bookmark> e) =>
 			// Add an extra UI() so it's guaranteed to be called after BookmarksVM's handler
 			UI(() => UI(() => BookmarksService_BookmarksChanged_UI(e)));
 		void BookmarksService_BookmarksChanged_UI(CollectionChangedEventArgs<Bookmark> e) => UpdateBookmarks_UI();
@@ -69,8 +69,7 @@ namespace dnSpy.Bookmarks.ToolWindows.Bookmarks {
 		void UpdateBookmarks_UI() {
 			uiDispatcher.VerifyAccess();
 			if (bookmarksVM.Value.IsOpen) {
-				//TODO: This should be view order
-				var bookmarks = bookmarksVM.Value.AllItems.Select(a => a.Bookmark).ToArray();
+				var bookmarks = bookmarksVM.Value.Sort(bookmarksVM.Value.AllItems).Select(a => a.Bookmark).ToArray();
 				UpdateBookmarks_UI(bookmarks);
 			}
 			else {

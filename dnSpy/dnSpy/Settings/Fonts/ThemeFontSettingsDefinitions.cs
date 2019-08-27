@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -22,15 +22,15 @@ using dnSpy.Contracts.Settings.Fonts;
 
 namespace dnSpy.Settings.Fonts {
 	static class ThemeFontSettingsDefinitions {
-#pragma warning disable 0169
+#pragma warning disable CS0169
 		[ExportThemeFontSettingsDefinition(AppearanceCategoryConstants.TextEditor, FontType.TextEditor)]
-		static readonly ThemeFontSettingsDefinition textEditorThemeFontSettingsDefinition;
+		static readonly ThemeFontSettingsDefinition? textEditorThemeFontSettingsDefinition;
 
 		[ExportThemeFontSettingsDefinition(AppearanceCategoryConstants.HexEditor, FontType.HexEditor)]
-		static readonly ThemeFontSettingsDefinition hexEditorThemeFontSettingsDefinition;
+		static readonly ThemeFontSettingsDefinition? hexEditorThemeFontSettingsDefinition;
 
 		[ExportThemeFontSettingsDefinition(AppearanceCategoryConstants.UIMisc, FontType.UI)]
-		static readonly ThemeFontSettingsDefinition uiThemeFontSettingsDefinition;
-#pragma warning restore 0169
+		static readonly ThemeFontSettingsDefinition? uiThemeFontSettingsDefinition;
+#pragma warning restore CS0169
 	}
 }

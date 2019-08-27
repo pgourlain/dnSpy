@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -81,7 +81,7 @@ namespace dnSpy.Debugger.ToolWindows.Modules {
 		}
 
 		// DbgManager thread
-		void DbgModule_PropertyChanged(object sender, PropertyChangedEventArgs e) =>
+		void DbgModule_PropertyChanged(object? sender, PropertyChangedEventArgs e) =>
 			Context.UIDispatcher.UI(() => DbgModule_PropertyChanged_UI(e.PropertyName));
 
 		// UI thread

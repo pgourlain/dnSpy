@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2017 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -26,11 +26,11 @@ namespace dnSpy.Contracts.Documents.Tabs.DocViewer {
 	/// <summary>
 	/// Reference info
 	/// </summary>
-	public struct ReferenceInfo : IEquatable<ReferenceInfo> {
+	public readonly struct ReferenceInfo : IEquatable<ReferenceInfo> {
 		/// <summary>
 		/// Gets the reference or null
 		/// </summary>
-		public object Reference { get; }
+		public object? Reference { get; }
 
 		/// <summary>
 		/// Gets the flags
@@ -58,11 +58,16 @@ namespace dnSpy.Contracts.Documents.Tabs.DocViewer {
 		public bool IsHidden => (Flags & DecompilerReferenceFlags.Hidden) != 0;
 
 		/// <summary>
+		/// true if reference can't be followed
+		/// </summary>
+		public bool NoFollow => (Flags & DecompilerReferenceFlags.NoFollow) != 0;
+
+		/// <summary>
 		/// Constructor
 		/// </summary>
 		/// <param name="reference">Reference or null</param>
 		/// <param name="flags">Flags</param>
-		public ReferenceInfo(object reference, DecompilerReferenceFlags flags) {
+		public ReferenceInfo(object? reference, DecompilerReferenceFlags flags) {
 			Reference = reference;
 			Flags = flags;
 		}
@@ -108,7 +113,7 @@ namespace dnSpy.Contracts.Documents.Tabs.DocViewer {
 		/// </summary>
 		/// <param name="obj"></param>
 		/// <returns></returns>
-		public override bool Equals(object obj) => obj is ReferenceInfo && Equals((ReferenceInfo)obj);
+		public override bool Equals(object? obj) => obj is ReferenceInfo && Equals((ReferenceInfo)obj);
 
 		/// <summary>
 		/// GetHashCode()
